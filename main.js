@@ -38,6 +38,13 @@ app.get('/', (req, res) => {
  * @param {string} y 光圈Y坐标
  * @param {boolean} tp 是否透明背景
  */
+let browser;
+(async function () {
+    browser = await puppeteer.launch({
+        headless: "new",
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+})()
 app.get('/balogo', async function (ctx, res) {
     console.log(ctx.query);
 
@@ -48,10 +55,6 @@ app.get('/balogo', async function (ctx, res) {
     y = ctx.query.y || "0";
     tp = ctx.query.tp || false;
 
-    const browser = await puppeteer.launch({
-        headless: "new",
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
     const page = await browser.newPage();
     await page.goto(`http://127.0.0.1:${port}/`);
     const client = await page.target().createCDPSession();
@@ -79,12 +82,12 @@ app.get('/balogo', async function (ctx, res) {
     await page.waitForSelector('#loading.hidden');
     await page.waitForSelector('#loading:not(.hidden)');
     await page.waitForSelector('#loading.hidden');
-    await sleep(500);
+    await sleep(100);
     const imgButton = await page.waitForSelector("#base64")
     await imgButton.click();
-    await sleep(500);
+    await sleep(100);
     const imgBase64 = await page.$eval('#base64', el => el.innerText);
-    await browser.close()
+    await page.close();
     // 将获取到的Base64编码转为Buffer
     res.setHeader('Access-Control-Allow-Origin', '*')
     const base64 = imgBase64.replace(/^data:image\/\w+;base64,/, "");
