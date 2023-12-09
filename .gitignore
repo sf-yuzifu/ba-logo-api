@@ -23,11 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-/fonts
-public/fonts/*/*
-public/*.*
-!public/fonts/RoGSans/font.css
-
 # Local Netlify folder
 .netlify
 

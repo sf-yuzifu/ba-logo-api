@@ -1,9 +1,7 @@
 // 导入所需库
 const puppeteer = require("puppeteer");
-const {readdir, createReadStream, existsSync, readdirSync, statSync, unlinkSync, rmdirSync} = require("fs");
-const {join} = require("path");
 // 初始化API参数
-let textL = "小鱼";
+let textL = "蔚蓝";
 let textR = "档案";
 let x = "-15";
 let y = "0";
@@ -16,25 +14,6 @@ const sleep = (timeout) => {
         }, timeout)
     })
 }
-// 删除文件夹
-const _deleteDir = (url) => {
-    let files = [];
-    if (existsSync(url)) {
-        files = readdirSync(url);
-        files.forEach(function (file) {
-            let curPath = join(url, file);
-            if (statSync(curPath).isDirectory()) {
-                _deleteDir(curPath);
-            } else {
-                unlinkSync(curPath);
-            }
-        });
-        rmdirSync(url);
-        console.log('清除目录', url);
-    } else {
-        console.log('路径不存在！');
-    }
-}
 // 服务器配置
 const express = require('express')
 const app = express()
@@ -43,6 +22,12 @@ const cors = require('cors')
 app.use(cors())
 app.listen(port, () => {
     console.log(`Server is running on http://127.0.0.1:${port}/`)
+});
+
+// 新建本地生成器
+app.use(express.static('public'));
+app.get('/', (req, res) => {
+    res.render('index');
 });
 
 /**
@@ -57,17 +42,18 @@ app.get('/balogo', async function (ctx, res) {
     console.log(ctx.query);
 
     let random = Math.random().toString(36).slice(-8);
-    textL = ctx.query.l || "";
-    textR = ctx.query.r || "";
+    textL = ctx.query.l || "蔚蓝";
+    textR = ctx.query.r || "档案";
     x = ctx.query.x || "-15";
     y = ctx.query.y || "0";
     tp = ctx.query.tp || false;
 
     const browser = await puppeteer.launch({
-        headless: true
+        headless: "new",
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
-    await page.goto("https://tmp.nulla.top/ba-logo/");
+    await page.goto(`http://127.0.0.1:${port}/`);
     const client = await page.target().createCDPSession();
     await client.send('Page.setDownloadBehavior', {
         behavior: 'allow',
@@ -94,25 +80,15 @@ app.get('/balogo', async function (ctx, res) {
     await page.waitForSelector('#loading:not(.hidden)');
     await page.waitForSelector('#loading.hidden');
     await sleep(500);
-    await page.evaluate(() => {
-        document.querySelector("#save").click();
-    });
+    const imgButton = await page.waitForSelector("#base64")
+    await imgButton.click();
     await sleep(500);
+    const imgBase64 = await page.$eval('#base64', el => el.innerText);
     await browser.close()
-
-    readdir(`./pic/${random}/`, {recursive: false}, (err, files) => {
-        console.log(files)
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        const cs = createReadStream(`./pic/${random}/${files[0]}`);
-        cs.on("data", chunk => {
-            res.write(chunk);
-        })
-        cs.on("end", () => {
-            res.status(200);
-            res.end();
-            _deleteDir(`./pic/${random}/`);
-        })
-    })
+    // 将获取到的Base64编码转为Buffer
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    const base64 = imgBase64.replace(/^data:image\/\w+;base64,/, "");
+    res.write(new Buffer.from(base64, 'base64'));
+    res.status(200);
+    res.end();
 })
-
-
