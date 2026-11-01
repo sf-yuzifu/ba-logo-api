@@ -125,6 +125,38 @@ describe('Renderer Core Unit Tests', () => {
     expect(whiteTp.height).toBe(normalTp.height);
   });
 
+  it('应当完美支持 CSS 语法 padding（单值、双值、四值及上下左右全向加白）', () => {
+    // 0 padding 紧贴边缘基准
+    const base = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 1, padding: 0 });
+
+    // 单值数字：四周各 +10px
+    const pad10 = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 1, padding: 10 });
+    expect(pad10.width).toBe(base.width + 20); // 左右各加 10
+    expect(pad10.height).toBe(base.height + 20); // 上下各加 10
+
+    // CSS 双值字符串 "10 30"：上下 10，左右 30
+    const pad2Val = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 1, padding: '10 30' });
+    expect(pad2Val.width).toBe(base.width + 60); // 左右各 30 -> 60
+    expect(pad2Val.height).toBe(base.height + 20); // 上下各 10 -> 20
+
+    // CSS 四值字符串 "5 15 25 35"：上 5，右 15，下 25，左 35
+    const pad4Val = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 1, padding: '5 15 25 35' });
+    expect(pad4Val.width).toBe(base.width + 15 + 35);
+    expect(pad4Val.height).toBe(base.height + 5 + 25);
+
+    // 独立方向参数覆盖
+    const padOverride = renderLogo({
+      textL: '蔚蓝',
+      textR: '档案',
+      scale: 1,
+      padding: 0,
+      paddingTop: 12,
+      paddingLeft: 24,
+    });
+    expect(padOverride.width).toBe(base.width + 24);
+    expect(padOverride.height).toBe(base.height + 12);
+  });
+
   it('单次渲染性能基准测试应当小于 50ms', () => {
     const start = performance.now();
     renderLogoToBuffer({ textL: '蔚蓝', textR: '档案', scale: 1 });

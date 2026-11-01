@@ -771,15 +771,14 @@ export function getWebUIHtml(): string {
         </div>
       </div>
 
-      <!-- 紧凑边距 -->
+      <!-- 留白边距 -->
       <div class="form-group" id="paddingGroup">
         <label class="form-label">
-          <span>边缘留白边距 (PADDING)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">默认 2px 贴边</span>
+          <span>留白边距 (PADDING - 支持 CSS 语法)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">如 2、10 20、10 20 30 40</span>
         </label>
-        <div class="range-group">
-          <input type="range" id="inputPadding" min="0" max="60" value="2">
-          <span class="range-val" id="valPadding">2px</span>
+        <div class="form-row">
+          <input type="text" id="inputPadding" class="input-text" value="2" placeholder="默认 2px，或输入 CSS 边距如 10 20">
         </div>
       </div>
 
@@ -901,7 +900,7 @@ export function getWebUIHtml(): string {
       transparent: false,
       dark: false,
       swap: false,
-      padding: 2,
+      padding: '2',
       center: true
     };
 
@@ -917,7 +916,6 @@ export function getWebUIHtml(): string {
     const valX = document.getElementById('valX');
     const valY = document.getElementById('valY');
     const elPadding = document.getElementById('inputPadding');
-    const valPadding = document.getElementById('valPadding');
     const elTp = document.getElementById('toggleTp');
     const elDark = document.getElementById('toggleDark');
     const elSwap = document.getElementById('toggleSwap');
@@ -962,7 +960,9 @@ export function getWebUIHtml(): string {
         if (state.dark) params.set('dark', 'true');
         if (state.swap) params.set('swap', 'true');
         if (state.format !== 'png') params.set('format', state.format);
-        if (state.padding !== 2) params.set('padding', state.padding);
+        if (state.padding && state.padding !== '2' && state.padding !== 2) {
+          params.set('padding', state.padding);
+        }
         if (state.center !== !state.transparent) params.set('center', String(state.center));
         const qs = params.toString();
         return '/balogo' + (qs ? '?' + qs : '');
@@ -987,7 +987,9 @@ export function getWebUIHtml(): string {
       if (state.transparent) params.set('transparent', 'true');
       if (state.dark) params.set('darkMode', 'true');
       if (state.swap) params.set('swapColors', 'true');
-      if (state.padding !== 2) params.set('padding', state.padding);
+      if (state.padding && state.padding !== '2' && state.padding !== 2) {
+        params.set('padding', state.padding);
+      }
       if (state.center !== !state.transparent) {
         params.set('center', String(state.center));
       }
@@ -1112,8 +1114,7 @@ export function getWebUIHtml(): string {
     });
 
     elPadding.addEventListener('input', (e) => {
-      state.padding = Number(e.target.value);
-      valPadding.innerText = state.padding + 'px';
+      state.padding = e.target.value.trim() || '2';
       updatePreview();
     });
 

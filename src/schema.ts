@@ -113,22 +113,30 @@ export const LogoQuerySchema = t.Object({
   color: t.Optional(t.String({ description: 'textColor 别名' })),
   tc: t.Optional(t.String({ description: 'textColor 别名' })),
 
-  // 留白边距
+  // 留白边距（支持纯数字如 10，或 CSS 语法字符串如 "10 20", "10,20,30,40"）
   padding: t.Optional(
-    t.Numeric({
-      description: '内容边缘留白边距像素（默认 2px，随 scale 缩放）',
-      minimum: 0,
-      maximum: 200,
-      examples: [2, 0, 10],
-    })
+    t.Union([
+      t.Numeric({ description: '留白边距像素值' }),
+      t.String({
+        description: '内容留白边距（支持 CSS 语法，如 "10 20", "10,20,30,40"）',
+        examples: ['2', '10', '10 20', '10,20,30,40'],
+      }),
+    ])
   ),
   pad: t.Optional(
-    t.Numeric({
-      description: 'padding 别名',
-      minimum: 0,
-      maximum: 200,
-    })
+    t.Union([
+      t.Numeric(),
+      t.String({ description: 'padding 别名' }),
+    ])
   ),
+  paddingTop: t.Optional(t.Numeric({ description: '独立上留白边距（像素）' })),
+  pt: t.Optional(t.Numeric({ description: 'paddingTop 别名' })),
+  paddingRight: t.Optional(t.Numeric({ description: '独立右留白边距（像素）' })),
+  pr: t.Optional(t.Numeric({ description: 'paddingRight 别名' })),
+  paddingBottom: t.Optional(t.Numeric({ description: '独立下留白边距（像素）' })),
+  pb: t.Optional(t.Numeric({ description: 'paddingBottom 别名' })),
+  paddingLeft: t.Optional(t.Numeric({ description: '独立左留白边距（像素）' })),
+  pl: t.Optional(t.Numeric({ description: 'paddingLeft 别名' })),
   center: t.Optional(
     FlexibleBoolean
   ),

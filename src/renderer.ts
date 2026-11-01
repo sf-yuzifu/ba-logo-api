@@ -18,6 +18,52 @@ import {
 
 export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64';
 
+export type PaddingValue = number | string | (number | string)[];
+
+export interface PaddingBox {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+/**
+ * 解析并格式化类似 CSS 语法的留白边距 (单值 / 2值 / 3值 / 4值)，支持数字、字符串与数组
+ */
+export function parsePadding(input?: PaddingValue, scale = 1): PaddingBox {
+  let box = [2, 2, 2, 2];
+
+  if (typeof input === 'number') {
+    const val = Number.isFinite(input) ? Math.max(0, input) : 2;
+    box = [val, val, val, val];
+  } else if (Array.isArray(input)) {
+    const nums = input.map((n) => Math.max(0, Number(n) || 0));
+    if (nums.length === 1) box = [nums[0], nums[0], nums[0], nums[0]];
+    else if (nums.length === 2) box = [nums[0], nums[1], nums[0], nums[1]];
+    else if (nums.length === 3) box = [nums[0], nums[1], nums[2], nums[1]];
+    else if (nums.length >= 4) box = [nums[0], nums[1], nums[2], nums[3]];
+  } else if (typeof input === 'string') {
+    const parts = input
+      .trim()
+      .split(/[\s,]+/)
+      .map((p) => p.replace(/px$/i, ''))
+      .filter((p) => p.length > 0)
+      .map((p) => Math.max(0, parseFloat(p) || 0));
+
+    if (parts.length === 1) box = [parts[0], parts[0], parts[0], parts[0]];
+    else if (parts.length === 2) box = [parts[0], parts[1], parts[0], parts[1]];
+    else if (parts.length === 3) box = [parts[0], parts[1], parts[2], parts[1]];
+    else if (parts.length >= 4) box = [parts[0], parts[1], parts[2], parts[3]];
+  }
+
+  return {
+    top: Math.round(box[0] * scale),
+    right: Math.round(box[1] * scale),
+    bottom: Math.round(box[2] * scale),
+    left: Math.round(box[3] * scale),
+  };
+}
+
 export interface RenderOptions {
   textL?: string;
   textR?: string;
@@ -26,7 +72,11 @@ export interface RenderOptions {
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
-  padding?: number; // 紧凑裁切留白边距（像素，默认 2，随 scale 缩放）
+  padding?: PaddingValue; // 留白边距（支持数字、CSS 语法字符串如 "10 20", "10,20,30,40"、数组）
+  paddingTop?: number; // 独立上留白边距（可选覆盖）
+  paddingRight?: number; // 独立右留白边距（可选覆盖）
+  paddingBottom?: number; // 独立下留白边距（可选覆盖）
+  paddingLeft?: number; // 独立左留白边距（可选覆盖）
   center?: boolean; // 文本垂直视觉居中（有背景时默认 true，透明模式默认 false）
   accentColor?: string; // 主强调色（左文字、十字架，默认 #128AFA）
   textColor?: string; // 文字主题色（右文字、光环，默认 #2B2B2B，暗黑模式默认 #FFFFFF）
@@ -98,12 +148,12 @@ function drawVectorShape(
 }
 
 /**
- * 基于像素分析计算实际图形边界，并精确保留指定 padding 边缘（默认 2px）
+ * 基于像素分析计算实际图形边界，并精确保留指定上下左右 padding 边缘
  * 当 center 为 true 时，以文本视觉中心对称计算纵向留白，避免文字下沉
  */
 function trimCanvas(
   canvas: Canvas,
-  padding: number,
+  padBox: PaddingBox,
   transparent: boolean,
   center: boolean,
   textCenterY: number,
@@ -181,18 +231,30 @@ function trimCanvas(
     }
   }
 
-  const cropX = Math.max(0, minX - padding);
-  const cropY = Math.max(0, minY - padding);
-  const cropW = Math.min(w - cropX, maxX - minX + 1 + padding * 2);
-  const cropH = effMaxY - minY + 1 + padding * 2;
+  const contentW = maxX - minX + 1;
+  const contentH = effMaxY - minY + 1;
+  const targetW = contentW + padBox.left + padBox.right;
+  const targetH = contentH + padBox.top + padBox.bottom;
 
-  const trimmed = createCanvas(cropW, cropH);
+  const trimmed = createCanvas(targetW, targetH);
   const tCtx = trimmed.getContext('2d');
   if (!transparent) {
     tCtx.fillStyle = bgColor;
-    tCtx.fillRect(0, 0, cropW, cropH);
+    tCtx.fillRect(0, 0, targetW, targetH);
   }
-  tCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+  const srcH = Math.min(h - minY, contentH);
+  tCtx.drawImage(
+    canvas,
+    minX,
+    minY,
+    contentW,
+    srcH,
+    padBox.left,
+    padBox.top,
+    contentW,
+    srcH
+  );
   return trimmed;
 }
 
@@ -267,9 +329,23 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     subtitleMetricsWidth = measureCtx.measureText(subtitle).width;
   }
 
-  // 计算用户自定义 padding，确保绘制基底有充足外延空间，不发生提前截断冲突
-  const userPad = Math.max(0, Math.round(Number(options.padding ?? 2) * scale));
-  const margin = Math.max(paddingX, userPad + 20 * scale);
+  // 计算用户自定义 padding，支持数字、CSS 语法或独立方向参数
+  const padBox = parsePadding(options.padding, scale);
+  if (options.paddingTop !== undefined && !Number.isNaN(Number(options.paddingTop))) {
+    padBox.top = Math.max(0, Math.round(Number(options.paddingTop) * scale));
+  }
+  if (options.paddingRight !== undefined && !Number.isNaN(Number(options.paddingRight))) {
+    padBox.right = Math.max(0, Math.round(Number(options.paddingRight) * scale));
+  }
+  if (options.paddingBottom !== undefined && !Number.isNaN(Number(options.paddingBottom))) {
+    padBox.bottom = Math.max(0, Math.round(Number(options.paddingBottom) * scale));
+  }
+  if (options.paddingLeft !== undefined && !Number.isNaN(Number(options.paddingLeft))) {
+    padBox.left = Math.max(0, Math.round(Number(options.paddingLeft) * scale));
+  }
+
+  const maxPadH = Math.max(padBox.left, padBox.right);
+  const margin = Math.max(paddingX, maxPadH + 20 * scale);
 
   // 根据主副文字长度动态计算基准画布左右分界线
   const rightSpan = subtitle ? textWidthR + subtitleFontSize + margin : textWidthR + margin;
@@ -351,10 +427,10 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.resetTransform();
   }
 
-  // 7. 紧凑像素级包围盒裁切（默认贴合到边缘 2px，支持自定义 padding 与文本居中）
+  // 7. 紧凑像素级包围盒裁切（支持四周 CSS 独立 padding 留白与文本视觉居中）
   const isCenter = options.center ?? !transparent;
   const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
-  return trimCanvas(canvas, userPad, transparent, isCenter, textCenterY, backgroundColor);
+  return trimCanvas(canvas, padBox, transparent, isCenter, textCenterY, backgroundColor);
 }
 
 /**

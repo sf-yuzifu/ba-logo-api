@@ -96,7 +96,11 @@ bun run bench
 | `swapColors` | `swap` | boolean | `false` | `true`, `false`, `1`, `0` | 是否对调左右文字的主次颜色 |
 | `offsetX` | `x` | number | `-15` | `0`, `10`, `-20` | 光环与十字 X 轴偏移量（像素） |
 | `offsetY` | `y` | number | `0` | `5`, `-5` | 光环与十字 Y 轴偏移量（像素） |
-| `padding` | `pad` | number | `2` | `2`, `0`, `10` | 紧凑裁切边缘留白边距（像素，随 scale 等比缩放） |
+| `padding` | `pad` | string / number | `2` | `10`, `10 20`, `10,20,30,40` | **留白边距**（上下左右全向加白，全面支持 **CSS 语法**：单值、双值、四值） |
+| `paddingTop` | `pt` | number | - | `10`, `20` | 独立上边距留白（可选细粒度覆盖） |
+| `paddingRight` | `pr` | number | - | `10`, `20` | 独立右边距留白（可选细粒度覆盖） |
+| `paddingBottom`| `pb` | number | - | `10`, `20` | 独立下边距留白（可选细粒度覆盖） |
+| `paddingLeft` | `pl` | number | - | `10`, `20` | 独立左边距留白（可选细粒度覆盖） |
 | `center` | `vcenter`| boolean | *智能自适应* | `true`, `false` | **文本垂直视觉居中**（非透明模式默认 true，透明模式默认 false） |
 
 ---
