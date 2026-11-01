@@ -45,4 +45,18 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(body.data.base64).toBeDefined();
     expect(body.data.dataUrl.startsWith('data:image/png;base64,')).toBe(true);
   });
+
+  it('参数校验失败时（如 scale 超标或非法格式）应当返回 422 错误以保护服务器', async () => {
+    // scale 超出 8.0 最大限制
+    const res1 = await app.handle(
+      new Request('http://localhost/api/logo?scale=99')
+    );
+    expect(res1.status).toBe(422);
+
+    // 非法 format 格式
+    const res2 = await app.handle(
+      new Request('http://localhost/api/logo?format=gif')
+    );
+    expect(res2.status).toBe(422);
+  });
 });

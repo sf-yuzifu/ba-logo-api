@@ -1,11 +1,12 @@
 import { Elysia } from 'elysia';
 import { cors } from '@elysiajs/cors';
 import { renderLogoToBuffer, type RenderOptions, type OutputFormat } from './renderer.ts';
+import { LogoQuerySchema, type LogoQuery } from './schema.ts';
 
 /**
  * 将 Query 查询参数解析并标准化为 RenderOptions
  */
-export function parseLogoQuery(query: Record<string, string | undefined>): RenderOptions {
+export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   // 左侧文字
   const textL = query.left ?? query.l ?? '蔚蓝';
   // 右侧文字
@@ -15,33 +16,42 @@ export function parseLogoQuery(query: Record<string, string | undefined>): Rende
   const subtitleColor = query.subtitleColor ?? query.subColor;
 
   // 坐标偏移
-  const xStr = query.offsetX ?? query.x;
-  const offsetX = xStr !== undefined && !Number.isNaN(Number(xStr)) ? Number(xStr) : undefined;
-  const yStr = query.offsetY ?? query.y;
-  const offsetY = yStr !== undefined && !Number.isNaN(Number(yStr)) ? Number(yStr) : undefined;
+  const rawX = query.offsetX ?? query.x;
+  const offsetX = rawX !== undefined && !Number.isNaN(Number(rawX)) ? Number(rawX) : undefined;
+  const rawY = query.offsetY ?? query.y;
+  const offsetY = rawY !== undefined && !Number.isNaN(Number(rawY)) ? Number(rawY) : undefined;
 
   // 透明背景
-  const tpStr = query.transparent ?? query.tp;
-  const transparent = tpStr === 'true' || tpStr === '1';
+  const rawTp = query.transparent ?? query.tp;
+  const transparent =
+    typeof rawTp === 'boolean' ? rawTp : rawTp === 'true' || rawTp === '1';
 
   // 缩放倍率
-  const scaleStr = query.scale ?? query.s;
-  const scale = scaleStr !== undefined && !Number.isNaN(Number(scaleStr)) ? Number(scaleStr) : undefined;
+  const rawScale = query.scale ?? query.s;
+  const scale =
+    rawScale !== undefined && !Number.isNaN(Number(rawScale)) ? Number(rawScale) : undefined;
 
   // 暗黑模式
-  const darkStr = query.darkMode ?? query.dark;
-  const darkMode = darkStr === 'true' || darkStr === '1';
+  const rawDark = query.darkMode ?? query.dark;
+  const darkMode =
+    typeof rawDark === 'boolean' ? rawDark : rawDark === 'true' || rawDark === '1';
 
   // 颜色互换
-  const swapStr = query.swapColors ?? query.swap;
-  const swapColors = swapStr === 'true' || swapStr === '1';
+  const rawSwap = query.swapColors ?? query.swap;
+  const swapColors =
+    typeof rawSwap === 'boolean' ? rawSwap : rawSwap === 'true' || rawSwap === '1';
 
   // 强调色
   const accentColor = query.accentColor ?? query.accent;
 
   // 紧凑裁切
-  const cropStr = query.crop;
-  const crop = cropStr !== undefined ? cropStr !== 'false' && cropStr !== '0' : true;
+  const rawCrop = query.crop;
+  const crop =
+    typeof rawCrop === 'boolean'
+      ? rawCrop
+      : rawCrop !== undefined
+      ? rawCrop !== 'false' && rawCrop !== '0'
+      : true;
 
   // 格式
   const format = (query.format ?? 'png').toLowerCase() as OutputFormat;
@@ -66,7 +76,7 @@ export function parseLogoQuery(query: Record<string, string | undefined>): Rende
 /**
  * 处理 Logo 生成请求的核心分发函数
  */
-export function handleLogoRequest(query: Record<string, string | undefined>, set: any) {
+export function handleLogoRequest(query: Record<string, any>, set: any) {
   const options = parseLogoQuery(query);
   const result = renderLogoToBuffer(options);
 
@@ -104,14 +114,26 @@ export function createApp() {
     .use(cors())
 
     // 1. 旧版兼容路由 (GET /balogo)
-    .get('/balogo', ({ query, set }) => {
-      return handleLogoRequest(query, set);
-    })
+    .get(
+      '/balogo',
+      ({ query, set }) => {
+        return handleLogoRequest(query, set);
+      },
+      {
+        query: LogoQuerySchema,
+      }
+    )
 
     // 2. 现代 RESTful 路由 (GET /api/logo)
-    .get('/api/logo', ({ query, set }) => {
-      return handleLogoRequest(query, set);
-    })
+    .get(
+      '/api/logo',
+      ({ query, set }) => {
+        return handleLogoRequest(query, set);
+      },
+      {
+        query: LogoQuerySchema,
+      }
+    )
 
     // 根路径健康检查/欢迎信息
     .get('/', () => {
