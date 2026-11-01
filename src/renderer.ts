@@ -1,26 +1,26 @@
 import {
+  type Canvas,
+  convertSVGTextToPath,
   createCanvas,
   Path2D,
-  convertSVGTextToPath,
-  type Canvas,
   type SKRSContext2D,
 } from '@napi-rs/canvas';
-import { loadFonts, FONT_FAMILY } from './font.ts';
 import {
   BASE_CANVAS_HEIGHT,
   BASE_CANVAS_WIDTH,
   BASE_FONT_SIZE,
   BASE_SUBTITLE_FONT_SIZE,
-  TEXT_BASELINE,
+  COLORS,
+  CROSS_PATH_DATA,
+  DEFAULT_GRAPH_OFFSET,
+  HALO_PATH_DATA,
+  HOLLOW_POLYGON,
   HORIZONTAL_TILT,
   PADDING_X,
-  DEFAULT_GRAPH_OFFSET,
   SVG_VIEWBOX_SIZE,
-  HALO_PATH_DATA,
-  CROSS_PATH_DATA,
-  HOLLOW_POLYGON,
-  COLORS,
+  TEXT_BASELINE,
 } from './constants.ts';
+import { FONT_FAMILY, loadFonts } from './font.ts';
 
 export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64' | 'svg';
 
@@ -98,8 +98,6 @@ export interface RenderOptions {
   format?: OutputFormat; // 输出格式（'png' | 'webp' | 'jpeg' | 'jpg' | 'base64'，默认 'png'）
 }
 
-export type BaseRenderOptions = RenderOptions;
-
 export interface RenderResult {
   canvas?: Canvas;
   buffer: Buffer;
@@ -149,7 +147,7 @@ function drawVectorShape(
   x: number,
   y: number,
   size: number,
-  color: string
+  color: string,
 ): void {
   ctx.save();
   ctx.fillStyle = color;
@@ -170,7 +168,7 @@ function trimCanvas(
   transparent: boolean,
   center: boolean,
   textCenterY: number,
-  bgColor: string
+  bgColor: string,
 ): Canvas {
   const w = canvas.width;
   const h = canvas.height;
@@ -178,14 +176,17 @@ function trimCanvas(
   const imgData = ctx.getImageData(0, 0, w, h);
   const u32 = new Uint32Array(imgData.data.buffer);
 
-  let minY = 0, maxY = h - 1, minX = 0, maxX = w - 1;
+  let minY = 0,
+    maxY = h - 1,
+    minX = 0,
+    maxX = w - 1;
   let found = false;
 
   // 1. 从上往下扫描 minY（统一基于 Alpha 透明通道检测，免疫前景色与背景色相同导致的检测失效）
   topLoop: for (let y = 0; y < h; y++) {
     const row = y * w;
     for (let x = 0; x < w; x++) {
-      if ((u32[row + x] >>> 24) > 10) {
+      if (u32[row + x] >>> 24 > 10) {
         minY = y;
         found = true;
         break topLoop;
@@ -208,7 +209,7 @@ function trimCanvas(
   bottomLoop: for (let y = h - 1; y >= minY; y--) {
     const row = y * w;
     for (let x = 0; x < w; x++) {
-      if ((u32[row + x] >>> 24) > 10) {
+      if (u32[row + x] >>> 24 > 10) {
         maxY = y;
         break bottomLoop;
       }
@@ -218,7 +219,7 @@ function trimCanvas(
   // 3. 从左往右扫描 minX
   leftLoop: for (let x = 0; x < w; x++) {
     for (let y = minY; y <= maxY; y++) {
-      if ((u32[y * w + x] >>> 24) > 10) {
+      if (u32[y * w + x] >>> 24 > 10) {
         minX = x;
         break leftLoop;
       }
@@ -228,7 +229,7 @@ function trimCanvas(
   // 4. 从右往左扫描 maxX
   rightLoop: for (let x = w - 1; x >= minX; x--) {
     for (let y = minY; y <= maxY; y++) {
-      if ((u32[y * w + x] >>> 24) > 10) {
+      if (u32[y * w + x] >>> 24 > 10) {
         maxX = x;
         break rightLoop;
       }
@@ -257,17 +258,7 @@ function trimCanvas(
   }
 
   const srcH = Math.min(h - minY, contentH);
-  tCtx.drawImage(
-    canvas,
-    minX,
-    minY,
-    contentW,
-    srcH,
-    padBox.left,
-    padBox.top,
-    contentW,
-    srcH
-  );
+  tCtx.drawImage(canvas, minX, minY, contentW, srcH, padBox.left, padBox.top, contentW, srcH);
   return trimmed;
 }
 
@@ -328,10 +319,12 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const textMetricsR = measureCtx.measureText(textR);
 
   // 计算斜体排版引起的文字宽度扩展
-  const ascentL = textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
-  const descentL = textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
-  const ascentR = textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74 * scale;
-  const descentR = textMetricsR.fontBoundingBoxDescent ?? textMetricsR.actualBoundingBoxDescent ?? 10 * scale;
+  const ascentL =
+    textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
+  const descentL =
+    textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
+  const ascentR =
+    textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74 * scale;
 
   const textWidthL =
     textMetricsL.width - (TEXT_BASELINE * canvasHeight + descentL) * HORIZONTAL_TILT;
@@ -356,12 +349,14 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     measureCtx.font = subtitleFont;
     const subMetrics = measureCtx.measureText(subtitle);
     subtitleMetricsWidth = subMetrics.width;
-    subAscent = subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
-    subDescent = subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
+    subAscent =
+      subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
+    subDescent =
+      subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
 
     const subtitleX_rel = textWidthR + subtitleFontSize + scaledSubOffsetX;
     // 斜体转换下，副标题相对于 midX 的屏幕 X 范围
-    minSubX_rel = (subtitleX_rel - subtitleMetricsWidth) + HORIZONTAL_TILT * (subY + subDescent);
+    minSubX_rel = subtitleX_rel - subtitleMetricsWidth + HORIZONTAL_TILT * (subY + subDescent);
     maxSubX_rel = subtitleX_rel + HORIZONTAL_TILT * (subY - subAscent);
   }
 
@@ -388,7 +383,9 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
 
   // 词间距（wordGap，范围 -100 ~ 300）
   const rawWordGap = Number(options.wordGap ?? 0);
-  const wordGap = Number.isFinite(rawWordGap) ? Math.min(Math.max(rawWordGap, -100), 300) * scale : 0;
+  const wordGap = Number.isFinite(rawWordGap)
+    ? Math.min(Math.max(rawWordGap, -100), 300) * scale
+    : 0;
   const halfGap = Math.round(wordGap / 2);
 
   // 综合主文字、副标题、光环偏移量与词间距，动态计算基底画布左右所需空间（防止超长副标题被截断）
@@ -396,13 +393,13 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     textWidthL + halfGap,
     canvasHeight / 2 - scaledOffsetX - halfGap,
     subtitle ? -(minSubX_rel + halfGap) : 0,
-    initialWidth / 2
+    initialWidth / 2,
   );
   const needRight = Math.max(
     textWidthR + halfGap,
     canvasHeight / 2 + scaledOffsetX + halfGap,
-    subtitle ? (maxSubX_rel + halfGap) : 0,
-    initialWidth / 2
+    subtitle ? maxSubX_rel + halfGap : 0,
+    initialWidth / 2,
   );
 
   const canvasWidthL = Math.ceil(needLeft + margin);
@@ -413,7 +410,7 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const totalCanvasHeight = Math.max(
     canvasHeight,
     subtitle ? Math.ceil(subY + subDescent + margin) : 0,
-    Math.ceil(scaledOffsetY + canvasHeight + margin)
+    Math.ceil(scaledOffsetY + canvasHeight + margin),
   );
 
   // 左右文字在中央分界线两侧施加 ± halfGap 偏移
@@ -437,12 +434,12 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.beginPath();
     ctx.moveTo(
       graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
     );
     for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
       ctx.lineTo(
         graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
       );
     }
     ctx.closePath();
@@ -503,12 +500,12 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.beginPath();
     ctx.moveTo(
       graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
     );
     for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
       ctx.lineTo(
         graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
       );
     }
     ctx.closePath();
@@ -550,18 +547,17 @@ function escapeXml(str: string): string {
 function textToVectorSvg(
   text: string,
   fontSize: number,
-  anchor: 'start' | 'end' = 'start'
+  anchor: 'start' | 'end' = 'start',
 ): string {
   if (!text) return '';
   const dummySvg = `<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="2000"><text x="1000" y="1000" font-family="${FONT_FAMILY}" font-size="${fontSize}" text-anchor="${anchor}">${escapeXml(
-    text
+    text,
   )}</text></svg>`;
   const res = convertSVGTextToPath(dummySvg).toString('utf8');
 
   const pathRegex = /<path\s+([^>]+)\/>/g;
-  let match;
   const paths: string[] = [];
-  while ((match = pathRegex.exec(res)) !== null) {
+  for (const match of res.matchAll(pathRegex)) {
     paths.push(`<path ${match[1]}/>`);
   }
 
@@ -582,7 +578,6 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
   const offsetY = options.offsetY ?? DEFAULT_GRAPH_OFFSET.y;
   const subX = options.subtitleOffsetX ?? 0;
   const subYOffset = options.subtitleOffsetY ?? 0;
-  const wordGap = options.wordGap ?? 0;
   const transparent = options.transparent ?? false;
   const darkMode = options.darkMode ?? false;
   const swapColors = options.swapColors ?? false;
@@ -599,7 +594,9 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
   const defaultCrossColor = swapColors ? baseTextColor : accentColor;
   const haloColor = options.haloColor ? normalizeColor(options.haloColor) : defaultHaloColor;
   const crossColor = options.crossColor ? normalizeColor(options.crossColor) : defaultCrossColor;
-  const subtitleColor = options.subtitleColor ? normalizeColor(options.subtitleColor) : secondaryColor;
+  const subtitleColor = options.subtitleColor
+    ? normalizeColor(options.subtitleColor)
+    : secondaryColor;
 
   const canvasHeight = Math.round(BASE_CANVAS_HEIGHT * scale);
   const initialWidth = Math.round(BASE_CANVAS_WIDTH * scale);
@@ -617,12 +614,17 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
   const textMetricsL = measureCtx.measureText(textL);
   const textMetricsR = measureCtx.measureText(textR);
 
-  const ascentL = textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
-  const descentL = textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
-  const ascentR = textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74 * scale;
+  const ascentL =
+    textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
+  const descentL =
+    textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
+  const ascentR =
+    textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74 * scale;
 
-  const textWidthL = textMetricsL.width - (TEXT_BASELINE * canvasHeight + descentL) * HORIZONTAL_TILT;
-  const textWidthR = textMetricsR.width + (TEXT_BASELINE * canvasHeight - ascentR) * HORIZONTAL_TILT;
+  const textWidthL =
+    textMetricsL.width - (TEXT_BASELINE * canvasHeight + descentL) * HORIZONTAL_TILT;
+  const textWidthR =
+    textMetricsR.width + (TEXT_BASELINE * canvasHeight - ascentR) * HORIZONTAL_TILT;
 
   let subtitleMetricsWidth = 0;
   let subAscent = 26 * scale;
@@ -638,11 +640,13 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
     measureCtx.font = `${subtitleFontSize}px "${FONT_FAMILY}"`;
     const subMetrics = measureCtx.measureText(subtitle);
     subtitleMetricsWidth = subMetrics.width;
-    subAscent = subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
-    subDescent = subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
+    subAscent =
+      subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
+    subDescent =
+      subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
 
     const subtitleX_rel = textWidthR + subtitleFontSize + scaledSubOffsetX;
-    minSubX_rel = (subtitleX_rel - subtitleMetricsWidth) + HORIZONTAL_TILT * (subY + subDescent);
+    minSubX_rel = subtitleX_rel - subtitleMetricsWidth + HORIZONTAL_TILT * (subY + subDescent);
     maxSubX_rel = subtitleX_rel + HORIZONTAL_TILT * (subY - subAscent);
   }
 
@@ -667,20 +671,22 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
   const scaledOffsetY = offsetY * scale;
 
   const rawWordGap = Number(options.wordGap ?? 0);
-  const wordGapVal = Number.isFinite(rawWordGap) ? Math.min(Math.max(rawWordGap, -100), 300) * scale : 0;
+  const wordGapVal = Number.isFinite(rawWordGap)
+    ? Math.min(Math.max(rawWordGap, -100), 300) * scale
+    : 0;
   const halfGap = Math.round(wordGapVal / 2);
 
   const needLeft = Math.max(
     textWidthL + halfGap,
     canvasHeight / 2 - scaledOffsetX - halfGap,
     subtitle ? -(minSubX_rel + halfGap) : 0,
-    initialWidth / 2
+    initialWidth / 2,
   );
   const needRight = Math.max(
     textWidthR + halfGap,
     canvasHeight / 2 + scaledOffsetX + halfGap,
     subtitle ? maxSubX_rel + halfGap : 0,
-    initialWidth / 2
+    initialWidth / 2,
   );
 
   const canvasWidthL = Math.ceil(needLeft + margin);
@@ -689,7 +695,7 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
   const totalCanvasHeight = Math.max(
     canvasHeight,
     subtitle ? Math.ceil(subY + subDescent + margin) : 0,
-    Math.ceil(scaledOffsetY + canvasHeight + margin)
+    Math.ceil(scaledOffsetY + canvasHeight + margin),
   );
 
   const leftTextX = canvasWidthL - halfGap;
@@ -730,11 +736,14 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
 
   const imgData = sCtx.getImageData(0, 0, totalCanvasWidth, totalCanvasHeight);
   const u32 = new Uint32Array(imgData.data.buffer);
-  let minX = totalCanvasWidth, minY = totalCanvasHeight, maxX = 0, maxY = 0;
+  let minX = totalCanvasWidth,
+    minY = totalCanvasHeight,
+    maxX = 0,
+    maxY = 0;
   for (let y = 0; y < totalCanvasHeight; y++) {
     const row = y * totalCanvasWidth;
     for (let x = 0; x < totalCanvasWidth; x++) {
-      if ((u32[row + x] >>> 24) > 10) {
+      if (u32[row + x] >>> 24 > 10) {
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;
@@ -762,9 +771,8 @@ export function renderLogoSvg(options: RenderOptions = {}): string {
   const hollowPoints = HOLLOW_POLYGON.map(
     (p) =>
       `${(graphX + (p[0] / SVG_VIEWBOX_SIZE) * canvasHeight).toFixed(2)},${(
-        graphY +
-        (p[1] / SVG_VIEWBOX_SIZE) * canvasHeight
-      ).toFixed(2)}`
+        graphY + (p[1] / SVG_VIEWBOX_SIZE) * canvasHeight
+      ).toFixed(2)}`,
   ).join(' ');
 
   const haloScale = (canvasHeight / SVG_VIEWBOX_SIZE).toFixed(4);

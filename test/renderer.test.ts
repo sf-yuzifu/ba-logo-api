@@ -1,6 +1,5 @@
-import { describe, it, expect } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import { renderLogo, renderLogoToBuffer } from '../src/renderer.ts';
-import { BASE_CANVAS_HEIGHT } from '../src/constants.ts';
 
 describe('Renderer Core Unit Tests', () => {
   it('应当正常渲染默认参数并生成有效图片', () => {

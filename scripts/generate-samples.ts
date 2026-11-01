@@ -1,6 +1,6 @@
-import { renderLogoToBuffer } from '../src/renderer.ts';
 import fs from 'node:fs';
 import path from 'node:path';
+import { renderLogoToBuffer } from '../src/renderer.ts';
 
 const outDir = path.resolve(import.meta.dir, '../samples');
 fs.mkdirSync(outDir, { recursive: true });
@@ -73,7 +73,7 @@ for (const s of samples) {
   const dest = path.join(outDir, s.filename);
   fs.writeFileSync(dest, res.buffer);
   console.log(
-    `✅ [${cost}ms] ${s.desc} -> ${s.filename} (${res.width}x${res.height}, ${(res.buffer.length / 1024).toFixed(1)} KB)`
+    `✅ [${cost}ms] ${s.desc} -> ${s.filename} (${res.width}x${res.height}, ${(res.buffer.length / 1024).toFixed(1)} KB)`,
   );
 }
 

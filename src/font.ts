@@ -1,5 +1,5 @@
-import { join } from 'node:path';
 import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { GlobalFonts } from '@napi-rs/canvas';
 
 export const FONT_FAMILY = 'BlueArchive';

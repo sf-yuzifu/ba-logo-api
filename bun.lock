@@ -11,12 +11,36 @@
         "elysia": "^1.4.30",
       },
       "devDependencies": {
+        "@biomejs/biome": "2.6.4",
         "@types/node": "^26.6.6",
-        "bun-types": "^1.4.4",
+        "bun-types": "1.3.14",
+        "typescript": "7.0.2",
       },
     },
   },
   "packages": {
+    "@biomejs/biome": ["@biomejs/biome@2.6.4", "https://registry.npmmirror.com/@biomejs/biome/-/biome-2.6.4.tgz", { "optionalDependencies": { "@biomejs/cli-android-arm64": "2.6.4", "@biomejs/cli-android-x64": "2.6.4", "@biomejs/cli-darwin-arm64": "2.6.4", "@biomejs/cli-darwin-x64": "2.6.4", "@biomejs/cli-linux-arm64": "2.6.4", "@biomejs/cli-linux-arm64-musl": "2.6.4", "@biomejs/cli-linux-x64": "2.6.4", "@biomejs/cli-linux-x64-musl": "2.6.4", "@biomejs/cli-win32-arm64": "2.6.4", "@biomejs/cli-win32-x64": "2.6.4" }, "bin": { "biome": "bin/biome" } }, "sha512-8sKKwaNW4ot22awZ3lBjwWLHnUFXgXnrBPYS2gNlBAXRbDC++7kqjK2H7dR/FgCDtPvO1xfKpgEhJkGxAKYkxA=="],
+
+    "@biomejs/cli-android-arm64": ["@biomejs/cli-android-arm64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-android-arm64/-/cli-android-arm64-2.6.4.tgz", { "os": "android", "cpu": "arm64" }, "sha512-jwrwigP4tBcHxzuV8izioX/BOUhJL/4e2rNSOE5nCjBkVC018LQAQUGiH+CNkFYvLtQ1dcZo5/xXERmaAGc7JQ=="],
+
+    "@biomejs/cli-android-x64": ["@biomejs/cli-android-x64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-android-x64/-/cli-android-x64-2.6.4.tgz", { "os": "android", "cpu": "x64" }, "sha512-HdGInPJ4nZFwHxzvEtcp2nmSBtUyJrurmtIK43upFckuS3+ZqVM05HtsxQWnqGsuy/pxckIAjyKWlEKRlBXUyA=="],
+
+    "@biomejs/cli-darwin-arm64": ["@biomejs/cli-darwin-arm64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-darwin-arm64/-/cli-darwin-arm64-2.6.4.tgz", { "os": "darwin", "cpu": "arm64" }, "sha512-0VvcUz46wbg59Q4TZ59KkIjDJrxEyu4Eoe79+F4SChxoWe+W7AEyIp6F5r72C9+p6MsB6dIovnZt1D30lGM3XA=="],
+
+    "@biomejs/cli-darwin-x64": ["@biomejs/cli-darwin-x64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-darwin-x64/-/cli-darwin-x64-2.6.4.tgz", { "os": "darwin", "cpu": "x64" }, "sha512-fxmvkF81srlS3DiMyfm+aG3J0eG+6/BjaxRyjy57KbLSafnq0PO+hHfVWmtH2ty0S7nm6yDXBRwySfFeaRJKRQ=="],
+
+    "@biomejs/cli-linux-arm64": ["@biomejs/cli-linux-arm64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-linux-arm64/-/cli-linux-arm64-2.6.4.tgz", { "os": "linux", "cpu": "arm64" }, "sha512-6+bK1Y/evmIUiJr7auertuMbiaYVicJhqA1bZyL47lCMWugv8l0gFQCqvR/gN1vZMHYm+HwoTKgeMxdNFCoQTg=="],
+
+    "@biomejs/cli-linux-arm64-musl": ["@biomejs/cli-linux-arm64-musl@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-linux-arm64-musl/-/cli-linux-arm64-musl-2.6.4.tgz", { "os": "linux", "cpu": "arm64" }, "sha512-31ZaH/MHqPX+O+evRwRrCHQ8W5/9adY+/eMytGGWZnRx1T41QsWIF09+/WujynLBhWZUxNGS5CtsWLwgOFTAyg=="],
+
+    "@biomejs/cli-linux-x64": ["@biomejs/cli-linux-x64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-linux-x64/-/cli-linux-x64-2.6.4.tgz", { "os": "linux", "cpu": "x64" }, "sha512-tbFZMdL6dP/ws4edXxYG9WhvaVa1ZDzL4G5DzahnWW7Psib9H+VTdyU4XXVxpJk5j/nYZroSbvSNyYlpW3yCIw=="],
+
+    "@biomejs/cli-linux-x64-musl": ["@biomejs/cli-linux-x64-musl@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-linux-x64-musl/-/cli-linux-x64-musl-2.6.4.tgz", { "os": "linux", "cpu": "x64" }, "sha512-bomSa2XdQAGGj6Cwdm4M13qE+lN9+AOlW8KtI4hdyVyRRF/Z71qPAi95T4wtdZK0QpBbkTW8hgbZZCwPi4xzIw=="],
+
+    "@biomejs/cli-win32-arm64": ["@biomejs/cli-win32-arm64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-win32-arm64/-/cli-win32-arm64-2.6.4.tgz", { "os": "win32", "cpu": "arm64" }, "sha512-eCsqt8Ma3eVap+oyJCDnJZH60SIU464B66n3y38EUTJdM1T/HfZol1FJC9vb+sHToX0ix8XzqPcwJnOzyAJz0g=="],
+
+    "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.6.4", "https://registry.npmmirror.com/@biomejs/cli-win32-x64/-/cli-win32-x64-2.6.4.tgz", { "os": "win32", "cpu": "x64" }, "sha512-pYsMy5AThiHFOZAsngg8qN4PurM6nInKBhVX7sbj3eNpRQqo1Hb0MgCwPL7VqVMrmcEEMj9Ks3qbkallR65e8g=="],
+
     "@borewit/text-codec": ["@borewit/text-codec@0.2.3", "https://registry.npmmirror.com/@borewit/text-codec/-/text-codec-0.2.3.tgz", {}, "sha512-49CycTz1aAZmvFcwkeFyhud1HUmRIB5Tabf7ALV+VA4Iu85MTfz2cUwzPagMFAdVBvrWdkCxG67I30tUwwpKsw=="],
 
     "@elysiajs/cors": ["@elysiajs/cors@1.4.2", "https://registry.npmmirror.com/@elysiajs/cors/-/cors-1.4.2.tgz", { "peerDependencies": { "elysia": ">= 1.4.0" } }, "sha512-FTCcbH35brTLigF1W7BYySRZomgI/dBEMK9BgK9RP9Nez7zmpGh4koL/Yr1BFv8nYz7CfhRvcM8d/c+XnwMaVQ=="],
@@ -61,9 +85,49 @@
 
     "@types/node": ["@types/node@26.6.6", "https://registry.npmmirror.com/@types/node/-/node-26.6.6.tgz", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog=="],
 
+    "@typescript/typescript-aix-ppc64": ["@typescript/typescript-aix-ppc64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-aix-ppc64/-/typescript-aix-ppc64-7.0.2.tgz", { "os": "aix", "cpu": "ppc64" }, "sha512-MTKKkWB7p/0E9xi1d1tHtZ5PiLkGEMIq88pK2CubZjOsLtYTLqhgIgi6zepFa+9GHZ6h05NMCkQxGKiPXMxXtQ=="],
+
+    "@typescript/typescript-darwin-arm64": ["@typescript/typescript-darwin-arm64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz", { "os": "darwin", "cpu": "arm64" }, "sha512-gowzar9MwS/aRWp6f3a4KUqzRjAZjOsmGNCM6LcTgXum+dBfgsBVMN+AgvOCCbguXyick6LJhpBszxMebJ8syA=="],
+
+    "@typescript/typescript-darwin-x64": ["@typescript/typescript-darwin-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-darwin-x64/-/typescript-darwin-x64-7.0.2.tgz", { "os": "darwin", "cpu": "x64" }, "sha512-SZ9xZInqApNlNGc9s0W1VSsktYSOe9cFqNOIqmN1Gs8SmkjKZYFt017G4VwPxASInODuAdbTW7sXiFUf893RgA=="],
+
+    "@typescript/typescript-freebsd-arm64": ["@typescript/typescript-freebsd-arm64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-freebsd-arm64/-/typescript-freebsd-arm64-7.0.2.tgz", { "os": "freebsd", "cpu": "arm64" }, "sha512-W5NH4y/J0plIIS5b2xvTEkU7JFxyqdMAOgf+Ilhl0vHQXKO5dZoxd+C/jEtq56c4F3wk71RB4BMRQ2XdI+bwYQ=="],
+
+    "@typescript/typescript-freebsd-x64": ["@typescript/typescript-freebsd-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-freebsd-x64/-/typescript-freebsd-x64-7.0.2.tgz", { "os": "freebsd", "cpu": "x64" }, "sha512-UMGDx5sTpzNw3WiPebH7l90IWfJggEd+egHt/q6p7/Cm3zqoV7VxkGXt+3DxPIw8CcmvAB0j3sVVfbhX+M4Tpw=="],
+
+    "@typescript/typescript-linux-arm": ["@typescript/typescript-linux-arm@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-arm/-/typescript-linux-arm-7.0.2.tgz", { "os": "linux", "cpu": "arm" }, "sha512-gffT3xPz9sR7j/YJExkyPntrI0P2EP9XbOyWzth2/Gs0RstK+90RBcO0ncXoXy/beYll1SXw846Nf2zdnEz0QQ=="],
+
+    "@typescript/typescript-linux-arm64": ["@typescript/typescript-linux-arm64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz", { "os": "linux", "cpu": "arm64" }, "sha512-Qh4eU4/y3yDjnfjjyPYihMj5/ODIlmt+Bzu17OI+fiSRDW57QmU5SiN63exPRNJPKUzcc1INa1NXdrJ+MqHjUQ=="],
+
+    "@typescript/typescript-linux-loong64": ["@typescript/typescript-linux-loong64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-loong64/-/typescript-linux-loong64-7.0.2.tgz", { "os": "linux", "cpu": "none" }, "sha512-uEHck9i8hoAzXPiYRib1O7miOnz23SxIeVl6F4LXox+qov1K35jHcEW6VHKvZI+pyvl7fZEP4MCU5LYvIq1GuQ=="],
+
+    "@typescript/typescript-linux-mips64el": ["@typescript/typescript-linux-mips64el@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-mips64el/-/typescript-linux-mips64el-7.0.2.tgz", { "os": "linux", "cpu": "none" }, "sha512-R4KvAMnE43W5Qeqb0Ly56O3mWMWIAgsMyz36DCaycd5nbg/9kzm0liw3JocfRqyJY0KPmzFjbswozXyW0DnIYA=="],
+
+    "@typescript/typescript-linux-ppc64": ["@typescript/typescript-linux-ppc64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-ppc64/-/typescript-linux-ppc64-7.0.2.tgz", { "os": "linux", "cpu": "ppc64" }, "sha512-DORx5b3sd/4S7eayxm4FQv+A7CrkUIGRaHiwI8oiHTAI1fAPWhF4J0vAlkC8biAlHSVVwxMQ3tjZ2/DVbnQiiA=="],
+
+    "@typescript/typescript-linux-riscv64": ["@typescript/typescript-linux-riscv64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-riscv64/-/typescript-linux-riscv64-7.0.2.tgz", { "os": "linux", "cpu": "none" }, "sha512-wf0jqEDOjrPRnKwYRyyJDRo11KMbvMFrU+q4zqKyChODBzvlkbhNQfKvLxQCcwTpdDaXSHZTVuh0JoCrKCUMHQ=="],
+
+    "@typescript/typescript-linux-s390x": ["@typescript/typescript-linux-s390x@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-s390x/-/typescript-linux-s390x-7.0.2.tgz", { "os": "linux", "cpu": "s390x" }, "sha512-IkwJc3L7yhytWd/ewjyxNDfOmswCm9GWMJT/ue/dU4aZNbwZeYAetq42VyLmsmSjvoX7z74X6ZaYCtzAr0EuGw=="],
+
+    "@typescript/typescript-linux-x64": ["@typescript/typescript-linux-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-linux-x64/-/typescript-linux-x64-7.0.2.tgz", { "os": "linux", "cpu": "x64" }, "sha512-EYdf2cNg7rgCWJnxCdJ+F3V39O8ihb37eHAu1LK8oAFizgTQbPOK7zHHXbPt8rX24COqODXeI3sIf0fCXG7H/A=="],
+
+    "@typescript/typescript-netbsd-arm64": ["@typescript/typescript-netbsd-arm64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-netbsd-arm64/-/typescript-netbsd-arm64-7.0.2.tgz", { "os": "none", "cpu": "arm64" }, "sha512-+polYF4MF04aPpO5FTkHran9yUQDSXqy5GiSDKpsll5jy3l3+g9QLhpf39T+ePtefhXLOGrLl0QIjkQP6VnelA=="],
+
+    "@typescript/typescript-netbsd-x64": ["@typescript/typescript-netbsd-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-netbsd-x64/-/typescript-netbsd-x64-7.0.2.tgz", { "os": "none", "cpu": "x64" }, "sha512-8YIT0EHM/3dq10ZOVF/A7pc/YSMtbcecct4rWtexrnSCHOPcpC2KTLXfTCR6vDpnSiY12heNb1GiN/wu+T/FyA=="],
+
+    "@typescript/typescript-openbsd-arm64": ["@typescript/typescript-openbsd-arm64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-openbsd-arm64/-/typescript-openbsd-arm64-7.0.2.tgz", { "os": "openbsd", "cpu": "arm64" }, "sha512-APT8+ClYnuYm1u9+kgGXoMj2VzWzcymwh2gNSQVySHfkRDGOTVkoWLjCmOQSaO+PoqQ57B0flRp9SA+7GnnkzQ=="],
+
+    "@typescript/typescript-openbsd-x64": ["@typescript/typescript-openbsd-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-openbsd-x64/-/typescript-openbsd-x64-7.0.2.tgz", { "os": "openbsd", "cpu": "x64" }, "sha512-yX7s+Q0Dln0Dt9tEzZsAjXXR/+ytBM7AlglaqyeMPxQszJ1JhlJdZ6jLA+IzldHtflX81em7lDao1xXu+aRRkg=="],
+
+    "@typescript/typescript-sunos-x64": ["@typescript/typescript-sunos-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-sunos-x64/-/typescript-sunos-x64-7.0.2.tgz", { "os": "sunos", "cpu": "x64" }, "sha512-dLJDGaLZ1D4HPQn62u1n8mBDkJREwMsAkCdkwd4Ieqw+x3TUyTsqY0YiBCtE6H6OzzgGk3iuZ3vFWRS+E8/d1g=="],
+
+    "@typescript/typescript-win32-arm64": ["@typescript/typescript-win32-arm64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-win32-arm64/-/typescript-win32-arm64-7.0.2.tgz", { "os": "win32", "cpu": "arm64" }, "sha512-Gyl1Vy6OsWesLzmq+EP0Fb7b4Nid5232AvcA2SFcdYreldpNtYFFofPjnt62y9hQy7VTaZp65ICJjuAQRaVcIQ=="],
+
+    "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "https://registry.npmmirror.com/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
+
     "@unhead/schema": ["@unhead/schema@1.11.20", "https://registry.npmmirror.com/@unhead/schema/-/schema-1.11.20.tgz", { "dependencies": { "hookable": "^5.5.3", "zhead": "^2.2.4" } }, "sha512-0zWykKAaJdm+/Y7yi/Yds20PrUK7XabLe9c3IRcjnwYmSWY6z0Cr19VIs3ozCj8P+GhR+/TI2mwtGlueCEYouA=="],
 
-    "bun-types": ["bun-types@1.4.4", "https://registry.npmmirror.com/bun-types/-/bun-types-1.4.4.tgz", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-yjrJh5oGX7mMPKGd19YXyIjmEuj4G4zNC30bs7PM9Az7NQ3ndF3j6hbeRdvJTRQEhJ/FYQwW0a2moweEi2hMxQ=="],
+    "bun-types": ["bun-types@1.3.14", "https://registry.npmmirror.com/bun-types/-/bun-types-1.3.14.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 
     "cookie": ["cookie@1.1.1", "https://registry.npmmirror.com/cookie/-/cookie-1.1.1.tgz", {}, "sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ=="],
 
@@ -96,6 +160,8 @@
     "token-types": ["token-types@6.1.2", "https://registry.npmmirror.com/token-types/-/token-types-6.1.2.tgz", { "dependencies": { "@borewit/text-codec": "^0.2.1", "@tokenizer/token": "^0.3.0", "ieee754": "^1.2.1" } }, "sha512-dRXchy+C0IgK8WPC6xvCHFRIWYUbqqdEIKPaKo/AcTUNzwLTK6AH7RjdLWsEZcAN/TBdtfUw3PYEgPr5VPr6ww=="],
 
     "type-fest": ["type-fest@4.41.0", "https://registry.npmmirror.com/type-fest/-/type-fest-4.41.0.tgz", {}, "sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA=="],
+
+    "typescript": ["typescript@7.0.2", "https://registry.npmmirror.com/typescript/-/typescript-7.0.2.tgz", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
 
     "uint8array-extras": ["uint8array-extras@1.6.0", "https://registry.npmmirror.com/uint8array-extras/-/uint8array-extras-1.6.0.tgz", {}, "sha512-8iAasVS4wUx0gPLjH8Xtz2PeDzTSiy8QiLGu2DT3X5GU+egFEQhpnbtkehbAwjvDcxIERmCYcysiODFmE3Ud0Q=="],
 

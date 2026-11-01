@@ -1627,7 +1627,7 @@ export function getWebUIHtml(): string {
         if (state.format === 'png' && currentBlobUrl) {
           blob = await fetch(currentBlobUrl).then(r => r.blob());
         } else {
-          const pngUrl = buildUrl().replace(/format=\w+/, 'format=png');
+          const pngUrl = buildUrl().replace(/format=[a-z0-9_]+/i, 'format=png');
           const finalPngUrl = pngUrl.includes('format=png') ? pngUrl : pngUrl + (pngUrl.includes('?') ? '&' : '?') + 'format=png';
           blob = await fetch(finalPngUrl).then(r => r.blob());
         }

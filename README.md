@@ -4,12 +4,12 @@
 
 ![Blue Archive Logo Preview](samples/02-official-en-jp-2x.png)
 
-基于 **Bun 1.3+** + **ElysiaJS** + **Google Skia 原生渲染引擎** 重构的高性能、极低内存占用、高清晰度的蔚蓝档案风格 Logo 生成接口。
+基于 **Bun 1.3.14+** + **ElysiaJS** + **Google Skia 原生渲染引擎** 重构的高性能、极低内存占用、高清晰度的蔚蓝档案风格 Logo 生成接口。
 
-[![Bun](https://img.shields.io/badge/Bun-1.3+-black?logo=bun)](https://bun.sh)
+[![Bun](https://img.shields.io/badge/Bun-1.3.14+-black?logo=bun)](https://bun.sh)
 [![ElysiaJS](https://img.shields.io/badge/ElysiaJS-1.4+-f06292)](https://elysiajs.com)
 [![Skia Canvas](https://img.shields.io/badge/@napi--rs/canvas-1.1+-green)](https://github.com/Brooooooklyn/canvas)
-[![Tests](https://img.shields.io/badge/tests-15%20passed-brightgreen)](#-自动化测试与离线样图生成)
+[![CI](https://github.com/sf-yuzifu/ba-logo-api/actions/workflows/ci.yml/badge.svg)](https://github.com/sf-yuzifu/ba-logo-api/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 [在线 WebUI 控制台](#-交互式-webui-控制台) • [Swagger 接口文档](#-swagger--openapi-文档) • [API 参数详解](#-api-参数详解) • [字体与技术说明](#-技术栈与字体资产说明) • [致谢](#-鸣谢与致敬)
@@ -40,13 +40,15 @@
 
 ### 本地运行 (需要安装 [Bun](https://bun.sh))
 
+要求 Bun **1.3.14 或更新版本**，当前验证基线为 **1.3.14**。CI 从 `.bun-version` 读取固定版本，Docker 使用同版本的 Alpine 镜像。升级基线时同步更新 `.bun-version`、`package.json` 中的 `packageManager` / `engines.bun` 和 Dockerfile 的 `BUN_VERSION`。
+
 ```bash
 # 1. 克隆项目
 git clone https://github.com/sf-yuzifu/ba-logo-api.git
 cd ba-logo-api
 
-# 2. 安装依赖
-bun install
+# 2. 按锁文件安装依赖
+bun install --frozen-lockfile
 
 # 3. 启动开发模式（支持毫秒级热重载）
 bun dev
@@ -63,7 +65,19 @@ bun start
 ### 🧪 自动化测试与离线样图生成
 
 ```bash
-# 运行单元与路由全量测试 (15 tests, 68 assertions)
+# 执行完整检查：类型检查 → 静态/格式检查 → 测试
+bun run check
+
+# 仅检查 TypeScript 类型（不输出编译产物）
+bun run typecheck
+
+# 检查 Biome 静态规则、导入顺序与代码格式（只读，警告也会失败）
+bun run lint
+
+# 格式化 TypeScript 与 JSON 文件
+bun run format
+
+# 运行单元与路由全量测试
 bun test
 
 # 一键批量生成各类风格的高清离线测试样图至 samples/ 目录
@@ -72,6 +86,10 @@ bun run samples
 # 执行高并发与内存压测脚本
 bun run bench
 ```
+
+代码统一使用两空格缩进、UTF-8 和 LF 换行；TypeScript 开启严格模式及未使用代码检查。`bun test` 不执行类型检查，提交前建议运行 `bun run check`。Biome 支持安全自动修复：`bunx --no-install biome check --write .`。
+
+GitHub Actions 在每次 push / pull request 时，分别在 Linux 与 Windows 执行冻结锁文件安装、类型检查、Biome 检查与测试。
 
 ---
 

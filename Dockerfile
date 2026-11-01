@@ -1,7 +1,8 @@
 # ==========================================
 # 阶段 1: 依赖安装阶段
 # ==========================================
-FROM oven/bun:1-alpine AS deps
+ARG BUN_VERSION=1.3.14
+FROM oven/bun:${BUN_VERSION}-alpine AS deps
 WORKDIR /app
 
 # 拷贝依赖配置并安装纯生产依赖
@@ -11,7 +12,7 @@ RUN bun install --frozen-lockfile --production
 # ==========================================
 # 阶段 2: 极简运行镜像
 # ==========================================
-FROM oven/bun:1-alpine AS runner
+FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \

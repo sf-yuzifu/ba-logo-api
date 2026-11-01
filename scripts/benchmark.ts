@@ -58,12 +58,12 @@ async function runBenchmark() {
   // 4. 并发与压力测试 (200 个并发请求并发冲撞)
   console.log('⚡ [4/4] 执行高并发压力测试 (200 并发任务)...');
   const concurStart = performance.now();
-  const promises: Promise<any>[] = [];
+  const promises: Promise<ArrayBuffer>[] = [];
 
   for (let i = 0; i < 200; i++) {
     const q = testQueries[i % testQueries.length];
     promises.push(
-      app.handle(new Request(`http://localhost/api/logo?${q}`)).then((r) => r.arrayBuffer())
+      app.handle(new Request(`http://localhost/api/logo?${q}`)).then((r) => r.arrayBuffer()),
     );
   }
 
@@ -84,7 +84,11 @@ async function runBenchmark() {
   console.log('====================================================');
   console.log('  最终常驻内存 (RSS):', (memFinal.rss / 1024 / 1024).toFixed(2), 'MB');
   console.log('  堆内存已用 (HeapUsed):', (memFinal.heapUsed / 1024 / 1024).toFixed(2), 'MB');
-  console.log('  总内存增长 (RSS Diff):', ((memFinal.rss - memInit.rss) / 1024 / 1024).toFixed(2), 'MB');
+  console.log(
+    '  总内存增长 (RSS Diff):',
+    ((memFinal.rss - memInit.rss) / 1024 / 1024).toFixed(2),
+    'MB',
+  );
   console.log('====================================================\n');
 
   // 指标断言
@@ -92,8 +96,12 @@ async function runBenchmark() {
   const memoryPassed = memFinal.rss / 1024 / 1024 < 60;
 
   console.log('🎯 验收目标检验:');
-  console.log(`  [${latencyPassed ? 'PASS' : 'WARN'}] 目标平均时延 < 20ms: 实测 ${avg.toFixed(2)} ms`);
-  console.log(`  [${memoryPassed ? 'PASS' : 'WARN'}] 目标常驻内存 < 60MB: 实测 ${(memFinal.rss / 1024 / 1024).toFixed(2)} MB\n`);
+  console.log(
+    `  [${latencyPassed ? 'PASS' : 'WARN'}] 目标平均时延 < 20ms: 实测 ${avg.toFixed(2)} ms`,
+  );
+  console.log(
+    `  [${memoryPassed ? 'PASS' : 'WARN'}] 目标常驻内存 < 60MB: 实测 ${(memFinal.rss / 1024 / 1024).toFixed(2)} MB\n`,
+  );
 }
 
 runBenchmark().catch(console.error);

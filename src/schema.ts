@@ -20,7 +20,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: 'Logo 左侧主文字（蓝色，默认"蔚蓝"）',
       examples: ['Blue', '蔚蓝'],
-    })
+    }),
   ),
   l: t.Optional(t.String({ description: 'left 别名' })),
 
@@ -28,7 +28,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: 'Logo 右侧主文字（深灰色，默认"档案"）',
       examples: ['Archive', '档案'],
-    })
+    }),
   ),
   r: t.Optional(t.String({ description: 'right 别名' })),
 
@@ -37,7 +37,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: '右下方可选副标题（如官方日文副标）',
       examples: ['ブルーアーカイブ', 'Blue Archive'],
-    })
+    }),
   ),
   sub: t.Optional(t.String({ description: 'subtitle 别名' })),
 
@@ -45,7 +45,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: '副标题颜色（默认跟随次要文字颜色）',
       examples: ['#2B2B2B', '#FFFFFF'],
-    })
+    }),
   ),
   subColor: t.Optional(t.String({ description: 'subtitleColor 别名' })),
 
@@ -53,7 +53,7 @@ export const LogoQuerySchema = t.Object({
     t.Numeric({
       description: '副标题 X 轴偏移量（像素，默认 0）',
       examples: [0, 20, -20],
-    })
+    }),
   ),
   subX: t.Optional(t.Numeric({ description: 'subtitleOffsetX 别名' })),
 
@@ -61,7 +61,7 @@ export const LogoQuerySchema = t.Object({
     t.Numeric({
       description: '副标题 Y 轴偏移量（像素，默认 0）',
       examples: [0, 10, -10],
-    })
+    }),
   ),
   subY: t.Optional(t.Numeric({ description: 'subtitleOffsetY 别名' })),
 
@@ -70,7 +70,7 @@ export const LogoQuerySchema = t.Object({
     t.Numeric({
       description: '光环与十字 X 轴偏移量（像素，默认 -15）',
       examples: [-15, 0, 20],
-    })
+    }),
   ),
   x: t.Optional(t.Numeric({ description: 'offsetX 别名' })),
 
@@ -78,7 +78,7 @@ export const LogoQuerySchema = t.Object({
     t.Numeric({
       description: '光环与十字 Y 轴偏移量（像素，默认 0）',
       examples: [0, -10, 10],
-    })
+    }),
   ),
   y: t.Optional(t.Numeric({ description: 'offsetY 别名' })),
 
@@ -89,20 +89,18 @@ export const LogoQuerySchema = t.Object({
       minimum: -100,
       maximum: 300,
       examples: [0, 20, -10],
-    })
+    }),
   ),
   gap: t.Optional(
     t.Numeric({
       description: 'wordGap 别名',
       minimum: -100,
       maximum: 300,
-    })
+    }),
   ),
 
   // 背景与样式
-  transparent: t.Optional(
-    FlexibleBoolean
-  ),
+  transparent: t.Optional(FlexibleBoolean),
   tp: t.Optional(FlexibleBoolean),
 
   // 分辨率缩放（PR #9）
@@ -112,14 +110,14 @@ export const LogoQuerySchema = t.Object({
       minimum: 0.1,
       maximum: 8.0,
       examples: [1, 2, 4],
-    })
+    }),
   ),
   s: t.Optional(
     t.Numeric({
       description: 'scale 别名',
       minimum: 0.1,
       maximum: 8.0,
-    })
+    }),
   ),
 
   // 配色方案（PR #6）
@@ -133,7 +131,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: '主强调色（十六进制颜色代码，影响左文字与十字架，默认 #128AFA）',
       examples: ['#128AFA', '#FF5722', '#00E5FF'],
-    })
+    }),
   ),
   accent: t.Optional(t.String({ description: 'accentColor 别名' })),
 
@@ -141,7 +139,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: '文字主题色（十六进制颜色代码，影响右文字与光环，默认 #2B2B2B）',
       examples: ['#2B2B2B', '#000000', '#FFFFFF'],
-    })
+    }),
   ),
   color: t.Optional(t.String({ description: 'textColor 别名' })),
   tc: t.Optional(t.String({ description: 'textColor 别名' })),
@@ -151,7 +149,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: '十字独立颜色（默认跟随 accentColor）',
       examples: ['#FFD700', '#FF5722', '#128AFA'],
-    })
+    }),
   ),
   cross: t.Optional(t.String({ description: 'crossColor 别名' })),
 
@@ -159,7 +157,7 @@ export const LogoQuerySchema = t.Object({
     t.String({
       description: '光环独立颜色（默认跟随 textColor）',
       examples: ['#9C27B0', '#2B2B2B', '#FFFFFF'],
-    })
+    }),
   ),
   halo: t.Optional(t.String({ description: 'haloColor 别名' })),
 
@@ -175,14 +173,9 @@ export const LogoQuerySchema = t.Object({
         description: '内容留白边距（支持 CSS 语法，如 "10 20", "10,20,30,40"）',
         examples: ['2', '10', '10 20', '10,20,30,40'],
       }),
-    ])
+    ]),
   ),
-  pad: t.Optional(
-    t.Union([
-      t.Numeric(),
-      t.String({ description: 'padding 别名' }),
-    ])
-  ),
+  pad: t.Optional(t.Union([t.Numeric(), t.String({ description: 'padding 别名' })])),
   paddingTop: t.Optional(t.Numeric({ description: '独立上留白边距（像素）' })),
   pt: t.Optional(t.Numeric({ description: 'paddingTop 别名' })),
   paddingRight: t.Optional(t.Numeric({ description: '独立右留白边距（像素）' })),
@@ -191,9 +184,7 @@ export const LogoQuerySchema = t.Object({
   pb: t.Optional(t.Numeric({ description: 'paddingBottom 别名' })),
   paddingLeft: t.Optional(t.Numeric({ description: '独立左留白边距（像素）' })),
   pl: t.Optional(t.Numeric({ description: 'paddingLeft 别名' })),
-  center: t.Optional(
-    FlexibleBoolean
-  ),
+  center: t.Optional(FlexibleBoolean),
   vcenter: t.Optional(FlexibleBoolean),
 
   format: t.Optional(
@@ -209,8 +200,8 @@ export const LogoQuerySchema = t.Object({
       {
         description: '输出格式（png / webp / jpeg / svg / base64）',
         default: 'png',
-      }
-    )
+      },
+    ),
   ),
 });
 
