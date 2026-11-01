@@ -84,6 +84,15 @@ describe('Renderer Core Unit Tests', () => {
 
     // 带有副标题时，由于包含右下方副标题文本，宽度应当合理覆盖
     expect(withSub.width).toBeGreaterThanOrEqual(withoutSub.width);
+
+    // 超长副标题向左延伸时不应发生左侧或底部截断
+    const longSub = renderLogo({
+      textL: '蔚蓝',
+      textR: '档案',
+      subtitle: '1145141313484848484111',
+      scale: 2,
+    });
+    expect(longSub.width).toBeGreaterThan(1200);
   });
 
   it('长短文本边界与裁剪安全性', () => {

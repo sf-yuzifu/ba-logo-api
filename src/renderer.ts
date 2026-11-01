@@ -322,11 +322,25 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const textWidthR =
     textMetricsR.width + (TEXT_BASELINE * canvasHeight - ascentR) * HORIZONTAL_TILT;
 
-  // 测量副标题
+  // 测量副标题排版边界
   let subtitleMetricsWidth = 0;
+  let subAscent = 26 * scale;
+  let subDescent = 6 * scale;
+  let minSubX_rel = 0;
+  let maxSubX_rel = 0;
+  const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale;
+
   if (subtitle) {
     measureCtx.font = subtitleFont;
-    subtitleMetricsWidth = measureCtx.measureText(subtitle).width;
+    const subMetrics = measureCtx.measureText(subtitle);
+    subtitleMetricsWidth = subMetrics.width;
+    subAscent = subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
+    subDescent = subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
+
+    const subtitleX_rel = textWidthR + subtitleFontSize;
+    // 斜体转换下，副标题相对于 midX 的屏幕 X 范围
+    minSubX_rel = (subtitleX_rel - subtitleMetricsWidth) + HORIZONTAL_TILT * (subY + subDescent);
+    maxSubX_rel = subtitleX_rel + HORIZONTAL_TILT * (subY - subAscent);
   }
 
   // 计算用户自定义 padding，支持数字、CSS 语法或独立方向参数
@@ -347,24 +361,44 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const maxPadH = Math.max(padBox.left, padBox.right);
   const margin = Math.max(paddingX, maxPadH + 20 * scale);
 
-  // 根据主副文字长度动态计算基准画布左右分界线
-  const rightSpan = subtitle ? textWidthR + subtitleFontSize + margin : textWidthR + margin;
-  const canvasWidthL = Math.max(textWidthL + margin, initialWidth / 2 + margin);
-  const canvasWidthR = Math.max(rightSpan, initialWidth / 2 + margin);
-  const totalCanvasWidth = canvasWidthL + canvasWidthR;
-
-  // 原始光环与副标题绝对坐标
   const scaledOffsetX = offsetX * scale;
   const scaledOffsetY = offsetY * scale;
+
+  // 综合主文字、副标题、光环偏移量，动态计算基底画布左右所需空间（防止超长副标题被截断）
+  const needLeft = Math.max(
+    textWidthL,
+    canvasHeight / 2 - scaledOffsetX,
+    subtitle ? -minSubX_rel : 0,
+    initialWidth / 2
+  );
+  const needRight = Math.max(
+    textWidthR,
+    canvasHeight / 2 + scaledOffsetX,
+    subtitle ? maxSubX_rel : 0,
+    initialWidth / 2
+  );
+
+  const canvasWidthL = Math.ceil(needLeft + margin);
+  const canvasWidthR = Math.ceil(needRight + margin);
+  const totalCanvasWidth = canvasWidthL + canvasWidthR;
+
+  // 动态扩展基底画布高度，确保副标题底部和光环上下位移有充足绘制空间
+  const totalCanvasHeight = Math.max(
+    canvasHeight,
+    subtitle ? Math.ceil(subY + subDescent + margin) : 0,
+    Math.ceil(scaledOffsetY + canvasHeight + margin)
+  );
+
+  // 原始光环与副标题绝对坐标
   const graphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
   const graphY = scaledOffsetY;
   const midX = canvasWidthL;
   const subtitleX = canvasWidthL + textWidthR + subtitleFontSize;
 
   // 创建绘制基底画布（始终在透明通道绘制图元，由裁切层统一负责背景填充与包围盒计算）
-  const canvas = createCanvas(totalCanvasWidth, canvasHeight);
+  const canvas = createCanvas(totalCanvasWidth, totalCanvasHeight);
   const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, totalCanvasWidth, canvasHeight);
+  ctx.clearRect(0, 0, totalCanvasWidth, totalCanvasHeight);
 
   // 2. 绘制左侧主文本 (textAlign = 'end')
   ctx.font = font;
