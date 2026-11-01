@@ -1,0 +1,13 @@
+services:
+  ba-logo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ba-logo-api:latest
+    container_name: ba-logo-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production

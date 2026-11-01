@@ -1,0 +1,10 @@
+node_modules
+.git
+.github
+samples
+test
+scripts
+*.log
+*.png
+.gitignore
+todo.md
