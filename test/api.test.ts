@@ -62,6 +62,16 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(buf.byteLength).toBeGreaterThan(1000);
   });
 
+  it('GET /api/logo 应当支持 wordGap / gap 两词间距参数', async () => {
+    const res = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&wordGap=30')
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toBe('image/png');
+    const buf = await res.arrayBuffer();
+    expect(buf.byteLength).toBeGreaterThan(1000);
+  });
+
   it('GET /api/logo?format=base64 应当返回结构化 JSON', async () => {
     const res = await app.handle(
       new Request('http://localhost/api/logo?left=蔚蓝&right=档案&format=base64')

@@ -47,6 +47,11 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   const accentColor = query.accentColor ?? query.accent;
   const textColor = query.textColor ?? query.color ?? query.tc;
 
+  // 词间距
+  const rawWordGap = query.wordGap ?? query.gap;
+  const wordGap =
+    rawWordGap !== undefined && !Number.isNaN(Number(rawWordGap)) ? Number(rawWordGap) : undefined;
+
   // 留白边距 (支持数字、CSS 语法字符串如 "10 20" 及独立方向参数)
   const padding = query.padding ?? query.pad;
   const paddingTop = query.paddingTop ?? query.pt;
@@ -72,6 +77,7 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
     subtitleColor,
     offsetX,
     offsetY,
+    wordGap,
     transparent,
     scale,
     darkMode,

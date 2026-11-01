@@ -66,6 +66,23 @@ export const LogoQuerySchema = t.Object({
   ),
   y: t.Optional(t.Numeric({ description: 'offsetY 别名' })),
 
+  // 词间距（左右两词间距微调）
+  wordGap: t.Optional(
+    t.Numeric({
+      description: '左右两词之间的间隔（像素，默认 0，范围 -100 ~ 300）',
+      minimum: -100,
+      maximum: 300,
+      examples: [0, 20, -10],
+    })
+  ),
+  gap: t.Optional(
+    t.Numeric({
+      description: 'wordGap 别名',
+      minimum: -100,
+      maximum: 300,
+    })
+  ),
+
   // 背景与样式
   transparent: t.Optional(
     FlexibleBoolean

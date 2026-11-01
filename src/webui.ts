@@ -751,6 +751,15 @@ export function getWebUIHtml(): string {
         <input type="number" id="inputY" class="input-text" value="0" placeholder="默认 0">
       </div>
 
+      <!-- 两词间距 -->
+      <div class="form-group">
+        <label class="form-label">
+          <span>两词间距 (WORD GAP)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px，支持负数紧凑</span>
+        </label>
+        <input type="number" id="inputWordGap" class="input-text" value="0" placeholder="默认 0">
+      </div>
+
       <!-- 留白边距 -->
       <div class="form-group" id="paddingGroup">
         <label class="form-label">
@@ -873,6 +882,7 @@ export function getWebUIHtml(): string {
       textColor: '#2B2B2B',
       x: -15,
       y: 0,
+      wordGap: 0,
       scale: 2,
       format: 'png',
       transparent: false,
@@ -891,6 +901,7 @@ export function getWebUIHtml(): string {
     const elTextColor = document.getElementById('inputTextColor');
     const elX = document.getElementById('inputX');
     const elY = document.getElementById('inputY');
+    const elWordGap = document.getElementById('inputWordGap');
     const elPadding = document.getElementById('inputPadding');
     const elTp = document.getElementById('toggleTp');
     const elDark = document.getElementById('toggleDark');
@@ -925,6 +936,7 @@ export function getWebUIHtml(): string {
         params.set('r', state.right);
         if (state.x !== -15) params.set('x', state.x);
         if (state.y !== 0) params.set('y', state.y);
+        if (state.wordGap !== 0) params.set('gap', state.wordGap);
         if (state.transparent) params.set('tp', 'true');
         if (state.scale !== 1) params.set('scale', state.scale);
         if (state.subtitle) params.set('sub', state.subtitle);
@@ -958,6 +970,7 @@ export function getWebUIHtml(): string {
       }
       if (state.x !== -15) params.set('offsetX', state.x);
       if (state.y !== 0) params.set('offsetY', state.y);
+      if (state.wordGap !== 0) params.set('wordGap', state.wordGap);
       if (state.scale !== 1) params.set('scale', state.scale);
       if (state.format !== 'png') params.set('format', state.format);
       if (state.transparent) params.set('transparent', 'true');
@@ -1086,6 +1099,12 @@ export function getWebUIHtml(): string {
     elY.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
       state.y = Number.isFinite(val) ? val : 0;
+      updatePreview();
+    });
+
+    elWordGap.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.wordGap = Number.isFinite(val) ? val : 0;
       updatePreview();
     });
 

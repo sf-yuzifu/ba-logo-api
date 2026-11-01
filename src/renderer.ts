@@ -77,6 +77,7 @@ export interface RenderOptions {
   paddingRight?: number; // 独立右留白边距（可选覆盖）
   paddingBottom?: number; // 独立下留白边距（可选覆盖）
   paddingLeft?: number; // 独立左留白边距（可选覆盖）
+  wordGap?: number; // 两词之间的间隔距离（像素，默认 0，范围 -100 ~ 300，随 scale 缩放）
   center?: boolean; // 文本垂直视觉居中（有背景时默认 true，透明模式默认 false）
   accentColor?: string; // 主强调色（左文字、十字架，默认 #128AFA）
   textColor?: string; // 文字主题色（右文字、光环，默认 #2B2B2B，暗黑模式默认 #FFFFFF）
@@ -364,17 +365,22 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const scaledOffsetX = offsetX * scale;
   const scaledOffsetY = offsetY * scale;
 
-  // 综合主文字、副标题、光环偏移量，动态计算基底画布左右所需空间（防止超长副标题被截断）
+  // 词间距（wordGap，范围 -100 ~ 300）
+  const rawWordGap = Number(options.wordGap ?? 0);
+  const wordGap = Number.isFinite(rawWordGap) ? Math.min(Math.max(rawWordGap, -100), 300) * scale : 0;
+  const halfGap = Math.round(wordGap / 2);
+
+  // 综合主文字、副标题、光环偏移量与词间距，动态计算基底画布左右所需空间（防止超长副标题被截断）
   const needLeft = Math.max(
-    textWidthL,
-    canvasHeight / 2 - scaledOffsetX,
-    subtitle ? -minSubX_rel : 0,
+    textWidthL + halfGap,
+    canvasHeight / 2 - scaledOffsetX - halfGap,
+    subtitle ? -(minSubX_rel + halfGap) : 0,
     initialWidth / 2
   );
   const needRight = Math.max(
-    textWidthR,
-    canvasHeight / 2 + scaledOffsetX,
-    subtitle ? maxSubX_rel : 0,
+    textWidthR + halfGap,
+    canvasHeight / 2 + scaledOffsetX + halfGap,
+    subtitle ? (maxSubX_rel + halfGap) : 0,
     initialWidth / 2
   );
 
@@ -389,11 +395,12 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     Math.ceil(scaledOffsetY + canvasHeight + margin)
   );
 
-  // 原始光环与副标题绝对坐标
-  const graphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
+  // 左右文字在中央分界线两侧施加 ± halfGap 偏移
+  const leftTextX = canvasWidthL - halfGap;
+  const rightTextX = canvasWidthL + halfGap;
+  const graphX = rightTextX - canvasHeight / 2 + scaledOffsetX;
   const graphY = scaledOffsetY;
-  const midX = canvasWidthL;
-  const subtitleX = canvasWidthL + textWidthR + subtitleFontSize;
+  const subtitleX = rightTextX + textWidthR + subtitleFontSize;
 
   // 创建绘制基底画布（始终在透明通道绘制图元，由裁切层统一负责背景填充与包围盒计算）
   const canvas = createCanvas(totalCanvasWidth, totalCanvasHeight);
@@ -405,7 +412,7 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   ctx.fillStyle = primaryColor;
   ctx.textAlign = 'end';
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  ctx.fillText(textL, midX, canvasHeight * TEXT_BASELINE);
+  ctx.fillText(textL, leftTextX, canvasHeight * TEXT_BASELINE);
   ctx.resetTransform();
 
   // 3. 绘制光环 (Halo)
@@ -420,12 +427,12 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = strokeWidth;
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  ctx.strokeText(textR, midX, canvasHeight * TEXT_BASELINE);
+  ctx.strokeText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
 
   // 填充文字实体颜色
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = secondaryColor;
-  ctx.fillText(textR, midX, canvasHeight * TEXT_BASELINE);
+  ctx.fillText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
   ctx.resetTransform();
 
   // 5. 绘制十字镂空多边形遮罩 (Hollow Polygon)

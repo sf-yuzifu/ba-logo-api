@@ -96,6 +96,7 @@ bun run bench
 | `swapColors` | `swap` | boolean | `false` | `true`, `false`, `1`, `0` | 是否对调左右文字的主次颜色 |
 | `offsetX` | `x` | number | `-15` | `0`, `10`, `-20` | 光环与十字 X 轴偏移量（像素） |
 | `offsetY` | `y` | number | `0` | `5`, `-5` | 光环与十字 Y 轴偏移量（像素） |
+| `wordGap` | `gap` | number | `0` | `20`, `-10`, `50` | **两词间距**（左右两词间距微调，支持正负数，范围 -100 ~ 300） |
 | `padding` | `pad` | string / number | `2` | `10`, `10 20`, `10,20,30,40` | **留白边距**（上下左右全向加白，全面支持 **CSS 语法**：单值、双值、四值） |
 | `paddingTop` | `pt` | number | - | `10`, `20` | 独立上边距留白（可选细粒度覆盖） |
 | `paddingRight` | `pr` | number | - | `10`, `20` | 独立右边距留白（可选细粒度覆盖） |

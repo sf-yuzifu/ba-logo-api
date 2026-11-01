@@ -166,6 +166,16 @@ describe('Renderer Core Unit Tests', () => {
     expect(padOverride.height).toBe(base.height + 12);
   });
 
+  it('应当支持两词间距微调 (wordGap / gap)', () => {
+    const normal = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, wordGap: 0 });
+    const wide = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, wordGap: 40 });
+    const tight = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, wordGap: -20 });
+
+    // scale: 2 时，gap=40 展开 80px，gap=-20 紧缩 40px
+    expect(wide.width).toBe(normal.width + 80);
+    expect(tight.width).toBe(normal.width - 40);
+  });
+
   it('单次渲染性能基准测试应当小于 50ms', () => {
     const start = performance.now();
     renderLogoToBuffer({ textL: '蔚蓝', textR: '档案', scale: 1 });
