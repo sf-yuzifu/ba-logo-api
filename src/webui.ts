@@ -750,6 +750,29 @@ export function getWebUIHtml(): string {
         </div>
       </div>
 
+      <!-- 独立十字与光环颜色 (可选独立定制) -->
+      <div class="form-group">
+        <label class="form-label">
+          <span>十字独立颜色 (CROSS COLOR)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">可选，默认跟随强调色</span>
+        </label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="inputCrossColor" class="input-text" value="" placeholder="默认跟随强调色，可输 Hex 如 #FFD700">
+          <input type="color" id="pickerCrossColor" value="#128AFA" title="十字拾色器">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span>光环独立颜色 (HALO COLOR)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">可选，默认跟随文字色</span>
+        </label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="inputHaloColor" class="input-text" value="" placeholder="默认跟随文字色，可输 Hex 如 #9C27B0">
+          <input type="color" id="pickerHaloColor" value="#2B2B2B" title="光环拾色器">
+        </div>
+      </div>
+
       <!-- 坐标偏移 -->
       <div class="form-group">
         <label class="form-label">
@@ -840,6 +863,14 @@ export function getWebUIHtml(): string {
             <span class="slider"></span>
           </div>
         </label>
+
+        <label class="toggle-item">
+          <span>图标置底</span>
+          <div class="switch">
+            <input type="checkbox" id="toggleBehind">
+            <span class="slider"></span>
+          </div>
+        </label>
       </div>
     </div>
 
@@ -898,6 +929,9 @@ export function getWebUIHtml(): string {
       subY: 0,
       accent: '#128AFA',
       textColor: '#2B2B2B',
+      crossColor: '',
+      haloColor: '',
+      behind: false,
       x: -15,
       y: 0,
       wordGap: 0,
@@ -919,6 +953,10 @@ export function getWebUIHtml(): string {
     const elSubY = document.getElementById('inputSubY');
     const elAccent = document.getElementById('inputAccent');
     const elTextColor = document.getElementById('inputTextColor');
+    const elCrossColor = document.getElementById('inputCrossColor');
+    const pickerCrossColor = document.getElementById('pickerCrossColor');
+    const elHaloColor = document.getElementById('inputHaloColor');
+    const pickerHaloColor = document.getElementById('pickerHaloColor');
     const elX = document.getElementById('inputX');
     const elY = document.getElementById('inputY');
     const elWordGap = document.getElementById('inputWordGap');
@@ -927,6 +965,7 @@ export function getWebUIHtml(): string {
     const elDark = document.getElementById('toggleDark');
     const elSwap = document.getElementById('toggleSwap');
     const elCenter = document.getElementById('toggleCenter');
+    const elBehind = document.getElementById('toggleBehind');
 
     const previewImg = document.getElementById('previewImg');
     const previewBox = document.getElementById('previewBox');
@@ -969,6 +1008,9 @@ export function getWebUIHtml(): string {
         if (state.textColor && state.textColor.toLowerCase() !== defaultTxt) {
           params.set('textColor', state.textColor.replace('#', ''));
         }
+        if (state.crossColor) params.set('cross', state.crossColor.replace('#', ''));
+        if (state.haloColor) params.set('halo', state.haloColor.replace('#', ''));
+        if (state.behind) params.set('behind', 'true');
         if (state.dark) params.set('dark', 'true');
         if (state.swap) params.set('swap', 'true');
         if (state.format !== 'png') params.set('format', state.format);
@@ -996,6 +1038,9 @@ export function getWebUIHtml(): string {
       if (state.textColor && state.textColor.toLowerCase() !== defaultTxt) {
         params.set('textColor', state.textColor.replace('#', ''));
       }
+      if (state.crossColor) params.set('crossColor', state.crossColor.replace('#', ''));
+      if (state.haloColor) params.set('haloColor', state.haloColor.replace('#', ''));
+      if (state.behind) params.set('motifsBehindText', 'true');
       if (state.x !== -15) params.set('offsetX', state.x);
       if (state.y !== 0) params.set('offsetY', state.y);
       if (state.wordGap !== 0) params.set('wordGap', state.wordGap);
@@ -1165,6 +1210,32 @@ export function getWebUIHtml(): string {
       });
     });
 
+    elCrossColor.addEventListener('input', (e) => {
+      state.crossColor = e.target.value.trim();
+      if (state.crossColor.startsWith('#') && state.crossColor.length === 7) {
+        pickerCrossColor.value = state.crossColor;
+      }
+      updatePreview();
+    });
+    pickerCrossColor.addEventListener('input', (e) => {
+      state.crossColor = e.target.value;
+      elCrossColor.value = e.target.value;
+      updatePreview();
+    });
+
+    elHaloColor.addEventListener('input', (e) => {
+      state.haloColor = e.target.value.trim();
+      if (state.haloColor.startsWith('#') && state.haloColor.length === 7) {
+        pickerHaloColor.value = state.haloColor;
+      }
+      updatePreview();
+    });
+    pickerHaloColor.addEventListener('input', (e) => {
+      state.haloColor = e.target.value;
+      elHaloColor.value = e.target.value;
+      updatePreview();
+    });
+
     elTp.addEventListener('change', (e) => {
       state.transparent = e.target.checked;
       // 开启透明背景时默认推荐贴边，关闭时推荐居中
@@ -1185,6 +1256,7 @@ export function getWebUIHtml(): string {
     });
     elSwap.addEventListener('change', (e) => { state.swap = e.target.checked; updatePreview(); });
     elCenter.addEventListener('change', (e) => { state.center = e.target.checked; updatePreview(); });
+    elBehind.addEventListener('change', (e) => { state.behind = e.target.checked; updatePreview(); });
 
     // Endpoint Pills
     document.querySelectorAll('#endpointPills .pill-btn').forEach(btn => {

@@ -146,6 +146,27 @@ export const LogoQuerySchema = t.Object({
   color: t.Optional(t.String({ description: 'textColor 别名' })),
   tc: t.Optional(t.String({ description: 'textColor 别名' })),
 
+  // 独立图元色彩与层级控制
+  crossColor: t.Optional(
+    t.String({
+      description: '十字独立颜色（默认跟随 accentColor）',
+      examples: ['#FFD700', '#FF5722', '#128AFA'],
+    })
+  ),
+  cross: t.Optional(t.String({ description: 'crossColor 别名' })),
+
+  haloColor: t.Optional(
+    t.String({
+      description: '光环独立颜色（默认跟随 textColor）',
+      examples: ['#9C27B0', '#2B2B2B', '#FFFFFF'],
+    })
+  ),
+  halo: t.Optional(t.String({ description: 'haloColor 别名' })),
+
+  motifsBehindText: t.Optional(FlexibleBoolean),
+  underText: t.Optional(FlexibleBoolean),
+  behind: t.Optional(FlexibleBoolean),
+
   // 留白边距（支持纯数字如 10，或 CSS 语法字符串如 "10 20", "10,20,30,40"）
   padding: t.Optional(
     t.Union([

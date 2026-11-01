@@ -83,6 +83,9 @@ export interface RenderOptions {
   center?: boolean; // 文本垂直视觉居中（有背景时默认 true，透明模式默认 false）
   accentColor?: string; // 主强调色（左文字、十字架，默认 #128AFA）
   textColor?: string; // 文字主题色（右文字、光环，默认 #2B2B2B，暗黑模式默认 #FFFFFF）
+  crossColor?: string; // 可选十字独立颜色（默认跟随 accentColor）
+  haloColor?: string; // 可选光环独立颜色（默认跟随 textColor）
+  motifsBehindText?: boolean; // 是否将十字与光环置于文字图层下方（默认 false）
   darkMode?: boolean; // 是否开启暗黑模式（默认 false）
   swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
   scale?: number; // 分辨率缩放倍率（默认 1，支持 2x, 3x, 4x 等高清水印与海报分辨率）
@@ -285,8 +288,11 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
 
   const primaryColor = swapColors ? baseTextColor : accentColor;
   const secondaryColor = swapColors ? accentColor : baseTextColor;
-  const haloColor = baseTextColor;
-  const crossColor = accentColor;
+  const defaultHaloColor = swapColors ? accentColor : baseTextColor;
+  const defaultCrossColor = swapColors ? baseTextColor : accentColor;
+  const haloColor = options.haloColor ? normalizeColor(options.haloColor) : defaultHaloColor;
+  const crossColor = options.crossColor ? normalizeColor(options.crossColor) : defaultCrossColor;
+  const motifsBehindText = options.motifsBehindText ?? false;
 
   // PR #9 高清缩放倍率 (支持 0.1 ~ 8x，默认 1)
   const rawScale = Number(options.scale ?? 1);
@@ -415,55 +421,99 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, totalCanvasWidth, totalCanvasHeight);
 
-  // 2. 绘制左侧主文本 (textAlign = 'end')
-  ctx.font = font;
-  ctx.fillStyle = primaryColor;
-  ctx.textAlign = 'end';
-  ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  ctx.fillText(textL, leftTextX, canvasHeight * TEXT_BASELINE);
-  ctx.resetTransform();
+  if (motifsBehindText) {
+    // 【图标置底模式】：光环与十字位于文字图层下方，文字无镂空遮挡
+    // 1. 绘制光环 (Halo)
+    drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, haloColor);
 
-  // 3. 绘制光环 (Halo)
-  drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, haloColor);
-
-  // 4. 绘制右侧文字 (次要颜色 + 描边裁切光环)
-  ctx.font = font;
-  ctx.textAlign = 'start';
-
-  // 使用 destination-out 擦除下方图层，实现镂空光环
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = strokeWidth;
-  ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  ctx.strokeText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
-
-  // 填充文字实体颜色
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = secondaryColor;
-  ctx.fillText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
-  ctx.resetTransform();
-
-  // 5. 绘制十字镂空多边形遮罩 (Hollow Polygon)
-  ctx.beginPath();
-  ctx.moveTo(
-    graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-    graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight
-  );
-  for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
-    ctx.lineTo(
-      graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-      graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+    // 2. 绘制十字镂空多边形遮罩 (Hollow Polygon)
+    ctx.beginPath();
+    ctx.moveTo(
+      graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
+      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight
     );
+    for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
+      ctx.lineTo(
+        graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
+        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+      );
+    }
+    ctx.closePath();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = '#000000';
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+
+    // 3. 绘制十字 (Cross)
+    drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, crossColor);
+
+    // 4. 绘制左侧主文本 (textAlign = 'end')
+    ctx.font = font;
+    ctx.fillStyle = primaryColor;
+    ctx.textAlign = 'end';
+    ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+    ctx.fillText(textL, leftTextX, canvasHeight * TEXT_BASELINE);
+    ctx.resetTransform();
+
+    // 5. 绘制右侧文字 (直接绘制在光环/十字上方)
+    ctx.font = font;
+    ctx.textAlign = 'start';
+    ctx.fillStyle = secondaryColor;
+    ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+    ctx.fillText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
+    ctx.resetTransform();
+  } else {
+    // 【官方标准层级模式】：左文字 -> 光环 -> 右文字描边镂空光环 -> 右文字填充 -> 镂空多边形 -> 十字
+    // 2. 绘制左侧主文本 (textAlign = 'end')
+    ctx.font = font;
+    ctx.fillStyle = primaryColor;
+    ctx.textAlign = 'end';
+    ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+    ctx.fillText(textL, leftTextX, canvasHeight * TEXT_BASELINE);
+    ctx.resetTransform();
+
+    // 3. 绘制光环 (Halo)
+    drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, haloColor);
+
+    // 4. 绘制右侧文字 (次要颜色 + 描边裁切光环)
+    ctx.font = font;
+    ctx.textAlign = 'start';
+
+    // 使用 destination-out 擦除下方图层，实现镂空光环
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = strokeWidth;
+    ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+    ctx.strokeText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
+
+    // 填充文字实体颜色
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = secondaryColor;
+    ctx.fillText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
+    ctx.resetTransform();
+
+    // 5. 绘制十字镂空多边形遮罩 (Hollow Polygon)
+    ctx.beginPath();
+    ctx.moveTo(
+      graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
+      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+    );
+    for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
+      ctx.lineTo(
+        graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
+        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight
+      );
+    }
+    ctx.closePath();
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = '#000000';
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+
+    // 6. 绘制十字 (Cross)
+    drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, crossColor);
   }
-  ctx.closePath();
-
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = '#000000';
-  ctx.fill();
-  ctx.globalCompositeOperation = 'source-over';
-
-  // 6. 绘制十字 (Cross)
-  drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, crossColor);
 
   // 6.5 绘制可选副标题 (PR #12)
   if (subtitle) {

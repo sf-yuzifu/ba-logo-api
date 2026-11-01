@@ -72,6 +72,21 @@ describe('Renderer Core Unit Tests', () => {
     // 透明背景
     const transparent = renderLogoToBuffer({ transparent: true });
     expect(transparent.buffer.length).toBeGreaterThan(0);
+
+    // 独立十字与光环颜色
+    const customMotifs = renderLogoToBuffer({
+      crossColor: '#FFD700',
+      haloColor: '#9C27B0',
+    });
+    expect(customMotifs.buffer.length).toBeGreaterThan(0);
+
+    // 图标置底模式
+    const behind = renderLogoToBuffer({
+      motifsBehindText: true,
+      crossColor: '#FFD700',
+      haloColor: '#9C27B0',
+    });
+    expect(behind.buffer.length).toBeGreaterThan(0);
   });
 
   it('应当支持副标题排版与渲染', () => {

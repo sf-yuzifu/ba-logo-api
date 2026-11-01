@@ -84,6 +84,18 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(buf.byteLength).toBeGreaterThan(1000);
   });
 
+  it('GET /api/logo 应当支持独立 crossColor, haloColor 与 motifsBehindText 参数', async () => {
+    const res = await app.handle(
+      new Request(
+        'http://localhost/api/logo?left=Blue&right=Archive&crossColor=FFD700&haloColor=9C27B0&motifsBehindText=true'
+      )
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toBe('image/png');
+    const buf = await res.arrayBuffer();
+    expect(buf.byteLength).toBeGreaterThan(1000);
+  });
+
   it('GET /api/logo?format=base64 应当返回结构化 JSON', async () => {
     const res = await app.handle(
       new Request('http://localhost/api/logo?left=蔚蓝&right=档案&format=base64')

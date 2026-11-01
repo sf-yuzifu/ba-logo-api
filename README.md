@@ -91,6 +91,9 @@ bun run bench
 | `subtitleOffsetY`| `subY` | number | `0` | `10`, `-5` | **副标题 Y 轴偏移量**（像素微调，支持正负数） |
 | `accentColor` | `accent` | string | `"#128AFA"` | `FF5722`, `#00E5FF` | **主强调色**（影响左文字与十字架，支持 Hex） |
 | `textColor` | `color`, `tc` | string | `"#2B2B2B"` | `000000`, `#FFFFFF` | **文字主题色**（影响右文字与光环，暗黑模式默认白） |
+| `crossColor` | `cross` | string | *跟随强调色* | `FFD700`, `#FF5722` | **十字独立颜色**（可选独立着色，支持 Hex） |
+| `haloColor` | `halo` | string | *跟随文字色* | `9C27B0`, `#000000` | **光环独立颜色**（可选独立着色，支持 Hex） |
+| `motifsBehindText`| `behind`, `underText`| boolean | `false` | `true`, `false` | **图标置底**（将十字与光环置于文字图层下方，文字无镂空） |
 | `scale` | `s` | number | `1` | `2`, `3`, `4` | **分辨率倍率**（1x=250p, 2x=500p, 4x=1000p，范围 0.1~8） |
 | `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `base64` | 输出图片格式（`base64` 将输出 JSON 结构体） |
 | `transparent` | `tp` | boolean | `false` | `true`, `false`, `1`, `0` | 是否开启背景透明（透明模式将镂空切除光环与十字） |

@@ -51,9 +51,16 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   const swapColors =
     typeof rawSwap === 'boolean' ? rawSwap : rawSwap === 'true' || rawSwap === '1';
 
-  // 强调色与文字主题色
+  // 强调色与文字主题色及独立图元色
   const accentColor = query.accentColor ?? query.accent;
   const textColor = query.textColor ?? query.color ?? query.tc;
+  const crossColor = query.crossColor ?? query.cross;
+  const haloColor = query.haloColor ?? query.halo;
+
+  // 图标置底
+  const rawBehind = query.motifsBehindText ?? query.underText ?? query.behind;
+  const motifsBehindText =
+    typeof rawBehind === 'boolean' ? rawBehind : rawBehind === 'true' || rawBehind === '1';
 
   // 词间距
   const rawWordGap = query.wordGap ?? query.gap;
@@ -94,6 +101,9 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
     swapColors,
     accentColor,
     textColor,
+    crossColor,
+    haloColor,
+    motifsBehindText,
     padding,
     paddingTop,
     paddingRight,
