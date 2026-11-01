@@ -30,6 +30,17 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(health.status).toBe('ok');
   });
 
+  it('GET / 应当返回支持 i18n、一键复制图片与重置的 WebUI', async () => {
+    const res = await app.handle(new Request('http://localhost/'));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/html');
+    const html = await res.text();
+    expect(html).toContain('id="langPills"');
+    expect(html).toContain('id="btnCopyImage"');
+    expect(html).toContain('id="btnResetAll"');
+    expect(html).toContain('class="reset-badge"');
+  });
+
   it('GET /balogo 应当完全向后兼容 3 年前的旧版参数', async () => {
     const res = await app.handle(
       new Request('http://localhost/balogo?l=碧蓝&r=档案&x=-10&y=5&tp=true')

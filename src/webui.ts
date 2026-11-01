@@ -548,6 +548,68 @@ export function getWebUIHtml(): string {
       box-shadow: 0 0 0 2px var(--focus-shadow);
     }
 
+    .action-btn-copy {
+      background: #F59E0B;
+      color: #fff;
+    }
+
+    .action-btn-copy:hover {
+      background: #D97706;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+
+    /* 快捷重置按钮 */
+    .reset-badge {
+      background: #F1F5F9;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s ease;
+      line-height: 1.2;
+    }
+
+    .reset-badge:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #fff;
+    }
+
+    /* 语言切换器 */
+    .lang-pills {
+      display: flex;
+      background: #F1F5F9;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--card-border);
+      gap: 2px;
+      margin-right: 4px;
+    }
+
+    .lang-pills .pill-btn {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+
+    .lang-pills .pill-btn.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
     /* API URL 预览条 */
     .url-box-container {
       background: #F8FAFC;
@@ -657,12 +719,18 @@ export function getWebUIHtml(): string {
       <div class="brand-title">Blue<span>Archive</span> Logo API</div>
     </a>
     <div class="nav-links">
+      <div class="lang-pills" id="langPills">
+        <button type="button" class="pill-btn active" data-lang="zh">中</button>
+        <button type="button" class="pill-btn" data-lang="zh-tw">繁</button>
+        <button type="button" class="pill-btn" data-lang="en">EN</button>
+        <button type="button" class="pill-btn" data-lang="ja">日</button>
+      </div>
       <a href="/swagger" class="nav-btn nav-btn-primary" target="_blank">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        Swagger 交互文档
+        <span data-i18n="nav-swagger">Swagger 交互文档</span>
       </a>
       <a href="https://github.com/nulla2011/bluearchive-logo" target="_blank" class="nav-btn nav-btn-default">
-        原版前端
+        <span data-i18n="nav-upstream">原版前端</span>
       </a>
     </div>
   </header>
@@ -672,57 +740,60 @@ export function getWebUIHtml(): string {
     <!-- 左侧控制面板 -->
     <div class="card">
       <div class="card-header">
-        <div class="card-title">Logo 参数控制台</div>
+        <div class="card-title" data-i18n="console-title">Logo 参数控制台</div>
         <!-- 路由模式切换 -->
         <div class="format-pills" id="endpointPills" style="width: 180px;">
-          <div class="pill-btn active" data-ep="api">RESTful</div>
-          <div class="pill-btn" data-ep="balogo">旧版兼容</div>
+          <div class="pill-btn active" data-ep="api" data-i18n="ep-restful">RESTful</div>
+          <div class="pill-btn" data-ep="balogo" data-i18n="ep-legacy">旧版兼容</div>
         </div>
       </div>
 
       <!-- 文字配置 -->
       <div class="form-group">
         <label class="form-label">
-          <span>标题文字 (LEFT / RIGHT)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">支持清空或单字</span>
+          <span data-i18n="label-title">标题文字 (LEFT / RIGHT)</span>
+          <button type="button" class="reset-badge" data-reset="text" title="重置文字"><span data-i18n="reset-text">默认 ↺</span></button>
         </label>
         <div class="form-row">
-          <input type="text" id="inputLeft" class="input-text" value="蔚蓝" placeholder="左文字（蓝色）">
-          <input type="text" id="inputRight" class="input-text" value="档案" placeholder="右文字（黑色）">
+          <input type="text" id="inputLeft" class="input-text" value="蔚蓝" placeholder="左文字（蓝色）" data-i18n-ph="ph-left">
+          <input type="text" id="inputRight" class="input-text" value="档案" placeholder="右文字（黑色）" data-i18n-ph="ph-right">
         </div>
       </div>
 
       <!-- 副标题配置 -->
       <div class="form-group">
         <label class="form-label">
-          <span>副标题 (SUBTITLE，可选)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">右下方对齐</span>
+          <span data-i18n="label-sub">副标题 (SUBTITLE，可选)</span>
+          <button type="button" class="reset-badge" data-reset="subtitle" title="清空副标题"><span data-i18n="reset-clear">清空 ↺</span></button>
         </label>
         <div style="display: flex; gap: 8px;">
-          <input type="text" id="inputSub" class="input-text" value="" placeholder="例如：ブルーアーカイブ / Blue Archive">
+          <input type="text" id="inputSub" class="input-text" value="" placeholder="例如：ブルーアーカイブ / Blue Archive" data-i18n-ph="ph-sub">
           <input type="color" id="inputSubColor" value="#2B2B2B" title="自定义副标题颜色">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">
-          <span>副标题 X 轴偏移量 (SUBTITLE X OFFSET)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px</span>
+          <span data-i18n="label-sub-x">副标题 X 轴偏移量 (SUBTITLE X OFFSET)</span>
+          <button type="button" class="reset-badge" data-reset="subX" title="重置 X 偏移"><span data-i18n="reset-0">默认 0 ↺</span></button>
         </label>
         <input type="number" id="inputSubX" class="input-text" value="0" placeholder="默认 0">
       </div>
 
       <div class="form-group">
         <label class="form-label">
-          <span>副标题 Y 轴偏移量 (SUBTITLE Y OFFSET)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px</span>
+          <span data-i18n="label-sub-y">副标题 Y 轴偏移量 (SUBTITLE Y OFFSET)</span>
+          <button type="button" class="reset-badge" data-reset="subY" title="重置 Y 偏移"><span data-i18n="reset-0">默认 0 ↺</span></button>
         </label>
         <input type="number" id="inputSubY" class="input-text" value="0" placeholder="默认 0">
       </div>
 
       <!-- 主题色彩 -->
       <div class="form-group">
-        <label class="form-label">强调色 (ACCENT COLOR - 左文字与十字)</label>
+        <label class="form-label">
+          <span data-i18n="label-accent">强调色 (ACCENT COLOR - 左文字与十字)</span>
+          <button type="button" class="reset-badge" data-reset="accent" title="重置强调色"><span data-i18n="reset-accent">默认蓝 ↺</span></button>
+        </label>
         <div class="color-picker-row">
           <input type="color" id="inputAccent" value="#128AFA">
           <div class="color-presets" id="accentPresets">
@@ -737,7 +808,10 @@ export function getWebUIHtml(): string {
 
       <!-- 文字主题色彩 -->
       <div class="form-group">
-        <label class="form-label">文字主题色 (TEXT COLOR - 右文字与光环)</label>
+        <label class="form-label">
+          <span data-i18n="label-text-color">文字主题色 (TEXT COLOR - 右文字与光环)</span>
+          <button type="button" class="reset-badge" data-reset="textColor" title="重置文字色"><span data-i18n="reset-text-color">默认灰 ↺</span></button>
+        </label>
         <div class="color-picker-row">
           <input type="color" id="inputTextColor" value="#2B2B2B">
           <div class="color-presets" id="textColorPresets">
@@ -753,22 +827,22 @@ export function getWebUIHtml(): string {
       <!-- 独立十字与光环颜色 (可选独立定制) -->
       <div class="form-group">
         <label class="form-label">
-          <span>十字独立颜色 (CROSS COLOR)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">可选，默认跟随强调色</span>
+          <span data-i18n="label-cross-color">十字独立颜色 (CROSS COLOR)</span>
+          <button type="button" class="reset-badge" data-reset="crossColor" title="跟随强调色"><span data-i18n="reset-follow">跟随 ↺</span></button>
         </label>
         <div style="display: flex; gap: 8px;">
-          <input type="text" id="inputCrossColor" class="input-text" value="" placeholder="默认跟随强调色，可输 Hex 如 #FFD700">
+          <input type="text" id="inputCrossColor" class="input-text" value="" placeholder="默认跟随强调色，可输 Hex 如 #FFD700" data-i18n-ph="ph-cross-color">
           <input type="color" id="pickerCrossColor" value="#128AFA" title="十字拾色器">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">
-          <span>光环独立颜色 (HALO COLOR)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">可选，默认跟随文字色</span>
+          <span data-i18n="label-halo-color">光环独立颜色 (HALO COLOR)</span>
+          <button type="button" class="reset-badge" data-reset="haloColor" title="跟随文字色"><span data-i18n="reset-follow">跟随 ↺</span></button>
         </label>
         <div style="display: flex; gap: 8px;">
-          <input type="text" id="inputHaloColor" class="input-text" value="" placeholder="默认跟随文字色，可输 Hex 如 #9C27B0">
+          <input type="text" id="inputHaloColor" class="input-text" value="" placeholder="默认跟随文字色，可输 Hex 如 #9C27B0" data-i18n-ph="ph-halo-color">
           <input type="color" id="pickerHaloColor" value="#2B2B2B" title="光环拾色器">
         </div>
       </div>
@@ -776,16 +850,16 @@ export function getWebUIHtml(): string {
       <!-- 坐标偏移 -->
       <div class="form-group">
         <label class="form-label">
-          <span>光环 X 轴偏移量 (X OFFSET)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">默认 -15px</span>
+          <span data-i18n="label-x-offset">光环 X 轴偏移量 (X OFFSET)</span>
+          <button type="button" class="reset-badge" data-reset="x" title="重置 X 偏移"><span data-i18n="reset-x">默认 -15 ↺</span></button>
         </label>
         <input type="number" id="inputX" class="input-text" value="-15" placeholder="默认 -15">
       </div>
 
       <div class="form-group">
         <label class="form-label">
-          <span>光环 Y 轴偏移量 (Y OFFSET)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px</span>
+          <span data-i18n="label-y-offset">光环 Y 轴偏移量 (Y OFFSET)</span>
+          <button type="button" class="reset-badge" data-reset="y" title="重置 Y 偏移"><span data-i18n="reset-0">默认 0 ↺</span></button>
         </label>
         <input type="number" id="inputY" class="input-text" value="0" placeholder="默认 0">
       </div>
@@ -793,8 +867,8 @@ export function getWebUIHtml(): string {
       <!-- 两词间距 -->
       <div class="form-group">
         <label class="form-label">
-          <span>两词间距 (WORD GAP)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px，支持负数紧凑</span>
+          <span data-i18n="label-word-gap">两词间距 (WORD GAP)</span>
+          <button type="button" class="reset-badge" data-reset="wordGap" title="重置间距"><span data-i18n="reset-0">默认 0 ↺</span></button>
         </label>
         <input type="number" id="inputWordGap" class="input-text" value="0" placeholder="默认 0">
       </div>
@@ -802,15 +876,15 @@ export function getWebUIHtml(): string {
       <!-- 留白边距 -->
       <div class="form-group" id="paddingGroup">
         <label class="form-label">
-          <span>留白边距 (PADDING - 支持 CSS 语法)</span>
-          <span style="font-weight: 500; font-size: 0.75rem;">如 2、10 20、10 20 30 40</span>
+          <span data-i18n="label-padding">留白边距 (PADDING - 支持 CSS 语法)</span>
+          <button type="button" class="reset-badge" data-reset="padding" title="重置留白"><span data-i18n="reset-pad">默认 2 ↺</span></button>
         </label>
-        <input type="text" id="inputPadding" class="input-text" value="2" placeholder="默认 2px，或输入 CSS 边距如 10 20">
+        <input type="text" id="inputPadding" class="input-text" value="2" placeholder="默认 2px，或输入 CSS 边距如 10 20" data-i18n-ph="ph-padding">
       </div>
 
       <!-- 分辨率倍率 -->
       <div class="form-group">
-        <label class="form-label">分辨率倍率 (SCALE)</label>
+        <label class="form-label" data-i18n="label-scale">分辨率倍率 (SCALE)</label>
         <div class="format-pills" id="scalePills">
           <div class="pill-btn" data-scale="1">1x (250p)</div>
           <div class="pill-btn active" data-scale="2">2x (500p)</div>
@@ -821,7 +895,7 @@ export function getWebUIHtml(): string {
 
       <!-- 导出格式 -->
       <div class="form-group">
-        <label class="form-label">输出格式 (FORMAT)</label>
+        <label class="form-label" data-i18n="label-format">输出格式 (FORMAT)</label>
         <div class="format-pills" id="formatPills">
           <div class="pill-btn active" data-format="png">PNG</div>
           <div class="pill-btn" data-format="webp">WebP (推荐)</div>
@@ -833,7 +907,7 @@ export function getWebUIHtml(): string {
       <!-- 开关项 -->
       <div class="toggles-grid">
         <label class="toggle-item">
-          <span>透明背景</span>
+          <span data-i18n="toggle-tp">透明背景</span>
           <div class="switch">
             <input type="checkbox" id="toggleTp">
             <span class="slider"></span>
@@ -841,7 +915,7 @@ export function getWebUIHtml(): string {
         </label>
 
         <label class="toggle-item">
-          <span>暗黑模式</span>
+          <span data-i18n="toggle-dark">暗黑模式</span>
           <div class="switch">
             <input type="checkbox" id="toggleDark">
             <span class="slider"></span>
@@ -849,7 +923,7 @@ export function getWebUIHtml(): string {
         </label>
 
         <label class="toggle-item">
-          <span>颜色互换</span>
+          <span data-i18n="toggle-swap">颜色互换</span>
           <div class="switch">
             <input type="checkbox" id="toggleSwap">
             <span class="slider"></span>
@@ -857,7 +931,7 @@ export function getWebUIHtml(): string {
         </label>
 
         <label class="toggle-item">
-          <span>垂直视觉居中</span>
+          <span data-i18n="toggle-center">垂直视觉居中</span>
           <div class="switch">
             <input type="checkbox" id="toggleCenter" checked>
             <span class="slider"></span>
@@ -865,7 +939,7 @@ export function getWebUIHtml(): string {
         </label>
 
         <label class="toggle-item">
-          <span>图标置底</span>
+          <span data-i18n="toggle-behind">图标置底</span>
           <div class="switch">
             <input type="checkbox" id="toggleBehind">
             <span class="slider"></span>
@@ -877,10 +951,10 @@ export function getWebUIHtml(): string {
     <!-- 右侧即时预览区 -->
     <div class="card preview-card">
       <div class="card-header">
-        <div class="card-title">实时渲染预览</div>
+        <div class="card-title" data-i18n="preview-title">实时渲染预览</div>
         <div class="meta-bar">
-          <div class="meta-badge">尺寸: <strong id="metaSize">--</strong></div>
-          <div class="meta-badge">耗时: <strong id="metaTime">--</strong></div>
+          <div class="meta-badge"><span data-i18n="meta-size">尺寸</span>: <strong id="metaSize">--</strong></div>
+          <div class="meta-badge"><span data-i18n="meta-time">耗时</span>: <strong id="metaTime">--</strong></div>
         </div>
       </div>
 
@@ -899,18 +973,26 @@ export function getWebUIHtml(): string {
       <!-- 实时 API URL -->
       <div class="url-box-container">
         <div class="url-text" id="apiUrlText">/api/logo</div>
-        <button class="copy-url-btn" id="btnCopyUrl">复制 API 链接</button>
+        <button class="copy-url-btn" id="btnCopyUrl" data-i18n="copy-api">复制 API 链接</button>
       </div>
 
       <!-- 动作按钮组 -->
       <div class="actions-grid">
         <button class="action-btn action-btn-primary" id="btnDownload">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          下载图片文件
+          <span data-i18n="btn-download">下载图片文件</span>
+        </button>
+        <button class="action-btn action-btn-copy" id="btnCopyImage">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span data-i18n="btn-copy-img">复制图片</span>
         </button>
         <button class="action-btn action-btn-secondary" id="btnCopyMarkdown">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-          复制 Markdown 标签
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span data-i18n="btn-copy-md">复制 Markdown</span>
+        </button>
+        <button class="action-btn action-btn-secondary" id="btnResetAll">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+          <span data-i18n="btn-reset-all">重置所有参数</span>
         </button>
       </div>
     </div>
@@ -919,7 +1001,223 @@ export function getWebUIHtml(): string {
   <div id="toast">已成功复制到剪贴板！</div>
 
   <script>
+    const I18N = {
+      zh: {
+        'nav-swagger': 'Swagger 交互文档',
+        'nav-upstream': '原版前端',
+        'console-title': 'Logo 参数控制台',
+        'ep-restful': 'RESTful',
+        'ep-legacy': '旧版兼容',
+        'label-title': '标题文字 (LEFT / RIGHT)',
+        'reset-text': '默认 ↺',
+        'ph-left': '左文字（蓝色）',
+        'ph-right': '右文字（黑色）',
+        'label-sub': '副标题 (SUBTITLE，可选)',
+        'reset-clear': '清空 ↺',
+        'ph-sub': '例如：ブルーアーカイブ / Blue Archive',
+        'label-sub-x': '副标题 X 轴偏移量 (SUBTITLE X OFFSET)',
+        'label-sub-y': '副标题 Y 轴偏移量 (SUBTITLE Y OFFSET)',
+        'reset-0': '默认 0 ↺',
+        'label-accent': '强调色 (ACCENT COLOR - 左文字与十字)',
+        'reset-accent': '默认蓝 ↺',
+        'label-text-color': '文字主题色 (TEXT COLOR - 右文字与光环)',
+        'reset-text-color': '默认灰 ↺',
+        'label-cross-color': '十字独立颜色 (CROSS COLOR)',
+        'ph-cross-color': '默认跟随强调色，可输 Hex 如 #FFD700',
+        'label-halo-color': '光环独立颜色 (HALO COLOR)',
+        'ph-halo-color': '默认跟随文字色，可输 Hex 如 #9C27B0',
+        'reset-follow': '跟随 ↺',
+        'label-x-offset': '光环 X 轴偏移量 (X OFFSET)',
+        'reset-x': '默认 -15 ↺',
+        'label-y-offset': '光环 Y 轴偏移量 (Y OFFSET)',
+        'label-word-gap': '两词间距 (WORD GAP)',
+        'label-padding': '留白边距 (PADDING - 支持 CSS 语法)',
+        'reset-pad': '默认 2 ↺',
+        'ph-padding': '默认 2px，或输入 CSS 边距如 10 20',
+        'label-scale': '分辨率倍率 (SCALE)',
+        'label-format': '输出格式 (FORMAT)',
+        'toggle-tp': '透明背景',
+        'toggle-dark': '暗黑模式',
+        'toggle-swap': '颜色互换',
+        'toggle-center': '垂直视觉居中',
+        'toggle-behind': '图标置底',
+        'preview-title': '实时渲染预览',
+        'meta-size': '尺寸',
+        'meta-time': '耗时',
+        'copy-api': '复制 API 链接',
+        'btn-download': '下载图片文件',
+        'btn-copy-img': '复制图片',
+        'btn-copy-md': '复制 Markdown 标签',
+        'btn-reset-all': '重置所有参数',
+        'toast-copied': '已成功复制到剪贴板！',
+        'toast-img-copied': '图片已成功复制到剪贴板！',
+        'toast-reset': '所有参数已恢复为默认值！',
+        'toast-copy-failed': '复制失败，请检查浏览器权限',
+        'toast-download': '图片下载已开始！',
+      },
+      'zh-tw': {
+        'nav-swagger': 'Swagger 文件',
+        'nav-upstream': '原版前端',
+        'console-title': 'Logo 參數控制台',
+        'ep-restful': 'RESTful',
+        'ep-legacy': '舊版相容',
+        'label-title': '標題文字 (LEFT / RIGHT)',
+        'reset-text': '預設 ↺',
+        'ph-left': '左文字（藍色）',
+        'ph-right': '右文字（黑色）',
+        'label-sub': '副標題 (SUBTITLE，可選)',
+        'reset-clear': '清空 ↺',
+        'ph-sub': '例如：ブルーアーカイブ / Blue Archive',
+        'label-sub-x': '副標題 X 軸偏移量 (SUBTITLE X OFFSET)',
+        'label-sub-y': '副標題 Y 軸偏移量 (SUBTITLE Y OFFSET)',
+        'reset-0': '預設 0 ↺',
+        'label-accent': '強調色 (ACCENT COLOR - 左文字與十字)',
+        'reset-accent': '預設藍 ↺',
+        'label-text-color': '文字主題色 (TEXT COLOR - 右文字與光環)',
+        'reset-text-color': '預設灰 ↺',
+        'label-cross-color': '十字獨立顏色 (CROSS COLOR)',
+        'ph-cross-color': '預設跟隨強調色，可輸入 Hex 如 #FFD700',
+        'label-halo-color': '光環獨立顏色 (HALO COLOR)',
+        'ph-halo-color': '預設跟隨文字色，可輸入 Hex 如 #9C27B0',
+        'reset-follow': '跟隨 ↺',
+        'label-x-offset': '光環 X 軸偏移量 (X OFFSET)',
+        'reset-x': '預設 -15 ↺',
+        'label-y-offset': '光環 Y 軸偏移量 (Y OFFSET)',
+        'label-word-gap': '兩詞間距 (WORD GAP)',
+        'label-padding': '留白邊距 (PADDING - 支援 CSS 語法)',
+        'reset-pad': '預設 2 ↺',
+        'ph-padding': '預設 2px，或輸入 CSS 邊距如 10 20',
+        'label-scale': '解析度倍率 (SCALE)',
+        'label-format': '輸出格式 (FORMAT)',
+        'toggle-tp': '透明背景',
+        'toggle-dark': '深色模式',
+        'toggle-swap': '顏色互換',
+        'toggle-center': '垂直視覺置中',
+        'toggle-behind': '圖標置底',
+        'preview-title': '即時渲染預覽',
+        'meta-size': '尺寸',
+        'meta-time': '耗時',
+        'copy-api': '複製 API 連結',
+        'btn-download': '下載圖片檔案',
+        'btn-copy-img': '複製圖片',
+        'btn-copy-md': '複製 Markdown 標籤',
+        'btn-reset-all': '重設所有參數',
+        'toast-copied': '已成功複製到剪貼簿！',
+        'toast-img-copied': '圖片已成功複製到剪貼簿！',
+        'toast-reset': '所有參數已恢復為預設值！',
+        'toast-copy-failed': '複製失敗，請檢查瀏覽器權限',
+        'toast-download': '圖片下載已開始！',
+      },
+      en: {
+        'nav-swagger': 'Swagger Docs',
+        'nav-upstream': 'Original Web',
+        'console-title': 'Logo Console',
+        'ep-restful': 'RESTful',
+        'ep-legacy': 'Legacy',
+        'label-title': 'Title Text (LEFT / RIGHT)',
+        'reset-text': 'Reset ↺',
+        'ph-left': 'Left text (Blue)',
+        'ph-right': 'Right text (Dark)',
+        'label-sub': 'Subtitle (Optional)',
+        'reset-clear': 'Clear ↺',
+        'ph-sub': 'e.g. Blue Archive / ブルーアーカイブ',
+        'label-sub-x': 'Subtitle X Offset',
+        'label-sub-y': 'Subtitle Y Offset',
+        'reset-0': '0px ↺',
+        'label-accent': 'Accent Color (Left text & Cross)',
+        'reset-accent': 'Default ↺',
+        'label-text-color': 'Text Color (Right text & Halo)',
+        'reset-text-color': 'Default ↺',
+        'label-cross-color': 'Cross Color (Independent)',
+        'ph-cross-color': 'Follows accent, or Hex like #FFD700',
+        'label-halo-color': 'Halo Color (Independent)',
+        'ph-halo-color': 'Follows text color, or Hex like #9C27B0',
+        'reset-follow': 'Follow ↺',
+        'label-x-offset': 'Halo X Offset',
+        'reset-x': '-15px ↺',
+        'label-y-offset': 'Halo Y Offset',
+        'label-word-gap': 'Word Gap',
+        'label-padding': 'Padding (Supports CSS syntax)',
+        'reset-pad': '2px ↺',
+        'ph-padding': 'Default 2px, or CSS like 10 20',
+        'label-scale': 'Resolution Scale',
+        'label-format': 'Export Format',
+        'toggle-tp': 'Transparent BG',
+        'toggle-dark': 'Dark Mode',
+        'toggle-swap': 'Swap Colors',
+        'toggle-center': 'Vertical Center',
+        'toggle-behind': 'Motifs Behind',
+        'preview-title': 'Live Preview',
+        'meta-size': 'Size',
+        'meta-time': 'Latency',
+        'copy-api': 'Copy API URL',
+        'btn-download': 'Download Image',
+        'btn-copy-img': 'Copy Image',
+        'btn-copy-md': 'Copy Markdown Tag',
+        'btn-reset-all': 'Reset All Settings',
+        'toast-copied': 'Copied to clipboard!',
+        'toast-img-copied': 'Image copied to clipboard!',
+        'toast-reset': 'All settings restored to defaults!',
+        'toast-copy-failed': 'Copy failed, please check permissions',
+        'toast-download': 'Image download started!',
+      },
+      ja: {
+        'nav-swagger': 'Swagger ドキュメント',
+        'nav-upstream': '元フロントエンド',
+        'console-title': 'ロゴ設定コンソール',
+        'ep-restful': 'RESTful',
+        'ep-legacy': '旧版互換',
+        'label-title': 'タイトル文字 (LEFT / RIGHT)',
+        'reset-text': '既定 ↺',
+        'ph-left': '左文字（青）',
+        'ph-right': '右文字（黒）',
+        'label-sub': 'サブタイトル (任意)',
+        'reset-clear': 'クリア ↺',
+        'ph-sub': '例：ブルーアーカイブ',
+        'label-sub-x': 'サブタイトル X オフセット',
+        'label-sub-y': 'サブタイトル Y オフセット',
+        'reset-0': '0px ↺',
+        'label-accent': 'アクセント色（左文字＆十字）',
+        'reset-accent': '既定青 ↺',
+        'label-text-color': 'テキスト色（右文字＆ヘイロー）',
+        'reset-text-color': '既定灰 ↺',
+        'label-cross-color': '十字独立カラー',
+        'ph-cross-color': 'アクセント色連動、Hex可（例：#FFD700）',
+        'label-halo-color': 'ヘイロー独立カラー',
+        'ph-halo-color': 'テキスト色連動、Hex可（例：#9C27B0）',
+        'reset-follow': '連動 ↺',
+        'label-x-offset': 'ヘイロー X 軸オフセット',
+        'reset-x': '-15px ↺',
+        'label-y-offset': 'ヘイロー Y 轴オフセット',
+        'label-word-gap': '単語間隔 (WORD GAP)',
+        'label-padding': '余白 (PADDING - CSS記法対応)',
+        'reset-pad': '2px ↺',
+        'ph-padding': '既定 2px、または 10 20 等',
+        'label-scale': '解像度スケール (SCALE)',
+        'label-format': '出力フォーマット (FORMAT)',
+        'toggle-tp': '透過背景',
+        'toggle-dark': 'ダークモード',
+        'toggle-swap': 'カラー入替',
+        'toggle-center': '視覚中央揃え',
+        'toggle-behind': 'モチーフ背面配置',
+        'preview-title': 'リアルタイムプレビュー',
+        'meta-size': 'サイズ',
+        'meta-time': '生成時間',
+        'copy-api': 'API URL をコピー',
+        'btn-download': '画像をダウンロード',
+        'btn-copy-img': '画像をコピー',
+        'btn-copy-md': 'Markdown をコピー',
+        'btn-reset-all': 'すべてリセット',
+        'toast-copied': 'クリップボードにコピーしました！',
+        'toast-img-copied': '画像をコピーしました！',
+        'toast-reset': '全設定をデフォルトにリセットしました！',
+        'toast-copy-failed': 'コピーに失敗しました。権限を確認してください',
+        'toast-download': 'ダウンロードを開始しました！',
+      },
+    };
+
     const state = {
+      lang: 'zh',
       endpoint: 'api', // 'api' | 'balogo'
       left: '蔚蓝',
       right: '档案',
@@ -975,6 +1273,8 @@ export function getWebUIHtml(): string {
     const metaSize = document.getElementById('metaSize');
     const metaTime = document.getElementById('metaTime');
     const toast = document.getElementById('toast');
+    const btnCopyImage = document.getElementById('btnCopyImage');
+    const btnResetAll = document.getElementById('btnResetAll');
 
     let currentBlobUrl = null;
     let latestBase64 = '';
@@ -1291,14 +1591,14 @@ export function getWebUIHtml(): string {
     // 复制与下载按钮
     document.getElementById('btnCopyUrl').addEventListener('click', () => {
       const fullUrl = window.location.origin + buildUrl();
-      navigator.clipboard.writeText(fullUrl).then(() => showToast('已复制完整 API 链接！'));
+      navigator.clipboard.writeText(fullUrl).then(() => showToast(I18N[state.lang]?.['toast-copied'] || '已复制完整 API 链接！'));
     });
 
     document.getElementById('btnCopyMarkdown').addEventListener('click', () => {
       const fullUrl = window.location.origin + buildUrl();
       const title = (state.left || 'Blue') + (state.right || 'Archive');
       const md = '![' + title + ' Logo](' + fullUrl + ')';
-      navigator.clipboard.writeText(md).then(() => showToast('已复制 Markdown 标签代码！'));
+      navigator.clipboard.writeText(md).then(() => showToast(I18N[state.lang]?.['toast-copied'] || '已复制 Markdown 标签代码！'));
     });
 
     document.getElementById('btnDownload').addEventListener('click', () => {
@@ -1316,8 +1616,180 @@ export function getWebUIHtml(): string {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      showToast('图片下载已开始！');
+      showToast(I18N[state.lang]?.['toast-download'] || '图片下载已开始！');
     });
+
+    // 复制图片到剪贴板
+    btnCopyImage.addEventListener('click', async () => {
+      try {
+        let blob;
+        if (state.format === 'png' && currentBlobUrl) {
+          blob = await fetch(currentBlobUrl).then(r => r.blob());
+        } else {
+          const pngUrl = buildUrl().replace(/format=\w+/, 'format=png');
+          const finalPngUrl = pngUrl.includes('format=png') ? pngUrl : pngUrl + (pngUrl.includes('?') ? '&' : '?') + 'format=png';
+          blob = await fetch(finalPngUrl).then(r => r.blob());
+        }
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        showToast(I18N[state.lang]?.['toast-img-copied'] || '图片已成功复制到剪贴板！');
+      } catch (err) {
+        console.error('Clipboard image write failed:', err);
+        showToast(I18N[state.lang]?.['toast-copy-failed'] || '复制失败，请检查浏览器权限');
+      }
+    });
+
+    // 重置所有参数
+    btnResetAll.addEventListener('click', () => {
+      state.endpoint = 'api';
+      state.left = '蔚蓝';
+      state.right = '档案';
+      state.subtitle = '';
+      state.subtitleColor = '';
+      state.subX = 0;
+      state.subY = 0;
+      state.accent = '#128AFA';
+      state.textColor = '#2B2B2B';
+      state.crossColor = '';
+      state.haloColor = '';
+      state.behind = false;
+      state.x = -15;
+      state.y = 0;
+      state.wordGap = 0;
+      state.scale = 2;
+      state.format = 'png';
+      state.transparent = false;
+      state.dark = false;
+      state.swap = false;
+      state.padding = '2';
+      state.center = true;
+
+      elLeft.value = state.left;
+      elRight.value = state.right;
+      elSub.value = state.subtitle;
+      elSubColor.value = '#2B2B2B';
+      elSubX.value = state.subX;
+      elSubY.value = state.subY;
+      elAccent.value = state.accent;
+      elTextColor.value = state.textColor;
+      elCrossColor.value = '';
+      pickerCrossColor.value = state.accent;
+      elHaloColor.value = '';
+      pickerHaloColor.value = state.textColor;
+      elX.value = state.x;
+      elY.value = state.y;
+      elWordGap.value = state.wordGap;
+      elPadding.value = state.padding;
+      elTp.checked = state.transparent;
+      elDark.checked = state.dark;
+      elSwap.checked = state.swap;
+      elCenter.checked = state.center;
+      elBehind.checked = state.behind;
+
+      document.querySelectorAll('#endpointPills .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.ep === 'api'));
+      document.querySelectorAll('#scalePills .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.scale === '2'));
+      document.querySelectorAll('#formatPills .pill-btn').forEach(b => b.classList.toggle('active', b.dataset.format === 'png'));
+
+      updatePreview();
+      showToast(I18N[state.lang]?.['toast-reset'] || '所有参数已恢复为默认值！');
+    });
+
+    // 独立微调项重置按钮
+    document.querySelectorAll('.reset-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.preventDefault();
+        const field = badge.dataset.reset;
+        switch (field) {
+          case 'text':
+            state.left = '蔚蓝';
+            state.right = '档案';
+            elLeft.value = '蔚蓝';
+            elRight.value = '档案';
+            break;
+          case 'subtitle':
+            state.subtitle = '';
+            elSub.value = '';
+            break;
+          case 'subX':
+            state.subX = 0;
+            elSubX.value = 0;
+            break;
+          case 'subY':
+            state.subY = 0;
+            elSubY.value = 0;
+            break;
+          case 'accent':
+            state.accent = '#128AFA';
+            elAccent.value = '#128AFA';
+            break;
+          case 'textColor':
+            state.textColor = state.dark ? '#FFFFFF' : '#2B2B2B';
+            elTextColor.value = state.textColor;
+            break;
+          case 'crossColor':
+            state.crossColor = '';
+            elCrossColor.value = '';
+            pickerCrossColor.value = state.accent;
+            break;
+          case 'haloColor':
+            state.haloColor = '';
+            elHaloColor.value = '';
+            pickerHaloColor.value = state.textColor;
+            break;
+          case 'x':
+            state.x = -15;
+            elX.value = -15;
+            break;
+          case 'y':
+            state.y = 0;
+            elY.value = 0;
+            break;
+          case 'wordGap':
+            state.wordGap = 0;
+            elWordGap.value = 0;
+            break;
+          case 'padding':
+            state.padding = '2';
+            elPadding.value = '2';
+            break;
+        }
+        updatePreview();
+      });
+    });
+
+    // 国际化语言切换
+    function applyI18n(lang) {
+      state.lang = lang;
+      localStorage.setItem('ba_lang', lang);
+      const dict = I18N[lang] || I18N.zh;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key]) el.textContent = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const key = el.dataset.i18nPh;
+        if (dict[key]) el.placeholder = dict[key];
+      });
+      document.querySelectorAll('#langPills .pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      document.documentElement.lang = lang === 'en' ? 'en' : lang === 'ja' ? 'ja' : lang === 'zh-tw' ? 'zh-Hant' : 'zh-CN';
+    }
+
+    document.querySelectorAll('#langPills .pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyI18n(btn.dataset.lang);
+      });
+    });
+
+    const savedLang = localStorage.getItem('ba_lang');
+    const browserLang = (navigator.language || '').toLowerCase();
+    const defaultLang = savedLang ||
+      (browserLang.startsWith('ja') ? 'ja' :
+       browserLang.startsWith('en') ? 'en' :
+       ['zh-tw', 'zh-hk', 'zh-mo', 'zh-hant'].includes(browserLang) ? 'zh-tw' : 'zh');
+    applyI18n(defaultLang);
 
     // 初始化首次渲染
     updatePreview();
