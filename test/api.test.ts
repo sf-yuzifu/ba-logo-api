@@ -13,7 +13,7 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(html).toContain('id="app"');
   });
 
-  it('GET / 携带 Accept: application/json 或访问 /health 应当返回 JSON 状态', async () => {
+  it('GET / 携带 Accept: application/json 或访问 /health 应当返回 JSON 状态及动态版本信息', async () => {
     const res = await app.handle(
       new Request('http://localhost/', {
         headers: { Accept: 'application/json' },
@@ -21,12 +21,37 @@ describe('HTTP Route & Compatibility Tests', () => {
     );
     expect(res.status).toBe(200);
     const body: unknown = await res.json();
-    expect(body).toMatchObject({ status: 'online', name: 'ba-logo-api' });
+    expect(body).toMatchObject({ status: 'online', name: 'ba-logo-api', version: '2.0.0' });
 
     const healthRes = await app.handle(new Request('http://localhost/health'));
     expect(healthRes.status).toBe(200);
     const health: unknown = await healthRes.json();
-    expect(health).toMatchObject({ status: 'ok' });
+    expect(health).toMatchObject({ status: 'ok', version: '2.0.0' });
+  });
+
+  it('GET /api/logo 应当保留 center 参数的布尔与 undefined 语义区别', async () => {
+    const defaultCenterRes = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive'),
+    );
+    const falseCenterRes = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&center=false'),
+    );
+    const trueCenterRes = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&center=true'),
+    );
+
+    expect(defaultCenterRes.status).toBe(200);
+    expect(falseCenterRes.status).toBe(200);
+    expect(trueCenterRes.status).toBe(200);
+
+    const defaultBuf = await defaultCenterRes.arrayBuffer();
+    const falseBuf = await falseCenterRes.arrayBuffer();
+    const trueBuf = await trueCenterRes.arrayBuffer();
+
+    // 默认（有背景时）为居中，与 center=true 完全一致
+    expect(defaultBuf.byteLength).toBe(trueBuf.byteLength);
+    // center=false 去除纵向对称居中留白，尺寸和内容大小不同
+    expect(falseBuf.byteLength).not.toBe(trueBuf.byteLength);
   });
 
   it('GET /assets/* 静态路由应当能正常分发构建后的前端资源文件', async () => {

@@ -46,6 +46,16 @@ describe('Renderer Core Unit Tests', () => {
     expect(base64Result.dataUrl.startsWith('data:image/png;base64,')).toBe(true);
   });
 
+  it('renderLogoToBuffer 应当对 Base64 与 dataUrl 实行惰性按需求值', () => {
+    const png = renderLogoToBuffer({ format: 'png' });
+    const descriptorBase64 = Object.getOwnPropertyDescriptor(png, 'base64');
+    const descriptorDataUrl = Object.getOwnPropertyDescriptor(png, 'dataUrl');
+    expect(typeof descriptorBase64?.get).toBe('function');
+    expect(typeof descriptorDataUrl?.get).toBe('function');
+    expect(png.base64.length).toBeGreaterThan(100);
+    expect(png.dataUrl.startsWith('data:image/png;base64,')).toBe(true);
+  });
+
   it('SVG 与位图应共享边界尺寸并返回 SVG 宽高元数据', async () => {
     const optionsList = [
       {},

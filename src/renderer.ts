@@ -68,14 +68,14 @@ export interface RenderOptions {
 }
 
 export interface RenderResult {
-  canvas?: Canvas;
   buffer: Buffer;
   mimeType: string;
-  dataUrl: string;
-  base64: string;
-  svg?: string;
   width: number;
   height: number;
+  canvas?: Canvas;
+  svg?: string;
+  readonly base64: string;
+  readonly dataUrl: string;
 }
 
 // 预先编译 SVG 矢量 Path2D 实例与全局单例测量画布
@@ -344,17 +344,6 @@ export interface SvgRenderResult {
   height: number;
 }
 
-export interface RenderResult {
-  canvas?: Canvas;
-  buffer: Buffer;
-  mimeType: string;
-  dataUrl: string;
-  base64: string;
-  svg?: string;
-  width: number;
-  height: number;
-}
-
 export function renderLogoSvg(options: RenderOptions = {}): SvgRenderResult {
   loadFonts();
   const normalized = normalizeRenderOptions(options);
@@ -557,17 +546,27 @@ export function renderLogoToBuffer(options: RenderOptions = {}): RenderResult {
     const { svg, width, height } = renderLogoSvg(options);
     const buffer = Buffer.from(svg, 'utf8');
     const mimeType = 'image/svg+xml; charset=utf-8';
-    const base64 = buffer.toString('base64');
-    const dataUrl = `data:${mimeType};base64,${base64}`;
+    let cachedBase64: string | undefined;
+    let cachedDataUrl: string | undefined;
 
     return {
       buffer,
       mimeType,
-      dataUrl,
-      base64,
       svg,
       width,
       height,
+      get base64() {
+        if (cachedBase64 === undefined) {
+          cachedBase64 = buffer.toString('base64');
+        }
+        return cachedBase64;
+      },
+      get dataUrl() {
+        if (cachedDataUrl === undefined) {
+          cachedDataUrl = `data:${mimeType};base64,${this.base64}`;
+        }
+        return cachedDataUrl;
+      },
     };
   }
 
@@ -595,16 +594,27 @@ export function renderLogoToBuffer(options: RenderOptions = {}): RenderResult {
     buffer = canvas.toBuffer('image/png');
   }
 
-  const base64 = buffer.toString('base64');
-  const dataUrl = `data:${mimeType};base64,${base64}`;
+  const width = canvas.width;
+  const height = canvas.height;
+  let cachedBase64: string | undefined;
+  let cachedDataUrl: string | undefined;
 
   return {
-    canvas,
     buffer,
     mimeType,
-    dataUrl,
-    base64,
-    width: canvas.width,
-    height: canvas.height,
+    width,
+    height,
+    get base64() {
+      if (cachedBase64 === undefined) {
+        cachedBase64 = buffer.toString('base64');
+      }
+      return cachedBase64;
+    },
+    get dataUrl() {
+      if (cachedDataUrl === undefined) {
+        cachedDataUrl = `data:${mimeType};base64,${this.base64}`;
+      }
+      return cachedDataUrl;
+    },
   };
 }

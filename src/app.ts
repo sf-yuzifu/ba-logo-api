@@ -2,88 +2,80 @@ import path from 'node:path';
 import { cors } from '@elysiajs/cors';
 import { swagger } from '@elysiajs/swagger';
 import { type Context, Elysia } from 'elysia';
+import pkg from '../package.json' with { type: 'json' };
 import { type OutputFormat, type RenderOptions, renderLogoToBuffer } from './renderer.ts';
 import { type LogoQuery, LogoQuerySchema } from './schema.ts';
 import { getWebUIHtml } from './webui.ts';
 
+const APP_NAME = pkg.name;
+const APP_VERSION = pkg.version;
 const WEB_DIST_DIR = path.resolve(import.meta.dir, '../dist/web');
 const WEB_INDEX_PATH = path.join(WEB_DIST_DIR, 'index.html');
+const CACHE_CONTROL_HEADER = 'public, max-age=86400, stale-while-revalidate=604800';
+
+function parseOptionalNumber(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === '') return undefined;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : undefined;
+}
+
+function parseOptionalBoolean(value: unknown): boolean | undefined {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+  if (value === 'true' || value === '1' || value === 1) return true;
+  if (value === 'false' || value === '0' || value === 0) return false;
+  return undefined;
+}
+
+function createCacheHeaders(
+  etag: string,
+  mimeType?: string,
+  contentLength?: number,
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    ETag: etag,
+    'Cache-Control': CACHE_CONTROL_HEADER,
+  };
+  if (mimeType) headers['Content-Type'] = mimeType;
+  if (contentLength !== undefined) headers['Content-Length'] = contentLength.toString();
+  return headers;
+}
 
 /**
  * 将 Query 查询参数解析并标准化为 RenderOptions
  */
 export function parseLogoQuery(query: LogoQuery): RenderOptions {
-  // 左侧文字
   const textL = query.left ?? query.l ?? '蔚蓝';
-  // 右侧文字
   const textR = query.right ?? query.r ?? '档案';
-  // 副标题
   const subtitle = query.subtitle ?? query.sub;
   const subtitleColor = query.subtitleColor ?? query.subColor;
 
-  // 坐标偏移
-  const rawX = query.offsetX ?? query.x;
-  const offsetX = rawX !== undefined && !Number.isNaN(Number(rawX)) ? Number(rawX) : undefined;
-  const rawY = query.offsetY ?? query.y;
-  const offsetY = rawY !== undefined && !Number.isNaN(Number(rawY)) ? Number(rawY) : undefined;
+  const offsetX = parseOptionalNumber(query.offsetX ?? query.x);
+  const offsetY = parseOptionalNumber(query.offsetY ?? query.y);
+  const subtitleOffsetX = parseOptionalNumber(query.subtitleOffsetX ?? query.subX);
+  const subtitleOffsetY = parseOptionalNumber(query.subtitleOffsetY ?? query.subY);
+  const scale = parseOptionalNumber(query.scale ?? query.s);
+  const wordGap = parseOptionalNumber(query.wordGap ?? query.gap);
 
-  // 副标题偏移
-  const rawSubX = query.subtitleOffsetX ?? query.subX;
-  const subtitleOffsetX =
-    rawSubX !== undefined && !Number.isNaN(Number(rawSubX)) ? Number(rawSubX) : undefined;
-  const rawSubY = query.subtitleOffsetY ?? query.subY;
-  const subtitleOffsetY =
-    rawSubY !== undefined && !Number.isNaN(Number(rawSubY)) ? Number(rawSubY) : undefined;
+  const transparent = parseOptionalBoolean(query.transparent ?? query.tp);
+  const darkMode = parseOptionalBoolean(query.darkMode ?? query.dark);
+  const swapColors = parseOptionalBoolean(query.swapColors ?? query.swap);
+  const motifsBehindText = parseOptionalBoolean(
+    query.motifsBehindText ?? query.underText ?? query.behind,
+  );
+  const center = parseOptionalBoolean(query.center ?? query.vcenter);
 
-  // 透明背景
-  const rawTp = query.transparent ?? query.tp;
-  const transparent = typeof rawTp === 'boolean' ? rawTp : rawTp === 'true' || rawTp === '1';
-
-  // 缩放倍率
-  const rawScale = query.scale ?? query.s;
-  const scale =
-    rawScale !== undefined && !Number.isNaN(Number(rawScale)) ? Number(rawScale) : undefined;
-
-  // 暗黑模式
-  const rawDark = query.darkMode ?? query.dark;
-  const darkMode = typeof rawDark === 'boolean' ? rawDark : rawDark === 'true' || rawDark === '1';
-
-  // 颜色互换
-  const rawSwap = query.swapColors ?? query.swap;
-  const swapColors = typeof rawSwap === 'boolean' ? rawSwap : rawSwap === 'true' || rawSwap === '1';
-
-  // 强调色与文字主题色及独立图元色
   const accentColor = query.accentColor ?? query.accent;
   const textColor = query.textColor ?? query.color ?? query.tc;
   const crossColor = query.crossColor ?? query.cross;
   const haloColor = query.haloColor ?? query.halo;
 
-  // 图标置底
-  const rawBehind = query.motifsBehindText ?? query.underText ?? query.behind;
-  const motifsBehindText =
-    typeof rawBehind === 'boolean' ? rawBehind : rawBehind === 'true' || rawBehind === '1';
-
-  // 词间距
-  const rawWordGap = query.wordGap ?? query.gap;
-  const wordGap =
-    rawWordGap !== undefined && !Number.isNaN(Number(rawWordGap)) ? Number(rawWordGap) : undefined;
-
-  // 留白边距 (支持数字、CSS 语法字符串如 "10 20" 及独立方向参数)
   const padding = query.padding ?? query.pad;
-  const paddingTop = query.paddingTop ?? query.pt;
-  const paddingRight = query.paddingRight ?? query.pr;
-  const paddingBottom = query.paddingBottom ?? query.pb;
-  const paddingLeft = query.paddingLeft ?? query.pl;
+  const paddingTop = parseOptionalNumber(query.paddingTop ?? query.pt);
+  const paddingRight = parseOptionalNumber(query.paddingRight ?? query.pr);
+  const paddingBottom = parseOptionalNumber(query.paddingBottom ?? query.pb);
+  const paddingLeft = parseOptionalNumber(query.paddingLeft ?? query.pl);
 
-  const rawCenter = query.center ?? query.vcenter;
-  const center =
-    typeof rawCenter === 'boolean'
-      ? rawCenter
-      : rawCenter !== undefined
-        ? rawCenter === 'true' || rawCenter === '1'
-        : undefined;
-
-  // 格式
   const format = (query.format ?? 'png').toLowerCase() as OutputFormat;
 
   return {
@@ -139,18 +131,14 @@ export function handleLogoRequest(
   if (ifNoneMatch && ifNoneMatch === etag) {
     return new Response(null, {
       status: 304,
-      headers: {
-        ETag: etag,
-        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: createCacheHeaders(etag),
     });
   }
 
   // 如果指定格式为 base64，返回结构化 JSON
   if (options.format === 'base64') {
     set.headers['content-type'] = 'application/json; charset=utf-8';
-    set.headers['cache-control'] = 'public, max-age=86400, stale-while-revalidate=604800';
+    set.headers['cache-control'] = CACHE_CONTROL_HEADER;
     set.headers.etag = etag;
     return {
       code: 200,
@@ -167,13 +155,7 @@ export function handleLogoRequest(
   // 默认返回二进制图片流并附带强缓存及 ETag 响应头
   return new Response(result.buffer, {
     status: 200,
-    headers: {
-      'Content-Type': result.mimeType,
-      'Content-Length': result.buffer.length.toString(),
-      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-      ETag: etag,
-      'Access-Control-Allow-Origin': '*',
-    },
+    headers: createCacheHeaders(etag, result.mimeType, result.buffer.length),
   });
 }
 
@@ -189,7 +171,7 @@ export function createApp() {
         documentation: {
           info: {
             title: 'Blue Archive Logo API',
-            version: '2.0.0',
+            version: APP_VERSION,
             description:
               '高性能蔚蓝档案 (Blue Archive) 风格 Logo 生成器 API。基于 Bun + ElysiaJS + Skia Canvas 构建，支持毫秒级渲染、无损矢量光环、4K高清倍率、副标题排版、暗黑模式及多格式导出。',
             license: {
@@ -246,8 +228,8 @@ export function createApp() {
         const accept = headers.accept ?? '';
         if (accept.includes('application/json')) {
           return {
-            name: 'ba-logo-api',
-            version: '2.0.0',
+            name: APP_NAME,
+            version: APP_VERSION,
             status: 'online',
             docs: '/swagger',
             endpoints: ['/api/logo', '/balogo'],
@@ -295,6 +277,7 @@ export function createApp() {
       () => {
         return {
           status: 'ok',
+          version: APP_VERSION,
           uptime: process.uptime(),
           timestamp: Date.now(),
         };

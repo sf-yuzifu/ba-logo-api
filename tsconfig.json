@@ -14,7 +14,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false,
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
 }
