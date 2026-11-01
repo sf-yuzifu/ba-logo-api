@@ -4,6 +4,7 @@ import {
   BASE_CANVAS_HEIGHT,
   BASE_CANVAS_WIDTH,
   BASE_FONT_SIZE,
+  BASE_SUBTITLE_FONT_SIZE,
   TEXT_BASELINE,
   HORIZONTAL_TILT,
   PADDING_X,
@@ -18,6 +19,8 @@ import {
 export interface RenderOptions {
   textL?: string;
   textR?: string;
+  subtitle?: string; // 可选副标题（PR #12，如 "ブルーアーカイブ"，右下方对齐绘制）
+  subtitleColor?: string; // 可选副标题颜色（默认跟随右侧次要文字颜色）
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
@@ -102,6 +105,14 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const strokeWidth = 12 * scale;
   const font = `${fontSize}px "${FONT_FAMILY}"`;
 
+  // PR #12 副标题配置
+  const subtitle = options.subtitle?.trim();
+  const subtitleColor = options.subtitleColor
+    ? normalizeColor(options.subtitleColor)
+    : secondaryColor;
+  const subtitleFontSize = Math.round(BASE_SUBTITLE_FONT_SIZE * scale);
+  const subtitleFont = `${subtitleFontSize}px "${FONT_FAMILY}"`;
+
   // 创建测量用临时画布与测量上下文
   const measureCanvas = createCanvas(initialWidth, canvasHeight);
   const measureCtx = measureCanvas.getContext('2d');
@@ -121,10 +132,22 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const textWidthR =
     textMetricsR.width + (TEXT_BASELINE * canvasHeight - ascentR) * HORIZONTAL_TILT;
 
-  // 根据文字长度动态计算画布左右分界线
+  // 测量副标题
+  let subtitleMetricsWidth = 0;
+  if (subtitle) {
+    measureCtx.font = subtitleFont;
+    subtitleMetricsWidth = measureCtx.measureText(subtitle).width;
+  }
+
+  // 根据主副文字长度动态计算画布左右分界线
+  const rightSpan = subtitle ? textWidthR + subtitleFontSize + paddingX : textWidthR + paddingX;
   const canvasWidthL = Math.max(textWidthL + paddingX, initialWidth / 2);
-  const canvasWidthR = Math.max(textWidthR + paddingX, initialWidth / 2);
+  const canvasWidthR = Math.max(rightSpan, initialWidth / 2);
   const totalCanvasWidth = canvasWidthL + canvasWidthR;
+
+  // 计算副标题实际边界
+  const subtitleRight = canvasWidthL + textWidthR + subtitleFontSize;
+  const subtitleLeft = subtitleRight - subtitleMetricsWidth;
 
   // 创建正式绘制画布
   const canvas = createCanvas(totalCanvasWidth, canvasHeight);
@@ -195,16 +218,32 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   // 6. 绘制十字 (Cross)
   drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, crossColor);
 
-  // 7. 紧凑裁切边界（修复 PR #1 并兼顾短文本光环完整性）
+  // 6.5 绘制可选副标题 (PR #12)
+  if (subtitle) {
+    ctx.font = subtitleFont;
+    ctx.fillStyle = subtitleColor;
+    ctx.textAlign = 'end';
+    ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+    const subX = subtitleRight;
+    const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale;
+    ctx.fillText(subtitle, subX, subY);
+    ctx.resetTransform();
+  }
+
+  // 7. 紧凑裁切边界（修复 PR #1 并兼顾短文本与副标题完整性）
   if (crop) {
     const graphRight = graphX + canvasHeight;
-    // 安全裁切左边界：确保同时容纳最左侧倾斜文字以及光环/十字左侧边缘
-    const safeLeft = Math.max(0, Math.floor(Math.min(canvasWidthL - textWidthL - paddingX, graphX)));
-    // 安全裁切右边界：确保同时容纳最右侧倾斜文字以及光环/十字右侧边缘
-    const safeRight = Math.min(
-      totalCanvasWidth,
-      Math.ceil(Math.max(canvasWidthL + textWidthR + paddingX, graphRight))
-    );
+    // 汇总所有元素的最小左边界与最大右边界
+    let minLeft = Math.min(canvasWidthL - textWidthL - paddingX, graphX);
+    let maxRight = Math.max(canvasWidthL + textWidthR + paddingX, graphRight);
+
+    if (subtitle) {
+      minLeft = Math.min(minLeft, subtitleLeft - paddingX);
+      maxRight = Math.max(maxRight, subtitleRight + paddingX);
+    }
+
+    const safeLeft = Math.max(0, Math.floor(minLeft));
+    const safeRight = Math.min(totalCanvasWidth, Math.ceil(maxRight));
     const croppedWidth = safeRight - safeLeft;
 
     if (croppedWidth < totalCanvasWidth) {
