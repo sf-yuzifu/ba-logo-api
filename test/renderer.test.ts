@@ -19,7 +19,7 @@ describe('Renderer Core Unit Tests', () => {
     expect(result.buffer[3]).toBe(0x47);
   });
 
-  it('应当支持多格式导出 (PNG, WebP, JPEG, Base64)', () => {
+  it('应当支持多格式导出 (PNG, WebP, JPEG, SVG, Base64)', () => {
     const png = renderLogoToBuffer({ format: 'png' });
     expect(png.mimeType).toBe('image/png');
     expect(png.buffer[0]).toBe(0x89);
@@ -35,6 +35,11 @@ describe('Renderer Core Unit Tests', () => {
     // JPEG SOI 校验 (FF D8)
     expect(jpeg.buffer[0]).toBe(0xff);
     expect(jpeg.buffer[1]).toBe(0xd8);
+
+    const svg = renderLogoToBuffer({ format: 'svg', textL: 'Blue', textR: 'Archive' });
+    expect(svg.mimeType).toContain('image/svg+xml');
+    expect(svg.buffer.toString('utf8')).toContain('<svg');
+    expect(svg.buffer.toString('utf8')).toContain('<path');
 
     const base64Result = renderLogoToBuffer({ format: 'base64' });
     expect(base64Result.base64).toBeDefined();

@@ -899,6 +899,7 @@ export function getWebUIHtml(): string {
         <div class="format-pills" id="formatPills">
           <div class="pill-btn active" data-format="png">PNG</div>
           <div class="pill-btn" data-format="webp">WebP (推荐)</div>
+          <div class="pill-btn" data-format="svg">SVG (矢量)</div>
           <div class="pill-btn" data-format="jpeg">JPEG</div>
           <div class="pill-btn" data-format="base64">Base64</div>
         </div>

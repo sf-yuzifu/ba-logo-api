@@ -1,4 +1,10 @@
-import { createCanvas, Path2D, type Canvas, type SKRSContext2D } from '@napi-rs/canvas';
+import {
+  createCanvas,
+  Path2D,
+  convertSVGTextToPath,
+  type Canvas,
+  type SKRSContext2D,
+} from '@napi-rs/canvas';
 import { loadFonts, FONT_FAMILY } from './font.ts';
 import {
   BASE_CANVAS_HEIGHT,
@@ -16,7 +22,7 @@ import {
   COLORS,
 } from './constants.ts';
 
-export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64';
+export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64' | 'svg';
 
 export type PaddingValue = number | string | (number | string)[];
 
@@ -95,11 +101,12 @@ export interface RenderOptions {
 export type BaseRenderOptions = RenderOptions;
 
 export interface RenderResult {
-  canvas: Canvas;
+  canvas?: Canvas;
   buffer: Buffer;
   mimeType: string;
   dataUrl: string;
   base64: string;
+  svg?: string;
   width: number;
   height: number;
 }
@@ -531,11 +538,328 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   return trimCanvas(canvas, padBox, transparent, isCenter, textCenterY, backgroundColor);
 }
 
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function textToVectorSvg(
+  text: string,
+  fontSize: number,
+  anchor: 'start' | 'end' = 'start'
+): string {
+  if (!text) return '';
+  const dummySvg = `<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="2000"><text x="1000" y="1000" font-family="${FONT_FAMILY}" font-size="${fontSize}" text-anchor="${anchor}">${escapeXml(
+    text
+  )}</text></svg>`;
+  const res = convertSVGTextToPath(dummySvg).toString('utf8');
+
+  const pathRegex = /<path\s+([^>]+)\/>/g;
+  let match;
+  const paths: string[] = [];
+  while ((match = pathRegex.exec(res)) !== null) {
+    paths.push(`<path ${match[1]}/>`);
+  }
+
+  return `<g transform="translate(-1000 -1000)">${paths.join('')}</g>`;
+}
+
 /**
- * 渲染并导出指定格式的 Logo 图片数据包（支持 png, webp, jpeg, base64）
+ * 渲染纯矢量 SVG 格式 Logo（包含汉字轮廓化 Path，无需客户端安装字体，支持 Figma / AI 无损缩放）
+ */
+export function renderLogoSvg(options: RenderOptions = {}): string {
+  loadFonts();
+
+  const scale = Number(options.scale ?? 1);
+  const textL = options.textL ?? '蔚蓝';
+  const textR = options.textR ?? '档案';
+  const subtitle = options.subtitle?.trim();
+  const offsetX = options.offsetX ?? DEFAULT_GRAPH_OFFSET.x;
+  const offsetY = options.offsetY ?? DEFAULT_GRAPH_OFFSET.y;
+  const subX = options.subtitleOffsetX ?? 0;
+  const subYOffset = options.subtitleOffsetY ?? 0;
+  const wordGap = options.wordGap ?? 0;
+  const transparent = options.transparent ?? false;
+  const darkMode = options.darkMode ?? false;
+  const swapColors = options.swapColors ?? false;
+  const motifsBehindText = options.motifsBehindText ?? false;
+
+  const accentColor = options.accentColor ? normalizeColor(options.accentColor) : COLORS.blue;
+  const defaultTextColor = darkMode ? COLORS.white : COLORS.darkGray;
+  const baseTextColor = options.textColor ? normalizeColor(options.textColor) : defaultTextColor;
+  const backgroundColor = darkMode ? COLORS.darkGray : COLORS.white;
+
+  const primaryColor = swapColors ? baseTextColor : accentColor;
+  const secondaryColor = swapColors ? accentColor : baseTextColor;
+  const defaultHaloColor = swapColors ? accentColor : baseTextColor;
+  const defaultCrossColor = swapColors ? baseTextColor : accentColor;
+  const haloColor = options.haloColor ? normalizeColor(options.haloColor) : defaultHaloColor;
+  const crossColor = options.crossColor ? normalizeColor(options.crossColor) : defaultCrossColor;
+  const subtitleColor = options.subtitleColor ? normalizeColor(options.subtitleColor) : secondaryColor;
+
+  const canvasHeight = Math.round(BASE_CANVAS_HEIGHT * scale);
+  const initialWidth = Math.round(BASE_CANVAS_WIDTH * scale);
+  const fontSize = Math.round(BASE_FONT_SIZE * scale);
+  const paddingX = Math.round(PADDING_X * scale);
+  const strokeWidth = 12 * scale;
+  const subtitleFontSize = Math.round(BASE_SUBTITLE_FONT_SIZE * scale);
+
+  const vectorL = textToVectorSvg(textL, fontSize, 'end');
+  const vectorR = textToVectorSvg(textR, fontSize, 'start');
+  const vectorSub = subtitle ? textToVectorSvg(subtitle, subtitleFontSize, 'end') : '';
+
+  const measureCtx = getMeasureCtx();
+  measureCtx.font = `${fontSize}px "${FONT_FAMILY}"`;
+  const textMetricsL = measureCtx.measureText(textL);
+  const textMetricsR = measureCtx.measureText(textR);
+
+  const ascentL = textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
+  const descentL = textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
+  const ascentR = textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74 * scale;
+
+  const textWidthL = textMetricsL.width - (TEXT_BASELINE * canvasHeight + descentL) * HORIZONTAL_TILT;
+  const textWidthR = textMetricsR.width + (TEXT_BASELINE * canvasHeight - ascentR) * HORIZONTAL_TILT;
+
+  let subtitleMetricsWidth = 0;
+  let subAscent = 26 * scale;
+  let subDescent = 6 * scale;
+  let minSubX_rel = 0;
+  let maxSubX_rel = 0;
+
+  const scaledSubOffsetX = subX * scale;
+  const scaledSubOffsetY = subYOffset * scale;
+  const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale + scaledSubOffsetY;
+
+  if (subtitle) {
+    measureCtx.font = `${subtitleFontSize}px "${FONT_FAMILY}"`;
+    const subMetrics = measureCtx.measureText(subtitle);
+    subtitleMetricsWidth = subMetrics.width;
+    subAscent = subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
+    subDescent = subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
+
+    const subtitleX_rel = textWidthR + subtitleFontSize + scaledSubOffsetX;
+    minSubX_rel = (subtitleX_rel - subtitleMetricsWidth) + HORIZONTAL_TILT * (subY + subDescent);
+    maxSubX_rel = subtitleX_rel + HORIZONTAL_TILT * (subY - subAscent);
+  }
+
+  const padBox = parsePadding(options.padding, scale);
+  if (options.paddingTop !== undefined && !Number.isNaN(Number(options.paddingTop))) {
+    padBox.top = Math.max(0, Math.round(Number(options.paddingTop) * scale));
+  }
+  if (options.paddingRight !== undefined && !Number.isNaN(Number(options.paddingRight))) {
+    padBox.right = Math.max(0, Math.round(Number(options.paddingRight) * scale));
+  }
+  if (options.paddingBottom !== undefined && !Number.isNaN(Number(options.paddingBottom))) {
+    padBox.bottom = Math.max(0, Math.round(Number(options.paddingBottom) * scale));
+  }
+  if (options.paddingLeft !== undefined && !Number.isNaN(Number(options.paddingLeft))) {
+    padBox.left = Math.max(0, Math.round(Number(options.paddingLeft) * scale));
+  }
+
+  const maxPadH = Math.max(padBox.left, padBox.right);
+  const margin = Math.max(paddingX, maxPadH + 20 * scale);
+
+  const scaledOffsetX = offsetX * scale;
+  const scaledOffsetY = offsetY * scale;
+
+  const rawWordGap = Number(options.wordGap ?? 0);
+  const wordGapVal = Number.isFinite(rawWordGap) ? Math.min(Math.max(rawWordGap, -100), 300) * scale : 0;
+  const halfGap = Math.round(wordGapVal / 2);
+
+  const needLeft = Math.max(
+    textWidthL + halfGap,
+    canvasHeight / 2 - scaledOffsetX - halfGap,
+    subtitle ? -(minSubX_rel + halfGap) : 0,
+    initialWidth / 2
+  );
+  const needRight = Math.max(
+    textWidthR + halfGap,
+    canvasHeight / 2 + scaledOffsetX + halfGap,
+    subtitle ? maxSubX_rel + halfGap : 0,
+    initialWidth / 2
+  );
+
+  const canvasWidthL = Math.ceil(needLeft + margin);
+  const canvasWidthR = Math.ceil(needRight + margin);
+  const totalCanvasWidth = canvasWidthL + canvasWidthR;
+  const totalCanvasHeight = Math.max(
+    canvasHeight,
+    subtitle ? Math.ceil(subY + subDescent + margin) : 0,
+    Math.ceil(scaledOffsetY + canvasHeight + margin)
+  );
+
+  const leftTextX = canvasWidthL - halfGap;
+  const rightTextX = canvasWidthL + halfGap;
+  const graphX = rightTextX - canvasHeight / 2 + scaledOffsetX;
+  const graphY = scaledOffsetY;
+  const subtitleX = rightTextX + textWidthR + subtitleFontSize + scaledSubOffsetX;
+
+  const scanCanvas = createCanvas(totalCanvasWidth, totalCanvasHeight);
+  const sCtx = scanCanvas.getContext('2d');
+  sCtx.font = `${fontSize}px "${FONT_FAMILY}"`;
+  sCtx.fillStyle = '#fff';
+  sCtx.textAlign = 'end';
+  sCtx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+  sCtx.fillText(textL, leftTextX, canvasHeight * TEXT_BASELINE);
+  sCtx.resetTransform();
+
+  sCtx.save();
+  sCtx.translate(graphX, graphY);
+  sCtx.scale(canvasHeight / SVG_VIEWBOX_SIZE, canvasHeight / SVG_VIEWBOX_SIZE);
+  sCtx.fill(new Path2D(HALO_PATH_DATA));
+  sCtx.fill(new Path2D(CROSS_PATH_DATA));
+  sCtx.restore();
+
+  sCtx.font = `${fontSize}px "${FONT_FAMILY}"`;
+  sCtx.textAlign = 'start';
+  sCtx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+  sCtx.fillText(textR, rightTextX, canvasHeight * TEXT_BASELINE);
+  sCtx.resetTransform();
+
+  if (subtitle) {
+    sCtx.font = `${subtitleFontSize}px "${FONT_FAMILY}"`;
+    sCtx.textAlign = 'end';
+    sCtx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
+    sCtx.fillText(subtitle, subtitleX, subY);
+    sCtx.resetTransform();
+  }
+
+  const imgData = sCtx.getImageData(0, 0, totalCanvasWidth, totalCanvasHeight);
+  const u32 = new Uint32Array(imgData.data.buffer);
+  let minX = totalCanvasWidth, minY = totalCanvasHeight, maxX = 0, maxY = 0;
+  for (let y = 0; y < totalCanvasHeight; y++) {
+    const row = y * totalCanvasWidth;
+    for (let x = 0; x < totalCanvasWidth; x++) {
+      if ((u32[row + x] >>> 24) > 10) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  const isCenter = options.center ?? !transparent;
+  const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
+  let effMaxY = maxY;
+  if (isCenter) {
+    const distTop = textCenterY - minY;
+    if (distTop > 0) effMaxY = Math.max(maxY, Math.round(textCenterY + distTop));
+  }
+
+  const contentW = maxX - minX + 1;
+  const contentH = effMaxY - minY + 1;
+  const finalW = contentW + padBox.left + padBox.right;
+  const finalH = contentH + padBox.top + padBox.bottom;
+
+  const vx = (minX - padBox.left).toFixed(2);
+  const vy = (minY - padBox.top).toFixed(2);
+
+  const hollowPoints = HOLLOW_POLYGON.map(
+    (p) =>
+      `${(graphX + (p[0] / SVG_VIEWBOX_SIZE) * canvasHeight).toFixed(2)},${(
+        graphY +
+        (p[1] / SVG_VIEWBOX_SIZE) * canvasHeight
+      ).toFixed(2)}`
+  ).join(' ');
+
+  const haloScale = (canvasHeight / SVG_VIEWBOX_SIZE).toFixed(4);
+  const baseL = canvasHeight * TEXT_BASELINE;
+  const transX_L = (leftTextX + HORIZONTAL_TILT * baseL).toFixed(2);
+  const transX_R = (rightTextX + HORIZONTAL_TILT * baseL).toFixed(2);
+
+  let svg = `<?xml version="1.0" encoding="utf-8"?>\n`;
+  svg += `<svg xmlns="http://www.w3.org/2000/svg" width="${finalW}" height="${finalH}" viewBox="${vx} ${vy} ${finalW} ${finalH}">\n`;
+
+  if (!transparent) {
+    svg += `  <rect x="${vx}" y="${vy}" width="${finalW}" height="${finalH}" fill="${backgroundColor}"/>\n`;
+  }
+
+  if (motifsBehindText) {
+    svg += `  <g transform="translate(${graphX} ${graphY}) scale(${haloScale})">\n`;
+    svg += `    <path fill="${haloColor}" d="${HALO_PATH_DATA}"/>\n`;
+    svg += `  </g>\n`;
+    svg += `  <polygon points="${hollowPoints}" fill="${transparent ? 'none' : backgroundColor}"/>\n`;
+    svg += `  <g transform="translate(${graphX} ${graphY}) scale(${haloScale})">\n`;
+    svg += `    <path fill="${crossColor}" d="${CROSS_PATH_DATA}"/>\n`;
+    svg += `  </g>\n`;
+    svg += `  <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_L} ${baseL.toFixed(2)})" fill="${primaryColor}">\n`;
+    svg += `    ${vectorL}\n`;
+    svg += `  </g>\n`;
+    svg += `  <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="${secondaryColor}">\n`;
+    svg += `    ${vectorR}\n`;
+    svg += `  </g>\n`;
+  } else {
+    svg += `  <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_L} ${baseL.toFixed(2)})" fill="${primaryColor}">\n`;
+    svg += `    ${vectorL}\n`;
+    svg += `  </g>\n`;
+
+    svg += `  <defs>\n`;
+    svg += `    <mask id="ba-halo-mask" maskUnits="userSpaceOnUse" x="-5000" y="-5000" width="10000" height="10000">\n`;
+    svg += `      <rect x="-5000" y="-5000" width="10000" height="10000" fill="white"/>\n`;
+    svg += `      <polygon points="${hollowPoints}" fill="black"/>\n`;
+    svg += `      <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="black" stroke="black" stroke-width="${strokeWidth}" stroke-linejoin="round" stroke-linecap="round">\n`;
+    svg += `        ${vectorR}\n`;
+    svg += `      </g>\n`;
+    svg += `    </mask>\n`;
+    svg += `  </defs>\n`;
+
+    svg += `  <g transform="translate(${graphX} ${graphY}) scale(${haloScale})" mask="url(#ba-halo-mask)">\n`;
+    svg += `    <path fill="${haloColor}" d="${HALO_PATH_DATA}"/>\n`;
+    svg += `  </g>\n`;
+
+    svg += `  <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="${secondaryColor}">\n`;
+    svg += `    ${vectorR}\n`;
+    svg += `  </g>\n`;
+
+    svg += `  <g transform="translate(${graphX} ${graphY}) scale(${haloScale})">\n`;
+    svg += `    <path fill="${crossColor}" d="${CROSS_PATH_DATA}"/>\n`;
+    svg += `  </g>\n`;
+  }
+
+  if (subtitle && vectorSub) {
+    const transX_Sub = (subtitleX + HORIZONTAL_TILT * subY).toFixed(2);
+    svg += `  <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_Sub} ${subY.toFixed(2)})" fill="${subtitleColor}">\n`;
+    svg += `    ${vectorSub}\n`;
+    svg += `  </g>\n`;
+  }
+
+  svg += `</svg>\n`;
+  return svg;
+}
+
+/**
+ * 渲染并导出指定格式的 Logo 图片数据包（支持 png, webp, jpeg, svg, base64）
  */
 export function renderLogoToBuffer(options: RenderOptions = {}): RenderResult {
   const format = (options.format ?? 'png').toLowerCase() as OutputFormat;
+
+  if (format === 'svg') {
+    const svg = renderLogoSvg(options);
+    const buffer = Buffer.from(svg, 'utf8');
+    const mimeType = 'image/svg+xml; charset=utf-8';
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${mimeType};base64,${base64}`;
+
+    const vbMatch = /viewBox="[^"]+\s+([\d.]+)\s+([\d.]+)"/.exec(svg);
+    const width = vbMatch ? Math.round(parseFloat(vbMatch[1])) : 722;
+    const height = vbMatch ? Math.round(parseFloat(vbMatch[2])) : 505;
+
+    return {
+      buffer,
+      mimeType,
+      dataUrl,
+      base64,
+      svg,
+      width,
+      height,
+    };
+  }
+
   const isJpeg = format === 'jpeg' || format === 'jpg';
 
   // JPEG 格式不支持 alpha 透明度通道，遇透明设置强制关闭以规避黑底瑕疵

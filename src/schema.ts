@@ -204,9 +204,10 @@ export const LogoQuerySchema = t.Object({
         t.Literal('jpeg'),
         t.Literal('jpg'),
         t.Literal('base64'),
+        t.Literal('svg'),
       ],
       {
-        description: '输出格式（png / webp / jpeg / base64）',
+        description: '输出格式（png / webp / jpeg / svg / base64）',
         default: 'png',
       }
     )

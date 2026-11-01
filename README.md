@@ -95,7 +95,7 @@ bun run bench
 | `haloColor` | `halo` | string | *跟随文字色* | `9C27B0`, `#000000` | **光环独立颜色**（可选独立着色，支持 Hex） |
 | `motifsBehindText`| `behind`, `underText`| boolean | `false` | `true`, `false` | **图标置底**（将十字与光环置于文字图层下方，文字无镂空） |
 | `scale` | `s` | number | `1` | `2`, `3`, `4` | **分辨率倍率**（1x=250p, 2x=500p, 4x=1000p，范围 0.1~8） |
-| `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `base64` | 输出图片格式（`base64` 将输出 JSON 结构体） |
+| `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `svg`, `base64` | 输出格式（`svg` 纯矢量轮廓，`base64` 输出 JSON） |
 | `transparent` | `tp` | boolean | `false` | `true`, `false`, `1`, `0` | 是否开启背景透明（透明模式将镂空切除光环与十字） |
 | `darkMode` | `dark` | boolean | `false` | `true`, `false`, `1`, `0` | 是否开启暗黑模式（深灰底、白字、白光环） |
 | `swapColors` | `swap` | boolean | `false` | `true`, `false`, `1`, `0` | 是否对调左右文字的主次颜色 |

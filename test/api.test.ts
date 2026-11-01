@@ -107,6 +107,17 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(buf.byteLength).toBeGreaterThan(1000);
   });
 
+  it('GET /api/logo?format=svg 应当返回纯矢量 SVG 文件', async () => {
+    const res = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&format=svg')
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('image/svg+xml');
+    const text = await res.text();
+    expect(text).toContain('<svg');
+    expect(text).toContain('<path');
+  });
+
   it('GET /api/logo?format=base64 应当返回结构化 JSON', async () => {
     const res = await app.handle(
       new Request('http://localhost/api/logo?left=蔚蓝&right=档案&format=base64')
