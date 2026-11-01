@@ -78,13 +78,40 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
 /**
  * 处理 Logo 生成请求的核心分发函数
  */
-export function handleLogoRequest(query: Record<string, any>, set: any) {
+export function handleLogoRequest(
+  query: Record<string, any>,
+  set: any,
+  requestHeaders?: Headers | Record<string, string | undefined>
+) {
   const options = parseLogoQuery(query);
   const result = renderLogoToBuffer(options);
+
+  // 基于图片内容生成 ETag (使用 Bun 内置高效快速哈希)
+  const hash = Bun.hash(result.buffer).toString(16);
+  const etag = `W/"${hash}-${result.buffer.length}"`;
+
+  // 检查客户端 If-None-Match 缓存命中
+  const ifNoneMatch =
+    requestHeaders instanceof Headers
+      ? requestHeaders.get('if-none-match')
+      : requestHeaders?.['if-none-match'];
+
+  if (ifNoneMatch && ifNoneMatch === etag) {
+    return new Response(null, {
+      status: 304,
+      headers: {
+        'ETag': etag,
+        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
 
   // 如果指定格式为 base64，返回结构化 JSON
   if (options.format === 'base64') {
     set.headers['content-type'] = 'application/json; charset=utf-8';
+    set.headers['cache-control'] = 'public, max-age=86400, stale-while-revalidate=604800';
+    set.headers['etag'] = etag;
     return {
       code: 200,
       data: {
@@ -97,12 +124,14 @@ export function handleLogoRequest(query: Record<string, any>, set: any) {
     };
   }
 
-  // 默认返回二进制图片流
+  // 默认返回二进制图片流并附带强缓存及 ETag 响应头
   return new Response(result.buffer, {
     status: 200,
     headers: {
       'Content-Type': result.mimeType,
       'Content-Length': result.buffer.length.toString(),
+      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+      'ETag': etag,
       'Access-Control-Allow-Origin': '*',
     },
   });
@@ -139,8 +168,8 @@ export function createApp() {
     // 1. 旧版兼容路由 (GET /balogo)
     .get(
       '/balogo',
-      ({ query, set }) => {
-        return handleLogoRequest(query, set);
+      ({ query, set, headers }) => {
+        return handleLogoRequest(query, set, headers);
       },
       {
         query: LogoQuerySchema,
@@ -156,8 +185,8 @@ export function createApp() {
     // 2. 现代 RESTful 路由 (GET /api/logo)
     .get(
       '/api/logo',
-      ({ query, set }) => {
-        return handleLogoRequest(query, set);
+      ({ query, set, headers }) => {
+        return handleLogoRequest(query, set, headers);
       },
       {
         query: LogoQuerySchema,

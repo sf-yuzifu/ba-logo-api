@@ -90,4 +90,22 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(spec.paths['/api/logo']).toBeDefined();
     expect(spec.paths['/balogo']).toBeDefined();
   });
+
+  it('应当正确输出 Cache-Control 与 ETag 并在命中缓存时响应 304 Not Modified', async () => {
+    // 首次请求获取 ETag
+    const firstRes = await app.handle(new Request('http://localhost/api/logo?left=Blue&right=Archive'));
+    expect(firstRes.status).toBe(200);
+    expect(firstRes.headers.get('cache-control')).toContain('max-age=86400');
+    const etag = firstRes.headers.get('etag');
+    expect(etag).toBeDefined();
+    expect(etag?.startsWith('W/"')).toBe(true);
+
+    // 带 If-None-Match 请求校验 304
+    const cachedRes = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive', {
+        headers: { 'If-None-Match': etag! },
+      })
+    );
+    expect(cachedRes.status).toBe(304);
+  });
 });
