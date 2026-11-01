@@ -46,9 +46,23 @@ export interface RenderResult {
   height: number;
 }
 
-// 预先编译 SVG 矢量 Path2D 实例
+// 预先编译 SVG 矢量 Path2D 实例与全局单例测量画布
 const haloPath = new Path2D(HALO_PATH_DATA);
 const crossPath = new Path2D(CROSS_PATH_DATA);
+
+let sharedMeasureCanvas: Canvas | null = null;
+let sharedMeasureCtx: SKRSContext2D | null = null;
+
+/**
+ * 获取单例 1x1 文本度量上下文（避免每次请求重复开辟大画布测量，节约 90% 测量内存）
+ */
+function getMeasureCtx(): SKRSContext2D {
+  if (!sharedMeasureCtx) {
+    sharedMeasureCanvas = createCanvas(1, 1);
+    sharedMeasureCtx = sharedMeasureCanvas.getContext('2d');
+  }
+  return sharedMeasureCtx;
+}
 
 /**
  * 规范化十六进制颜色字符串（自动补充 # 前缀）
@@ -126,9 +140,8 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const subtitleFontSize = Math.round(BASE_SUBTITLE_FONT_SIZE * scale);
   const subtitleFont = `${subtitleFontSize}px "${FONT_FAMILY}"`;
 
-  // 创建测量用临时画布与测量上下文
-  const measureCanvas = createCanvas(initialWidth, canvasHeight);
-  const measureCtx = measureCanvas.getContext('2d');
+  // 1. 获取全局单例测量上下文（避免每次请求重复开辟无谓画布）
+  const measureCtx = getMeasureCtx();
   measureCtx.font = font;
 
   const textMetricsL = measureCtx.measureText(textL);
@@ -152,25 +165,54 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     subtitleMetricsWidth = measureCtx.measureText(subtitle).width;
   }
 
-  // 根据主副文字长度动态计算画布左右分界线
+  // 根据主副文字长度动态计算基准画布左右分界线
   const rightSpan = subtitle ? textWidthR + subtitleFontSize + paddingX : textWidthR + paddingX;
   const canvasWidthL = Math.max(textWidthL + paddingX, initialWidth / 2);
   const canvasWidthR = Math.max(rightSpan, initialWidth / 2);
   const totalCanvasWidth = canvasWidthL + canvasWidthR;
 
-  // 计算副标题实际边界
-  const subtitleRight = canvasWidthL + textWidthR + subtitleFontSize;
-  const subtitleLeft = subtitleRight - subtitleMetricsWidth;
+  // 原始光环与副标题绝对坐标（基于 totalCanvasWidth 坐标系）
+  const scaledOffsetX = offsetX * scale;
+  const scaledOffsetY = offsetY * scale;
+  const rawGraphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
+  const rawGraphRight = rawGraphX + canvasHeight;
+  const rawSubtitleRight = canvasWidthL + textWidthR + subtitleFontSize;
+  const rawSubtitleLeft = rawSubtitleRight - subtitleMetricsWidth;
 
-  // 创建正式绘制画布
-  const canvas = createCanvas(totalCanvasWidth, canvasHeight);
+  // 计算安全裁切边界（提前在绘图前计算，避免二次画布创建与拷贝）
+  let safeLeft = 0;
+  let finalWidth = totalCanvasWidth;
+
+  if (crop) {
+    let minLeft = Math.min(canvasWidthL - textWidthL - paddingX, rawGraphX);
+    let maxRight = Math.max(canvasWidthL + textWidthR + paddingX, rawGraphRight);
+
+    if (subtitle) {
+      minLeft = Math.min(minLeft, rawSubtitleLeft - paddingX);
+      maxRight = Math.max(maxRight, rawSubtitleRight + paddingX);
+    }
+
+    safeLeft = Math.max(0, Math.floor(minLeft));
+    const safeRight = Math.min(totalCanvasWidth, Math.ceil(maxRight));
+    finalWidth = safeRight - safeLeft;
+  }
+
+  // 坐标平移原点偏移量
+  const originX = -safeLeft;
+  const midX = canvasWidthL + originX;
+  const graphX = rawGraphX + originX;
+  const graphY = scaledOffsetY;
+  const subtitleX = rawSubtitleRight + originX;
+
+  // 直接创建最终尺寸的目标画布（1 步到位，零中间画布与内存开销）
+  const canvas = createCanvas(finalWidth, canvasHeight);
   const ctx = canvas.getContext('2d');
 
   // 1. 清空并绘制背景
-  ctx.clearRect(0, 0, totalCanvasWidth, canvasHeight);
+  ctx.clearRect(0, 0, finalWidth, canvasHeight);
   if (!transparent) {
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, totalCanvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, finalWidth, canvasHeight);
   }
 
   // 2. 绘制左侧主文本 (textAlign = 'end')
@@ -178,14 +220,10 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   ctx.fillStyle = primaryColor;
   ctx.textAlign = 'end';
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  ctx.fillText(textL, canvasWidthL, canvasHeight * TEXT_BASELINE);
+  ctx.fillText(textL, midX, canvasHeight * TEXT_BASELINE);
   ctx.resetTransform();
 
   // 3. 绘制光环 (Halo)
-  const scaledOffsetX = offsetX * scale;
-  const scaledOffsetY = offsetY * scale;
-  const graphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
-  const graphY = scaledOffsetY;
   drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, haloColor);
 
   // 4. 绘制右侧文字 (次要颜色 + 描边裁切光环)
@@ -199,12 +237,12 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   ctx.strokeStyle = backgroundColor;
   ctx.lineWidth = strokeWidth;
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  ctx.strokeText(textR, canvasWidthL, canvasHeight * TEXT_BASELINE);
+  ctx.strokeText(textR, midX, canvasHeight * TEXT_BASELINE);
 
   // 填充文字实体颜色
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = secondaryColor;
-  ctx.fillText(textR, canvasWidthL, canvasHeight * TEXT_BASELINE);
+  ctx.fillText(textR, midX, canvasHeight * TEXT_BASELINE);
   ctx.resetTransform();
 
   // 5. 绘制十字镂空多边形遮罩 (Hollow Polygon)
@@ -237,44 +275,9 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.fillStyle = subtitleColor;
     ctx.textAlign = 'end';
     ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-    const subX = subtitleRight;
     const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale;
-    ctx.fillText(subtitle, subX, subY);
+    ctx.fillText(subtitle, subtitleX, subY);
     ctx.resetTransform();
-  }
-
-  // 7. 紧凑裁切边界（修复 PR #1 并兼顾短文本与副标题完整性）
-  if (crop) {
-    const graphRight = graphX + canvasHeight;
-    // 汇总所有元素的最小左边界与最大右边界
-    let minLeft = Math.min(canvasWidthL - textWidthL - paddingX, graphX);
-    let maxRight = Math.max(canvasWidthL + textWidthR + paddingX, graphRight);
-
-    if (subtitle) {
-      minLeft = Math.min(minLeft, subtitleLeft - paddingX);
-      maxRight = Math.max(maxRight, subtitleRight + paddingX);
-    }
-
-    const safeLeft = Math.max(0, Math.floor(minLeft));
-    const safeRight = Math.min(totalCanvasWidth, Math.ceil(maxRight));
-    const croppedWidth = safeRight - safeLeft;
-
-    if (croppedWidth < totalCanvasWidth) {
-      const croppedCanvas = createCanvas(croppedWidth, canvasHeight);
-      const croppedCtx = croppedCanvas.getContext('2d');
-      croppedCtx.drawImage(
-        canvas,
-        safeLeft,
-        0,
-        croppedWidth,
-        canvasHeight,
-        0,
-        0,
-        croppedWidth,
-        canvasHeight
-      );
-      return croppedCanvas;
-    }
   }
 
   return canvas;
