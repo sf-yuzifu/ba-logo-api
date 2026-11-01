@@ -704,6 +704,22 @@ export function getWebUIHtml(): string {
         </div>
       </div>
 
+      <div class="form-group">
+        <label class="form-label">
+          <span>副标题 X 轴偏移量 (SUBTITLE X OFFSET)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px</span>
+        </label>
+        <input type="number" id="inputSubX" class="input-text" value="0" placeholder="默认 0">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span>副标题 Y 轴偏移量 (SUBTITLE Y OFFSET)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px</span>
+        </label>
+        <input type="number" id="inputSubY" class="input-text" value="0" placeholder="默认 0">
+      </div>
+
       <!-- 主题色彩 -->
       <div class="form-group">
         <label class="form-label">强调色 (ACCENT COLOR - 左文字与十字)</label>
@@ -878,6 +894,8 @@ export function getWebUIHtml(): string {
       right: '档案',
       subtitle: '',
       subtitleColor: '',
+      subX: 0,
+      subY: 0,
       accent: '#128AFA',
       textColor: '#2B2B2B',
       x: -15,
@@ -897,6 +915,8 @@ export function getWebUIHtml(): string {
     const elRight = document.getElementById('inputRight');
     const elSub = document.getElementById('inputSub');
     const elSubColor = document.getElementById('inputSubColor');
+    const elSubX = document.getElementById('inputSubX');
+    const elSubY = document.getElementById('inputSubY');
     const elAccent = document.getElementById('inputAccent');
     const elTextColor = document.getElementById('inputTextColor');
     const elX = document.getElementById('inputX');
@@ -939,7 +959,11 @@ export function getWebUIHtml(): string {
         if (state.wordGap !== 0) params.set('gap', state.wordGap);
         if (state.transparent) params.set('tp', 'true');
         if (state.scale !== 1) params.set('scale', state.scale);
-        if (state.subtitle) params.set('sub', state.subtitle);
+        if (state.subtitle) {
+          params.set('sub', state.subtitle);
+          if (state.subX !== 0) params.set('subX', state.subX);
+          if (state.subY !== 0) params.set('subY', state.subY);
+        }
         if (state.accent && state.accent.toLowerCase() !== '#128afa') params.set('accent', state.accent.replace('#', ''));
         const defaultTxt = state.dark ? '#ffffff' : '#2b2b2b';
         if (state.textColor && state.textColor.toLowerCase() !== defaultTxt) {
@@ -959,8 +983,12 @@ export function getWebUIHtml(): string {
       // 现代 RESTful /api/logo 路由
       params.set('left', state.left);
       params.set('right', state.right);
-      if (state.subtitle) params.set('subtitle', state.subtitle);
-      if (state.subtitleColor) params.set('subtitleColor', state.subtitleColor.replace('#', ''));
+      if (state.subtitle) {
+        params.set('subtitle', state.subtitle);
+        if (state.subtitleColor) params.set('subtitleColor', state.subtitleColor.replace('#', ''));
+        if (state.subX !== 0) params.set('subX', state.subX);
+        if (state.subY !== 0) params.set('subY', state.subY);
+      }
       if (state.accent && state.accent.toLowerCase() !== '#128afa') {
         params.set('accent', state.accent.replace('#', ''));
       }
@@ -1080,6 +1108,16 @@ export function getWebUIHtml(): string {
 
     elAccent.addEventListener('input', (e) => { state.accent = e.target.value; updatePreview(); });
     elSubColor.addEventListener('input', (e) => { state.subtitleColor = e.target.value; updatePreview(); });
+    elSubX.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.subX = Number.isFinite(val) ? val : 0;
+      updatePreview();
+    });
+    elSubY.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.subY = Number.isFinite(val) ? val : 0;
+      updatePreview();
+    });
 
     document.querySelectorAll('#accentPresets .color-dot').forEach(dot => {
       dot.addEventListener('click', () => {

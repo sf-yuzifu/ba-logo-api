@@ -69,6 +69,8 @@ export interface RenderOptions {
   textR?: string;
   subtitle?: string; // 可选副标题（PR #12，如 "ブルーアーカイブ"，右下方对齐绘制）
   subtitleColor?: string; // 可选副标题颜色（默认跟随右侧次要文字颜色）
+  subtitleOffsetX?: number; // 副标题 X 轴偏移量微调（像素，默认 0）
+  subtitleOffsetY?: number; // 副标题 Y 轴偏移量微调（像素，默认 0）
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
@@ -329,7 +331,13 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   let subDescent = 6 * scale;
   let minSubX_rel = 0;
   let maxSubX_rel = 0;
-  const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale;
+
+  const rawSubOffsetX = Number(options.subtitleOffsetX ?? 0);
+  const rawSubOffsetY = Number(options.subtitleOffsetY ?? 0);
+  const scaledSubOffsetX = Number.isFinite(rawSubOffsetX) ? rawSubOffsetX * scale : 0;
+  const scaledSubOffsetY = Number.isFinite(rawSubOffsetY) ? rawSubOffsetY * scale : 0;
+
+  const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale + scaledSubOffsetY;
 
   if (subtitle) {
     measureCtx.font = subtitleFont;
@@ -338,7 +346,7 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     subAscent = subMetrics.fontBoundingBoxAscent ?? subMetrics.actualBoundingBoxAscent ?? 26 * scale;
     subDescent = subMetrics.fontBoundingBoxDescent ?? subMetrics.actualBoundingBoxDescent ?? 6 * scale;
 
-    const subtitleX_rel = textWidthR + subtitleFontSize;
+    const subtitleX_rel = textWidthR + subtitleFontSize + scaledSubOffsetX;
     // 斜体转换下，副标题相对于 midX 的屏幕 X 范围
     minSubX_rel = (subtitleX_rel - subtitleMetricsWidth) + HORIZONTAL_TILT * (subY + subDescent);
     maxSubX_rel = subtitleX_rel + HORIZONTAL_TILT * (subY - subAscent);
@@ -400,7 +408,7 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const rightTextX = canvasWidthL + halfGap;
   const graphX = rightTextX - canvasHeight / 2 + scaledOffsetX;
   const graphY = scaledOffsetY;
-  const subtitleX = rightTextX + textWidthR + subtitleFontSize;
+  const subtitleX = rightTextX + textWidthR + subtitleFontSize + scaledSubOffsetX;
 
   // 创建绘制基底画布（始终在透明通道绘制图元，由裁切层统一负责背景填充与包围盒计算）
   const canvas = createCanvas(totalCanvasWidth, totalCanvasHeight);
@@ -463,7 +471,6 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.fillStyle = subtitleColor;
     ctx.textAlign = 'end';
     ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-    const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale;
     ctx.fillText(subtitle, subtitleX, subY);
     ctx.resetTransform();
   }

@@ -49,6 +49,22 @@ export const LogoQuerySchema = t.Object({
   ),
   subColor: t.Optional(t.String({ description: 'subtitleColor 别名' })),
 
+  subtitleOffsetX: t.Optional(
+    t.Numeric({
+      description: '副标题 X 轴偏移量（像素，默认 0）',
+      examples: [0, 20, -20],
+    })
+  ),
+  subX: t.Optional(t.Numeric({ description: 'subtitleOffsetX 别名' })),
+
+  subtitleOffsetY: t.Optional(
+    t.Numeric({
+      description: '副标题 Y 轴偏移量（像素，默认 0）',
+      examples: [0, 10, -10],
+    })
+  ),
+  subY: t.Optional(t.Numeric({ description: 'subtitleOffsetY 别名' })),
+
   // 坐标偏移
   offsetX: t.Optional(
     t.Numeric({

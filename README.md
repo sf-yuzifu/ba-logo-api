@@ -87,6 +87,8 @@ bun run bench
 | `right` | `r` | string | `"档案"` | `Archive`, `航线` | 右侧主要文字（次要颜色） |
 | `subtitle` | `sub` | string | `""` | `ブルーアーカイブ` | **可选副标题**，在右下方倾斜对齐显示 |
 | `subtitleColor`| `subColor` | string | *跟随右文字* | `#2B2B2B`, `#FFFFFF` | 副标题颜色（支持 Hex） |
+| `subtitleOffsetX`| `subX` | number | `0` | `20`, `-15` | **副标题 X 轴偏移量**（像素微调，支持正负数） |
+| `subtitleOffsetY`| `subY` | number | `0` | `10`, `-5` | **副标题 Y 轴偏移量**（像素微调，支持正负数） |
 | `accentColor` | `accent` | string | `"#128AFA"` | `FF5722`, `#00E5FF` | **主强调色**（影响左文字与十字架，支持 Hex） |
 | `textColor` | `color`, `tc` | string | `"#2B2B2B"` | `000000`, `#FFFFFF` | **文字主题色**（影响右文字与光环，暗黑模式默认白） |
 | `scale` | `s` | number | `1` | `2`, `3`, `4` | **分辨率倍率**（1x=250p, 2x=500p, 4x=1000p，范围 0.1~8） |

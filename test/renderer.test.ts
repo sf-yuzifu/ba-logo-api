@@ -93,6 +93,24 @@ describe('Renderer Core Unit Tests', () => {
       scale: 2,
     });
     expect(longSub.width).toBeGreaterThan(1200);
+
+    // 支持副标题独立位置微调 (subX, subY)
+    const baseSub = renderLogo({
+      textL: 'Blue',
+      textR: 'Archive',
+      subtitle: 'ブルーアーカイブ',
+      transparent: true,
+    });
+    const shiftedSub = renderLogo({
+      textL: 'Blue',
+      textR: 'Archive',
+      subtitle: 'ブルーアーカイブ',
+      subtitleOffsetX: 60,
+      subtitleOffsetY: 30,
+      transparent: true,
+    });
+    expect(shiftedSub.width).toBeGreaterThan(baseSub.width);
+    expect(shiftedSub.height).toBeGreaterThan(baseSub.height);
   });
 
   it('长短文本边界与裁剪安全性', () => {

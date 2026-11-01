@@ -23,6 +23,14 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   const rawY = query.offsetY ?? query.y;
   const offsetY = rawY !== undefined && !Number.isNaN(Number(rawY)) ? Number(rawY) : undefined;
 
+  // 副标题偏移
+  const rawSubX = query.subtitleOffsetX ?? query.subX;
+  const subtitleOffsetX =
+    rawSubX !== undefined && !Number.isNaN(Number(rawSubX)) ? Number(rawSubX) : undefined;
+  const rawSubY = query.subtitleOffsetY ?? query.subY;
+  const subtitleOffsetY =
+    rawSubY !== undefined && !Number.isNaN(Number(rawSubY)) ? Number(rawSubY) : undefined;
+
   // 透明背景
   const rawTp = query.transparent ?? query.tp;
   const transparent =
@@ -75,6 +83,8 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
     textR,
     subtitle,
     subtitleColor,
+    subtitleOffsetX,
+    subtitleOffsetY,
     offsetX,
     offsetY,
     wordGap,

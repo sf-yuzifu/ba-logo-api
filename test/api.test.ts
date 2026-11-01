@@ -72,6 +72,18 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(buf.byteLength).toBeGreaterThan(1000);
   });
 
+  it('GET /api/logo 应当支持副标题偏移 (subX / subY)', async () => {
+    const res = await app.handle(
+      new Request(
+        'http://localhost/api/logo?left=Blue&right=Archive&subtitle=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subX=20&subY=10'
+      )
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toBe('image/png');
+    const buf = await res.arrayBuffer();
+    expect(buf.byteLength).toBeGreaterThan(1000);
+  });
+
   it('GET /api/logo?format=base64 应当返回结构化 JSON', async () => {
     const res = await app.handle(
       new Request('http://localhost/api/logo?left=蔚蓝&right=档案&format=base64')
