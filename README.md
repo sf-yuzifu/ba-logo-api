@@ -88,6 +88,7 @@ bun run bench
 | `subtitle` | `sub` | string | `""` | `ブルーアーカイブ` | **可选副标题**，在右下方倾斜对齐显示 |
 | `subtitleColor`| `subColor` | string | *跟随右文字* | `#2B2B2B`, `#FFFFFF` | 副标题颜色（支持 Hex） |
 | `accentColor` | `accent` | string | `"#128AFA"` | `FF5722`, `#00E5FF` | **主强调色**（影响左文字与十字架，支持 Hex） |
+| `textColor` | `color`, `tc` | string | `"#2B2B2B"` | `000000`, `#FFFFFF` | **文字主题色**（影响右文字与光环，暗黑模式默认白） |
 | `scale` | `s` | number | `1` | `2`, `3`, `4` | **分辨率倍率**（1x=250p, 2x=500p, 4x=1000p，范围 0.1~8） |
 | `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `base64` | 输出图片格式（`base64` 将输出 JSON 结构体） |
 | `transparent` | `tp` | boolean | `false` | `true`, `false`, `1`, `0` | 是否开启背景透明（透明模式将镂空切除光环与十字） |

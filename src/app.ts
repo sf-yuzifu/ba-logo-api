@@ -43,8 +43,9 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   const swapColors =
     typeof rawSwap === 'boolean' ? rawSwap : rawSwap === 'true' || rawSwap === '1';
 
-  // 强调色
+  // 强调色与文字主题色
   const accentColor = query.accentColor ?? query.accent;
+  const textColor = query.textColor ?? query.color ?? query.tc;
 
   // 紧凑裁切与留白边距
   const rawCrop = query.crop;
@@ -82,6 +83,7 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
     darkMode,
     swapColors,
     accentColor,
+    textColor,
     crop,
     padding,
     center,

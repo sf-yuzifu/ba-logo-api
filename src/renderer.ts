@@ -29,7 +29,8 @@ export interface RenderOptions {
   crop?: boolean; // 是否自动紧凑裁切两端多余空白（默认 true）
   padding?: number; // 紧凑裁切留白边距（像素，默认 2，随 scale 缩放）
   center?: boolean; // 文本垂直视觉居中（有背景时默认 true，透明模式默认 false）
-  accentColor?: string; // 自定义主题强调色（默认 #128AFA）
+  accentColor?: string; // 主强调色（左文字、十字架，默认 #128AFA）
+  textColor?: string; // 文字主题色（右文字、光环，默认 #2B2B2B，暗黑模式默认 #FFFFFF）
   darkMode?: boolean; // 是否开启暗黑模式（默认 false）
   swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
   scale?: number; // 分辨率缩放倍率（默认 1，支持 2x, 3x, 4x 等高清水印与海报分辨率）
@@ -218,7 +219,9 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const swapColors = options.swapColors ?? false;
 
   const backgroundColor = darkMode ? COLORS.darkGray : COLORS.white;
-  const baseTextColor = darkMode ? COLORS.white : COLORS.darkGray;
+  const defaultTextColor = darkMode ? COLORS.white : COLORS.darkGray;
+  const baseTextColor = options.textColor ? normalizeColor(options.textColor) : defaultTextColor;
+
   const primaryColor = swapColors ? baseTextColor : accentColor;
   const secondaryColor = swapColors ? accentColor : baseTextColor;
   const haloColor = baseTextColor;
@@ -268,54 +271,33 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     subtitleMetricsWidth = measureCtx.measureText(subtitle).width;
   }
 
+  // 计算用户自定义 padding，确保绘制基底有充足外延空间，不发生提前截断冲突
+  const userPad = Math.max(0, Math.round(Number(options.padding ?? 2) * scale));
+  const margin = Math.max(paddingX, userPad + 20 * scale);
+
   // 根据主副文字长度动态计算基准画布左右分界线
-  const rightSpan = subtitle ? textWidthR + subtitleFontSize + paddingX : textWidthR + paddingX;
-  const canvasWidthL = Math.max(textWidthL + paddingX, initialWidth / 2);
-  const canvasWidthR = Math.max(rightSpan, initialWidth / 2);
+  const rightSpan = subtitle ? textWidthR + subtitleFontSize + margin : textWidthR + margin;
+  const canvasWidthL = Math.max(textWidthL + margin, initialWidth / 2 + margin);
+  const canvasWidthR = Math.max(rightSpan, initialWidth / 2 + margin);
   const totalCanvasWidth = canvasWidthL + canvasWidthR;
 
-  // 原始光环与副标题绝对坐标（基于 totalCanvasWidth 坐标系）
+  // 原始光环与副标题绝对坐标
   const scaledOffsetX = offsetX * scale;
   const scaledOffsetY = offsetY * scale;
-  const rawGraphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
-  const rawGraphRight = rawGraphX + canvasHeight;
-  const rawSubtitleRight = canvasWidthL + textWidthR + subtitleFontSize;
-  const rawSubtitleLeft = rawSubtitleRight - subtitleMetricsWidth;
-
-  // 计算安全裁切边界（提前在绘图前计算，避免二次画布创建与拷贝）
-  let safeLeft = 0;
-  let finalWidth = totalCanvasWidth;
-
-  if (crop) {
-    let minLeft = Math.min(canvasWidthL - textWidthL - paddingX, rawGraphX);
-    let maxRight = Math.max(canvasWidthL + textWidthR + paddingX, rawGraphRight);
-
-    if (subtitle) {
-      minLeft = Math.min(minLeft, rawSubtitleLeft - paddingX);
-      maxRight = Math.max(maxRight, rawSubtitleRight + paddingX);
-    }
-
-    safeLeft = Math.max(0, Math.floor(minLeft));
-    const safeRight = Math.min(totalCanvasWidth, Math.ceil(maxRight));
-    finalWidth = safeRight - safeLeft;
-  }
-
-  // 坐标平移原点偏移量
-  const originX = -safeLeft;
-  const midX = canvasWidthL + originX;
-  const graphX = rawGraphX + originX;
+  const graphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
   const graphY = scaledOffsetY;
-  const subtitleX = rawSubtitleRight + originX;
+  const midX = canvasWidthL;
+  const subtitleX = canvasWidthL + textWidthR + subtitleFontSize;
 
-  // 直接创建最终尺寸的目标画布（1 步到位，零中间画布与内存开销）
-  const canvas = createCanvas(finalWidth, canvasHeight);
+  // 创建绘制基底画布
+  const canvas = createCanvas(totalCanvasWidth, canvasHeight);
   const ctx = canvas.getContext('2d');
 
   // 1. 清空并绘制背景
-  ctx.clearRect(0, 0, finalWidth, canvasHeight);
+  ctx.clearRect(0, 0, totalCanvasWidth, canvasHeight);
   if (!transparent) {
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, finalWidth, canvasHeight);
+    ctx.fillRect(0, 0, totalCanvasWidth, canvasHeight);
   }
 
   // 2. 绘制左侧主文本 (textAlign = 'end')
@@ -383,15 +365,11 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.resetTransform();
   }
 
-  // 7. 紧凑像素级包围盒裁切（默认贴合到边缘 2px，支持自定义 padding）
+  // 7. 紧凑像素级包围盒裁切（默认贴合到边缘 2px，支持自定义 padding 与文本居中）
   if (crop) {
-    const rawPad = Number(options.padding ?? 2);
-    const safePad = Number.isFinite(rawPad)
-      ? Math.max(0, Math.round(rawPad * scale))
-      : Math.round(2 * scale);
     const isCenter = options.center ?? !transparent;
     const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
-    return trimCanvas(canvas, safePad, transparent, isCenter, textCenterY, backgroundColor);
+    return trimCanvas(canvas, userPad, transparent, isCenter, textCenterY, backgroundColor);
   }
 
   return canvas;

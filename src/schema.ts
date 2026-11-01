@@ -18,8 +18,7 @@ export const LogoQuerySchema = t.Object({
   // 主要文字
   left: t.Optional(
     t.String({
-      description: 'Logo 左侧主文字（蓝色）',
-      default: '蔚蓝',
+      description: 'Logo 左侧主文字（蓝色，默认"蔚蓝"）',
       examples: ['Blue', '蔚蓝'],
     })
   ),
@@ -27,8 +26,7 @@ export const LogoQuerySchema = t.Object({
 
   right: t.Optional(
     t.String({
-      description: 'Logo 右侧主文字（深灰色）',
-      default: '档案',
+      description: 'Logo 右侧主文字（深灰色，默认"档案"）',
       examples: ['Archive', '档案'],
     })
   ),
@@ -54,8 +52,7 @@ export const LogoQuerySchema = t.Object({
   // 坐标偏移
   offsetX: t.Optional(
     t.Numeric({
-      description: '光环与十字 X 轴偏移量（像素）',
-      default: -15,
+      description: '光环与十字 X 轴偏移量（像素，默认 -15）',
       examples: [-15, 0, 20],
     })
   ),
@@ -63,8 +60,7 @@ export const LogoQuerySchema = t.Object({
 
   offsetY: t.Optional(
     t.Numeric({
-      description: '光环与十字 Y 轴偏移量（像素）',
-      default: 0,
+      description: '光环与十字 Y 轴偏移量（像素，默认 0）',
       examples: [0, -10, 10],
     })
   ),
@@ -79,8 +75,7 @@ export const LogoQuerySchema = t.Object({
   // 分辨率缩放（PR #9）
   scale: t.Optional(
     t.Numeric({
-      description: '分辨率缩放倍率（1x=250p, 2x=500p, 4x=1000p，范围 0.1 ~ 8.0）',
-      default: 1,
+      description: '分辨率缩放倍率（1x=250p, 2x=500p, 4x=1000p，范围 0.1 ~ 8.0，默认 1）',
       minimum: 0.1,
       maximum: 8.0,
       examples: [1, 2, 4],
@@ -103,19 +98,26 @@ export const LogoQuerySchema = t.Object({
 
   accentColor: t.Optional(
     t.String({
-      description: '主强调色（十六进制颜色代码，影响左文字与十字架）',
-      default: '#128AFA',
+      description: '主强调色（十六进制颜色代码，影响左文字与十字架，默认 #128AFA）',
       examples: ['#128AFA', '#FF5722', '#00E5FF'],
     })
   ),
   accent: t.Optional(t.String({ description: 'accentColor 别名' })),
+
+  textColor: t.Optional(
+    t.String({
+      description: '文字主题色（十六进制颜色代码，影响右文字与光环，默认 #2B2B2B）',
+      examples: ['#2B2B2B', '#000000', '#FFFFFF'],
+    })
+  ),
+  color: t.Optional(t.String({ description: 'textColor 别名' })),
+  tc: t.Optional(t.String({ description: 'textColor 别名' })),
 
   // 裁切与留白边距
   crop: t.Optional(FlexibleBoolean),
   padding: t.Optional(
     t.Numeric({
       description: '内容边缘留白边距像素（默认 2px，随 scale 缩放）',
-      default: 2,
       minimum: 0,
       maximum: 200,
       examples: [2, 0, 10],

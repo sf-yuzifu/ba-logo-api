@@ -151,7 +151,7 @@ export function getWebUIHtml(): string {
       margin: 0 auto;
       padding: 2rem;
       display: grid;
-      grid-template-columns: 460px 1fr;
+      grid-template-columns: 480px 1fr;
       gap: 2rem;
     }
 
@@ -177,7 +177,7 @@ export function getWebUIHtml(): string {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       padding-bottom: 0.75rem;
       border-bottom: 1.5px solid var(--primary-light);
     }
@@ -203,11 +203,13 @@ export function getWebUIHtml(): string {
 
     /* 表单控件 */
     .form-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.15rem;
     }
 
     .form-label {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: 0.85rem;
       font-weight: 700;
       color: var(--text-muted);
@@ -311,8 +313,8 @@ export function getWebUIHtml(): string {
     .toggles-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 1.25rem;
+      gap: 10px;
+      margin-top: 1rem;
     }
 
     .toggle-item {
@@ -334,7 +336,7 @@ export function getWebUIHtml(): string {
     }
 
     .toggle-item span {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-main);
     }
@@ -342,8 +344,8 @@ export function getWebUIHtml(): string {
     .switch {
       position: relative;
       display: inline-block;
-      width: 40px;
-      height: 22px;
+      width: 38px;
+      height: 20px;
     }
 
     .switch input {
@@ -361,14 +363,14 @@ export function getWebUIHtml(): string {
       bottom: 0;
       background-color: #CBD5E1;
       transition: .3s;
-      border-radius: 22px;
+      border-radius: 20px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 16px;
-      width: 16px;
+      height: 14px;
+      width: 14px;
       left: 3px;
       bottom: 3px;
       background-color: white;
@@ -392,9 +394,9 @@ export function getWebUIHtml(): string {
 
     .pill-btn {
       flex: 1;
-      padding: 8px 0;
+      padding: 7px 0;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 800;
       border: 1.5px solid var(--card-border);
       border-radius: var(--radius-sm);
@@ -415,7 +417,7 @@ export function getWebUIHtml(): string {
     .preview-card {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
     .preview-canvas-box {
@@ -427,7 +429,7 @@ export function getWebUIHtml(): string {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: 1.5rem;
       position: relative;
       overflow: hidden;
       box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
@@ -449,6 +451,7 @@ export function getWebUIHtml(): string {
 
     .preview-img {
       max-width: 100%;
+      max-height: 480px;
       height: auto;
       object-fit: contain;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.08));
@@ -457,13 +460,14 @@ export function getWebUIHtml(): string {
 
     .preview-loading {
       position: absolute;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(4px);
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-weight: 800;
@@ -471,6 +475,7 @@ export function getWebUIHtml(): string {
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease;
+      gap: 8px;
     }
 
     .preview-loading.active {
@@ -478,11 +483,24 @@ export function getWebUIHtml(): string {
       pointer-events: auto;
     }
 
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--primary-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* 元数据徽章 */
     .meta-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       font-size: 0.85rem;
       font-weight: 700;
@@ -512,7 +530,7 @@ export function getWebUIHtml(): string {
     }
 
     .action-btn {
-      padding: 12px;
+      padding: 11px;
       font-size: 0.9rem;
       font-weight: 800;
       border: none;
@@ -566,6 +584,7 @@ export function getWebUIHtml(): string {
       overflow-x: auto;
       white-space: nowrap;
       text-overflow: ellipsis;
+      user-select: all;
     }
 
     .copy-url-btn {
@@ -583,6 +602,21 @@ export function getWebUIHtml(): string {
 
     .copy-url-btn:hover {
       background: var(--primary-hover);
+    }
+
+    /* Base64 弹窗 */
+    #base64Box {
+      display: none;
+      margin-top: 10px;
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      font-family: monospace;
+      font-size: 0.75rem;
+      max-height: 100px;
+      overflow-y: auto;
+      word-break: break-all;
     }
 
     /* Toast 提示 */
@@ -634,27 +668,40 @@ export function getWebUIHtml(): string {
     <div class="card">
       <div class="card-header">
         <div class="card-title">Logo 参数控制台</div>
-        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">LIVE CONFIG</span>
+        <!-- 路由模式切换 -->
+        <div class="format-pills" id="endpointPills" style="width: 180px;">
+          <div class="pill-btn active" data-ep="api">RESTful</div>
+          <div class="pill-btn" data-ep="balogo">旧版兼容</div>
+        </div>
       </div>
 
       <!-- 文字配置 -->
       <div class="form-group">
-        <label class="form-label">标题文字 (LEFT / RIGHT)</label>
+        <label class="form-label">
+          <span>标题文字 (LEFT / RIGHT)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">支持清空或单字</span>
+        </label>
         <div class="form-row">
-          <input type="text" id="inputLeft" class="input-text" value="蔚蓝" placeholder="左文字（默认蔚蓝）">
-          <input type="text" id="inputRight" class="input-text" value="档案" placeholder="右文字（默认档案）">
+          <input type="text" id="inputLeft" class="input-text" value="蔚蓝" placeholder="左文字（蓝色）">
+          <input type="text" id="inputRight" class="input-text" value="档案" placeholder="右文字（黑色）">
         </div>
       </div>
 
       <!-- 副标题配置 -->
       <div class="form-group">
-        <label class="form-label">副标题 (SUBTITLE，可选)</label>
-        <input type="text" id="inputSub" class="input-text" value="" placeholder="例如：ブルーアーカイブ / Blue Archive">
+        <label class="form-label">
+          <span>副标题 (SUBTITLE，可选)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">右下方对齐</span>
+        </label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="inputSub" class="input-text" value="" placeholder="例如：ブルーアーカイブ / Blue Archive">
+          <input type="color" id="inputSubColor" value="#2B2B2B" title="自定义副标题颜色">
+        </div>
       </div>
 
       <!-- 主题色彩 -->
       <div class="form-group">
-        <label class="form-label">强调色 (ACCENT COLOR)</label>
+        <label class="form-label">强调色 (ACCENT COLOR - 左文字与十字)</label>
         <div class="color-picker-row">
           <input type="color" id="inputAccent" value="#128AFA">
           <div class="color-presets">
@@ -663,6 +710,21 @@ export function getWebUIHtml(): string {
             <div class="color-dot" style="background: #00E5FF;" data-color="#00E5FF" title="千年数码青"></div>
             <div class="color-dot" style="background: #9C27B0;" data-color="#9C27B0" title="格黑娜暗紫"></div>
             <div class="color-dot" style="background: #FFB300;" data-color="#FFB300" title="三一金色"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 文字主题色彩 -->
+      <div class="form-group">
+        <label class="form-label">文字主题色 (TEXT COLOR - 右文字与光环)</label>
+        <div class="color-picker-row">
+          <input type="color" id="inputTextColor" value="#2B2B2B">
+          <div class="color-presets">
+            <div class="color-dot text-color-dot" style="background: #2B2B2B;" data-color="#2B2B2B" title="官方深灰黑"></div>
+            <div class="color-dot text-color-dot" style="background: #000000;" data-color="#000000" title="纯黑"></div>
+            <div class="color-dot text-color-dot" style="background: #FFFFFF; border-color: #cbd5e1;" data-color="#FFFFFF" title="纯白"></div>
+            <div class="color-dot text-color-dot" style="background: #4C5866;" data-color="#4C5866" title="石板灰"></div>
+            <div class="color-dot text-color-dot" style="background: #128AFA;" data-color="#128AFA" title="同色天蓝"></div>
           </div>
         </div>
       </div>
@@ -685,10 +747,13 @@ export function getWebUIHtml(): string {
       </div>
 
       <!-- 紧凑边距 -->
-      <div class="form-group">
-        <label class="form-label">边缘紧凑留白 (PADDING，默认 2px 极致贴边)</label>
+      <div class="form-group" id="paddingGroup" style="transition: opacity 0.2s ease;">
+        <label class="form-label">
+          <span>边缘留白边距 (PADDING)</span>
+          <span id="paddingHint" style="font-weight: 500; font-size: 0.75rem;">默认 2px 贴边</span>
+        </label>
         <div class="range-group">
-          <input type="range" id="inputPadding" min="0" max="40" value="2">
+          <input type="range" id="inputPadding" min="0" max="60" value="2">
           <span class="range-val" id="valPadding">2px</span>
         </div>
       </div>
@@ -711,6 +776,7 @@ export function getWebUIHtml(): string {
           <div class="pill-btn active" data-format="png">PNG</div>
           <div class="pill-btn" data-format="webp">WebP (推荐)</div>
           <div class="pill-btn" data-format="jpeg">JPEG</div>
+          <div class="pill-btn" data-format="base64">Base64</div>
         </div>
       </div>
 
@@ -749,7 +815,7 @@ export function getWebUIHtml(): string {
         </label>
 
         <label class="toggle-item">
-          <span>文本视觉居中</span>
+          <span>垂直视觉居中</span>
           <div class="switch">
             <input type="checkbox" id="toggleCenter" checked>
             <span class="slider"></span>
@@ -771,8 +837,14 @@ export function getWebUIHtml(): string {
       <!-- 画布视口 -->
       <div class="preview-canvas-box" id="previewBox">
         <img id="previewImg" class="preview-img" alt="Logo Preview" src="">
-        <div class="preview-loading" id="previewLoading">渲染中...</div>
+        <div class="preview-loading" id="previewLoading">
+          <div class="spinner"></div>
+          <div>即时渲染中...</div>
+        </div>
       </div>
+
+      <!-- Base64 文本展示区 (仅在 format=base64 时显示) -->
+      <div id="base64Box"></div>
 
       <!-- 实时 API URL -->
       <div class="url-box-container">
@@ -798,10 +870,13 @@ export function getWebUIHtml(): string {
 
   <script>
     const state = {
+      endpoint: 'api', // 'api' | 'balogo'
       left: '蔚蓝',
       right: '档案',
       subtitle: '',
+      subtitleColor: '',
       accent: '#128AFA',
+      textColor: '#2B2B2B',
       x: -15,
       y: 0,
       scale: 2,
@@ -818,7 +893,9 @@ export function getWebUIHtml(): string {
     const elLeft = document.getElementById('inputLeft');
     const elRight = document.getElementById('inputRight');
     const elSub = document.getElementById('inputSub');
+    const elSubColor = document.getElementById('inputSubColor');
     const elAccent = document.getElementById('inputAccent');
+    const elTextColor = document.getElementById('inputTextColor');
     const elX = document.getElementById('inputX');
     const elY = document.getElementById('inputY');
     const valX = document.getElementById('valX');
@@ -834,10 +911,14 @@ export function getWebUIHtml(): string {
     const previewImg = document.getElementById('previewImg');
     const previewBox = document.getElementById('previewBox');
     const previewLoading = document.getElementById('previewLoading');
+    const base64Box = document.getElementById('base64Box');
     const apiUrlText = document.getElementById('apiUrlText');
     const metaSize = document.getElementById('metaSize');
     const metaTime = document.getElementById('metaTime');
     const toast = document.getElementById('toast');
+
+    let currentBlobUrl = null;
+    let latestBase64 = '';
 
     function showToast(msg) {
       toast.innerText = msg;
@@ -847,20 +928,56 @@ export function getWebUIHtml(): string {
 
     function buildUrl() {
       const params = new URLSearchParams();
-      if (state.left) params.set('left', state.left);
-      if (state.right) params.set('right', state.right);
+      const isLegacy = state.endpoint === 'balogo';
+
+      if (isLegacy) {
+        // 旧版 /balogo 路由与参数命名
+        params.set('l', state.left);
+        params.set('r', state.right);
+        if (state.x !== -15) params.set('x', state.x);
+        if (state.y !== 0) params.set('y', state.y);
+        if (state.transparent) params.set('tp', 'true');
+        if (state.scale !== 1) params.set('scale', state.scale);
+        if (state.subtitle) params.set('sub', state.subtitle);
+        if (state.accent && state.accent.toLowerCase() !== '#128afa') params.set('accent', state.accent.replace('#', ''));
+        const defaultTxt = state.dark ? '#ffffff' : '#2b2b2b';
+        if (state.textColor && state.textColor.toLowerCase() !== defaultTxt) {
+          params.set('textColor', state.textColor.replace('#', ''));
+        }
+        if (state.dark) params.set('dark', 'true');
+        if (state.swap) params.set('swap', 'true');
+        if (state.format !== 'png') params.set('format', state.format);
+        if (!state.crop) params.set('crop', 'false');
+        if (state.crop && state.padding !== 2) params.set('padding', state.padding);
+        if (state.center !== !state.transparent) params.set('center', String(state.center));
+        const qs = params.toString();
+        return '/balogo' + (qs ? '?' + qs : '');
+      }
+
+      // 现代 RESTful /api/logo 路由
+      params.set('left', state.left);
+      params.set('right', state.right);
       if (state.subtitle) params.set('subtitle', state.subtitle);
-      if (state.accent && state.accent.toLowerCase() !== '#128afa') params.set('accent', state.accent.replace('#', ''));
-      if (state.x !== -15) params.set('x', state.x);
-      if (state.y !== 0) params.set('y', state.y);
+      if (state.subtitleColor) params.set('subtitleColor', state.subtitleColor.replace('#', ''));
+      if (state.accent && state.accent.toLowerCase() !== '#128afa') {
+        params.set('accent', state.accent.replace('#', ''));
+      }
+      const defaultTxt = state.dark ? '#ffffff' : '#2b2b2b';
+      if (state.textColor && state.textColor.toLowerCase() !== defaultTxt) {
+        params.set('textColor', state.textColor.replace('#', ''));
+      }
+      if (state.x !== -15) params.set('offsetX', state.x);
+      if (state.y !== 0) params.set('offsetY', state.y);
       if (state.scale !== 1) params.set('scale', state.scale);
       if (state.format !== 'png') params.set('format', state.format);
       if (state.transparent) params.set('transparent', 'true');
-      if (state.dark) params.set('dark', 'true');
-      if (state.swap) params.set('swap', 'true');
+      if (state.dark) params.set('darkMode', 'true');
+      if (state.swap) params.set('swapColors', 'true');
       if (!state.crop) params.set('crop', 'false');
-      if (state.padding !== 2) params.set('padding', state.padding);
-      if (!state.center) params.set('center', 'false');
+      if (state.crop && state.padding !== 2) params.set('padding', state.padding);
+      if (state.center !== !state.transparent) {
+        params.set('center', String(state.center));
+      }
 
       const qs = params.toString();
       return '/api/logo' + (qs ? '?' + qs : '');
@@ -881,28 +998,84 @@ export function getWebUIHtml(): string {
         const startTime = performance.now();
         try {
           const res = await fetch(url);
-          const blob = await res.blob();
           const cost = (performance.now() - startTime).toFixed(1);
-          const objUrl = URL.createObjectURL(blob);
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ message: res.statusText }));
+            metaSize.innerText = '错误 ' + res.status;
+            metaTime.innerText = cost + 'ms';
+            previewLoading.classList.remove('active');
+            showToast('请求校验失败: ' + (err.summary || err.message || res.statusText));
+            return;
+          }
+
+          // 处理 Base64 格式响应
+          if (state.format === 'base64') {
+            const json = await res.json();
+            latestBase64 = json.data.base64;
+            base64Box.style.display = 'block';
+            base64Box.innerText = json.data.dataUrl;
+
+            previewImg.onload = () => {
+              metaSize.innerText = json.data.width + ' × ' + json.data.height;
+              metaTime.innerText = cost + 'ms';
+              previewLoading.classList.remove('active');
+            };
+            previewImg.src = json.data.dataUrl;
+            return;
+          }
+
+          base64Box.style.display = 'none';
+          const blob = await res.blob();
+          
+          if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+          }
+          currentBlobUrl = URL.createObjectURL(blob);
           
           previewImg.onload = () => {
             metaSize.innerText = previewImg.naturalWidth + ' × ' + previewImg.naturalHeight;
             metaTime.innerText = cost + 'ms';
             previewLoading.classList.remove('active');
           };
-          previewImg.src = objUrl;
+          previewImg.onerror = () => {
+            metaSize.innerText = '加载失败';
+            metaTime.innerText = '--';
+            previewLoading.classList.remove('active');
+          };
+          previewImg.src = currentBlobUrl;
         } catch (err) {
           console.error(err);
+          metaSize.innerText = '网络异常';
+          metaTime.innerText = '--';
           previewLoading.classList.remove('active');
+          showToast('无法连接后端 API');
         }
-      }, 100);
+      }, 80);
     }
 
-    // 事件绑定
-    elLeft.addEventListener('input', (e) => { state.left = e.target.value; updatePreview(); });
-    elRight.addEventListener('input', (e) => { state.right = e.target.value; updatePreview(); });
-    elSub.addEventListener('input', (e) => { state.subtitle = e.target.value; updatePreview(); });
+    // 输入框事件绑定（集成 IME 输入法防抖，防止拼音选词过程中误触发请求）
+    let isComposing = false;
+    [elLeft, elRight, elSub].forEach(input => {
+      input.addEventListener('compositionstart', () => { isComposing = true; });
+      input.addEventListener('compositionend', (e) => {
+        isComposing = false;
+        if (input === elLeft) state.left = e.target.value;
+        if (input === elRight) state.right = e.target.value;
+        if (input === elSub) state.subtitle = e.target.value;
+        updatePreview();
+      });
+      input.addEventListener('input', (e) => {
+        if (isComposing) return;
+        if (input === elLeft) state.left = e.target.value;
+        if (input === elRight) state.right = e.target.value;
+        if (input === elSub) state.subtitle = e.target.value;
+        updatePreview();
+      });
+    });
+
     elAccent.addEventListener('input', (e) => { state.accent = e.target.value; updatePreview(); });
+    elSubColor.addEventListener('input', (e) => { state.subtitleColor = e.target.value; updatePreview(); });
 
     document.querySelectorAll('.color-dot').forEach(dot => {
       dot.addEventListener('click', () => {
@@ -931,16 +1104,59 @@ export function getWebUIHtml(): string {
       updatePreview();
     });
 
+    elTextColor.addEventListener('input', (e) => {
+      state.textColor = e.target.value;
+      updatePreview();
+    });
+
+    document.querySelectorAll('.text-color-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const c = dot.dataset.color;
+        elTextColor.value = c;
+        state.textColor = c;
+        updatePreview();
+      });
+    });
+
     elTp.addEventListener('change', (e) => {
       state.transparent = e.target.checked;
+      // 开启透明背景时默认推荐贴边，关闭时推荐居中
       state.center = !state.transparent;
       elCenter.checked = state.center;
       updatePreview();
     });
-    elDark.addEventListener('change', (e) => { state.dark = e.target.checked; updatePreview(); });
+    elDark.addEventListener('change', (e) => {
+      state.dark = e.target.checked;
+      if (state.dark && state.textColor.toLowerCase() === '#2b2b2b') {
+        state.textColor = '#FFFFFF';
+        elTextColor.value = '#FFFFFF';
+      } else if (!state.dark && state.textColor.toLowerCase() === '#ffffff') {
+        state.textColor = '#2B2B2B';
+        elTextColor.value = '#2B2B2B';
+      }
+      updatePreview();
+    });
     elSwap.addEventListener('change', (e) => { state.swap = e.target.checked; updatePreview(); });
-    elCrop.addEventListener('change', (e) => { state.crop = e.target.checked; updatePreview(); });
+    elCrop.addEventListener('change', (e) => {
+      state.crop = e.target.checked;
+      elPadding.disabled = !state.crop;
+      const padGroup = document.getElementById('paddingGroup');
+      const padHint = document.getElementById('paddingHint');
+      if (padGroup) padGroup.style.opacity = state.crop ? '1' : '0.4';
+      if (padHint) padHint.innerText = state.crop ? '默认 2px 贴边' : '(裁切已关闭，留白不生效)';
+      updatePreview();
+    });
     elCenter.addEventListener('change', (e) => { state.center = e.target.checked; updatePreview(); });
+
+    // Endpoint Pills
+    document.querySelectorAll('#endpointPills .pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#endpointPills .pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.endpoint = btn.dataset.ep;
+        updatePreview();
+      });
+    });
 
     // Scale Pills
     document.querySelectorAll('#scalePills .pill-btn').forEach(btn => {
@@ -970,18 +1186,30 @@ export function getWebUIHtml(): string {
 
     document.getElementById('btnCopyMarkdown').addEventListener('click', () => {
       const fullUrl = window.location.origin + buildUrl();
-      const md = '![' + (state.left + state.right) + ' Logo](' + fullUrl + ')';
+      const title = (state.left || 'Blue') + (state.right || 'Archive');
+      const md = '![' + title + ' Logo](' + fullUrl + ')';
       navigator.clipboard.writeText(md).then(() => showToast('已复制 Markdown 标签代码！'));
     });
 
     document.getElementById('btnDownload').addEventListener('click', () => {
+      if (state.format === 'base64') {
+        if (latestBase64) {
+          navigator.clipboard.writeText(latestBase64).then(() => showToast('已复制 Base64 编码字符串！'));
+        }
+        return;
+      }
+      if (!currentBlobUrl) return;
       const a = document.createElement('a');
-      a.href = buildUrl();
-      a.download = (state.left + state.right) + '_logo.' + state.format;
+      a.href = currentBlobUrl;
+      const title = (state.left || 'Blue') + (state.right || 'Archive');
+      a.download = title + '_logo.' + state.format;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      showToast('图片下载已开始！');
     });
 
-    // 初始化渲染
+    // 初始化首次渲染
     updatePreview();
   </script>
 </body>

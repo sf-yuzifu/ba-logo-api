@@ -43,7 +43,7 @@ describe('HTTP Route & Compatibility Tests', () => {
   it('GET /api/logo 应当支持现代全量参数', async () => {
     const res = await app.handle(
       new Request(
-        'http://localhost/api/logo?left=Blue&right=Archive&subtitle=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&scale=2&format=webp&accent=00E5FF'
+        'http://localhost/api/logo?left=Blue&right=Archive&subtitle=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&scale=2&format=webp&accent=00E5FF&textColor=000000&padding=10'
       )
     );
     expect(res.status).toBe(200);
