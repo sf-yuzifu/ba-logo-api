@@ -1,81 +1,77 @@
 export default {
   // ナビゲーション
-  'nav-swagger': 'Swagger ドキュメント',
+  'nav-swagger': 'Swagger API',
   'nav-upstream': '元フロントエンド',
 
-  // 設定コンソール
-  'console-title': 'ロゴ設定コンソール',
+  // コンソールカード
+  'console-title': 'パラメータ設定',
   'ep-restful': 'RESTful',
   'ep-legacy': '旧版互換',
 
   // タイトル文字
-  'label-title': 'タイトル文字 (LEFT / RIGHT)',
-  'reset-text': '既定 ↺',
-  'ph-left': '左文字（青）',
-  'ph-right': '右文字（黒）',
+  'label-title': 'タイトル文字 (左 / 右)',
+  'reset-text': 'リセット ↺',
+  'ph-left': '左文字 (青色)',
+  'ph-right': '右文字 (濃色)',
 
   // サブタイトル
   'label-sub': 'サブタイトル (任意)',
   'reset-clear': 'クリア ↺',
-  'ph-sub': '例：ブルーアーカイブ',
+  'ph-sub': '例：ブルーアーカイブ / Blue Archive',
   'label-sub-x': 'サブタイトル X オフセット',
   'label-sub-y': 'サブタイトル Y オフセット',
-  'reset-0': '0px ↺',
+  'reset-0': '0 ↺',
 
   // カラー設定
-  'label-accent': 'アクセント色（左文字＆十字）',
+  'label-accent': 'アクセントカラー (左文字・十字)',
   'reset-accent': '既定青 ↺',
-  'label-text-color': 'テキスト色（右文字＆ヘイロー）',
-  'reset-text-color': '既定灰 ↺',
-  'label-cross-color': '十字独立カラー',
-  'ph-cross-color': 'アクセント色連動、Hex可（例：#FFD700）',
-  'label-halo-color': 'ヘイロー独立カラー',
-  'ph-halo-color': 'テキスト色連動、Hex可（例：#9C27B0）',
+  'label-text-color': 'メイン文字色 (右文字・光輪)',
+  'reset-text-color': '既定濃 ↺',
+  'label-cross-color': '十字の個別カラー',
+  'ph-cross-color': 'アクセント色連動、または #FFD700',
+  'label-halo-color': '光輪の個別カラー',
+  'ph-halo-color': '文字色連動、または #9C27B0',
   'reset-follow': '連動 ↺',
 
   // 座標と間隔
-  'label-x-offset': 'ヘイロー X 軸オフセット',
-  'reset-x': '-15px ↺',
-  'label-y-offset': 'ヘイロー Y 轴オフセット',
-  'label-word-gap': '単語間隔 (WORD GAP)',
-  'label-padding': '余白 (PADDING - CSS記法対応)',
-  'reset-pad': '2px ↺',
-  'ph-padding': '既定 2px、または 10 20 等',
+  'label-x-offset': '光輪 X オフセット',
+  'reset-x': '-15 ↺',
+  'label-y-offset': '光輪 Y オフセット',
+  'label-word-gap': '単語間スペース',
+  'label-padding': '余白マージン (Padding)',
+  'reset-pad': '既定 2 ↺',
+  'ph-padding': '既定 2px、CSS構文（例：10 20）対応',
 
   // スケールとフォーマット
-  'label-scale': '解像度スケール (SCALE)',
-  'label-format': '出力フォーマット (FORMAT)',
+  'label-scale': '解像度倍率 (SCALE)',
+  'label-format': '出力形式 (FORMAT)',
   'format-png': 'PNG',
   'format-webp': 'WebP (推奨)',
   'format-svg': 'SVG (ベクター)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
 
-  // スイッチ
-  'toggle-tp': '透過背景',
+  // トグル
+  'toggle-tp': '背景透過',
   'toggle-dark': 'ダークモード',
   'toggle-swap': 'カラー入替',
-  'toggle-center': '視覚中央揃え',
-  'toggle-behind': 'モチーフ背面配置',
+  'toggle-center': '垂直中央揃え',
+  'toggle-behind': '図柄を背面に配置',
 
-  // プレビュー
-  'preview-title': 'リアルタイムプレビュー',
+  // プレビューカード
+  'preview-title': 'リアルタイム表示',
   'preview-loading': 'レンダリング中...',
-  'meta-size': 'サイズ',
-  'meta-time': '生成時間',
-  'copy-api': 'API URL をコピー',
-  'btn-download': '画像をダウンロード',
+  'meta-size': '解像度',
+  'meta-time': '描画時間',
+  'copy-api': 'APIリンクをコピー',
+  'btn-download': '画像を保存',
   'btn-copy-img': '画像をコピー',
-  'btn-copy-md': 'Markdown をコピー',
-  'btn-reset-all': 'すべてリセット',
+  'btn-copy-md': 'Markdownをコピー',
+  'btn-reset-all': '全パラメータ初期化',
 
-  // トースト・ステータス
-  'toast-copied': 'クリップボードにコピーしました！',
-  'toast-img-copied': '画像をコピーしました！',
-  'toast-reset': '全設定をデフォルトにリセットしました！',
-  'toast-copy-failed': 'コピーに失敗しました。権限を確認してください',
-  'toast-download': 'ダウンロードを開始しました！',
-  'toast-network-error': 'ネットワークエラー：APIに接続できません',
-  'toast-validation-failed': 'リクエスト検証に失敗しました',
-  'load-failed': '読み込み失敗',
+  // トーストメッセージ
+  'toast-copied': 'APIリンクをクリップボードにコピーしました！',
+  'toast-img-copied': '画像をクリップボードにコピーしました！',
+  'toast-reset': 'すべての設定を初期値に戻しました！',
+  'toast-copy-failed': 'コピーに失敗しました。手動でコピーしてください',
 };

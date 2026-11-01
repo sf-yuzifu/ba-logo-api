@@ -92,8 +92,15 @@ const handleHaloColorPicker = (e: Event) => {
 
 <template>
   <div class="card controls-card">
+    <!-- 战术卡片头部 -->
     <div class="card-header">
-      <div class="card-title">{{ t('console-title') }}</div>
+      <div class="card-title-group">
+        <div class="card-sec-tag">// SCHALE CONFIG DESK</div>
+        <div class="card-title">
+          <span>{{ t('console-title') }}</span>
+          <span class="card-title-slashes">///</span>
+        </div>
+      </div>
       <div class="endpoint-pills" id="endpointPills">
         <button
           type="button"
@@ -114,422 +121,465 @@ const handleHaloColorPicker = (e: Event) => {
       </div>
     </div>
 
-    <!-- 标题文字 -->
-    <div class="form-group">
-      <label class="form-label">
-        <span>{{ t('label-title') }}</span>
-        <button
-          type="button"
-          class="reset-badge"
-          @click="() => { resetField('left'); resetField('right'); }"
-          title="重置文字"
-        >
-          {{ t('reset-text') }}
-        </button>
-      </label>
+    <!-- 01. 文本排版 -->
+    <div class="tactical-section">
+      <div class="section-divider">
+        <span class="section-tag">01 // 文本排版 (TEXT)</span>
+      </div>
+
+      <!-- 标题文字 -->
+      <div class="form-group">
+        <label class="form-label">
+          <span class="label-text">{{ t('label-title') }}</span>
+          <button
+            type="button"
+            class="reset-badge"
+            @click="() => { resetField('left'); resetField('right'); }"
+            title="重置文字"
+          >
+            {{ t('reset-text') }}
+          </button>
+        </label>
+        <div class="form-row">
+          <div class="input-with-tag">
+            <span class="input-prefix-tag tag-blue">L</span>
+            <input
+              type="text"
+              id="inputLeft"
+              v-model="state.left"
+              class="input-text"
+              :placeholder="t('ph-left')"
+              @input="handleInput"
+              @compositionstart="handleCompositionStart"
+              @compositionend="handleCompositionEnd"
+            >
+          </div>
+          <div class="input-with-tag">
+            <span class="input-prefix-tag tag-dark">R</span>
+            <input
+              type="text"
+              id="inputRight"
+              v-model="state.right"
+              class="input-text"
+              :placeholder="t('ph-right')"
+              @input="handleInput"
+              @compositionstart="handleCompositionStart"
+              @compositionend="handleCompositionEnd"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- 副标题 -->
+      <div class="form-group">
+        <label class="form-label">
+          <span class="label-text">{{ t('label-sub') }}</span>
+          <button
+            type="button"
+            class="reset-badge"
+            @click="resetField('subtitle')"
+            title="清空副标题"
+          >
+            {{ t('reset-clear') }}
+          </button>
+        </label>
+        <div class="subtitle-input-row">
+          <input
+            type="text"
+            id="inputSub"
+            v-model="state.subtitle"
+            class="input-text"
+            :placeholder="t('ph-sub')"
+            @input="handleInput"
+            @compositionstart="handleCompositionStart"
+            @compositionend="handleCompositionEnd"
+          >
+          <div class="color-picker-mini-wrapper" title="副标题颜色">
+            <input
+              type="color"
+              id="inputSubColor"
+              v-model="state.subtitleColor"
+              class="native-color-picker mini-picker"
+              @input="handleInput"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- 副标题偏移量微调 -->
       <div class="form-row">
-        <input
-          type="text"
-          id="inputLeft"
-          v-model="state.left"
-          class="input-text"
-          :placeholder="t('ph-left')"
-          @input="handleInput"
-          @compositionstart="handleCompositionStart"
-          @compositionend="handleCompositionEnd"
-        >
-        <input
-          type="text"
-          id="inputRight"
-          v-model="state.right"
-          class="input-text"
-          :placeholder="t('ph-right')"
-          @input="handleInput"
-          @compositionstart="handleCompositionStart"
-          @compositionend="handleCompositionEnd"
-        >
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-sub-x') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('subX')"
+              title="重置 X 偏移"
+            >
+              {{ t('reset-0') }}
+            </button>
+          </label>
+          <input
+            type="number"
+            id="inputSubX"
+            v-model.number="state.subX"
+            class="input-text input-mono"
+            placeholder="0"
+            @input="handleInput"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-sub-y') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('subY')"
+              title="重置 Y 偏移"
+            >
+              {{ t('reset-0') }}
+            </button>
+          </label>
+          <input
+            type="number"
+            id="inputSubY"
+            v-model.number="state.subY"
+            class="input-text input-mono"
+            placeholder="0"
+            @input="handleInput"
+          >
+        </div>
       </div>
     </div>
 
-    <!-- 副标题 -->
-    <div class="form-group">
-      <label class="form-label">
-        <span>{{ t('label-sub') }}</span>
-        <button
-          type="button"
-          class="reset-badge"
-          @click="resetField('subtitle')"
-          title="清空副标题"
-        >
-          {{ t('reset-clear') }}
-        </button>
-      </label>
-      <div class="subtitle-input-row">
-        <input
-          type="text"
-          id="inputSub"
-          v-model="state.subtitle"
-          class="input-text"
-          :placeholder="t('ph-sub')"
-          @input="handleInput"
-          @compositionstart="handleCompositionStart"
-          @compositionend="handleCompositionEnd"
-        >
-        <input
-          type="color"
-          id="inputSubColor"
-          v-model="state.subtitleColor"
-          class="color-picker-sub"
-          title="副标题专属颜色"
-          @input="handleInput"
-        >
+    <!-- 02. 色彩配置 -->
+    <div class="tactical-section">
+      <div class="section-divider">
+        <span class="section-tag">02 // 色彩定制 (COLORS)</span>
       </div>
-    </div>
 
-    <!-- 副标题偏移量微调 -->
-    <div class="form-row">
+      <!-- 主题色彩 -->
       <div class="form-group">
         <label class="form-label">
-          <span>{{ t('label-sub-x') }}</span>
+          <span class="label-text">{{ t('label-accent') }}</span>
           <button
             type="button"
             class="reset-badge"
-            @click="resetField('subX')"
-            title="重置 X 偏移"
+            @click="resetField('accent')"
+            title="重置强调色"
           >
-            {{ t('reset-0') }}
+            {{ t('reset-accent') }}
           </button>
         </label>
-        <input
-          type="number"
-          id="inputSubX"
-          v-model.number="state.subX"
-          class="input-text"
-          placeholder="0"
-          @input="handleInput"
-        >
+        <ColorField
+          v-model="state.accent"
+          :presets="ACCENT_PRESETS"
+          @update:modelValue="handleInput"
+        />
       </div>
 
+      <!-- 文字主题色彩 -->
       <div class="form-group">
         <label class="form-label">
-          <span>{{ t('label-sub-y') }}</span>
+          <span class="label-text">{{ t('label-text-color') }}</span>
           <button
             type="button"
             class="reset-badge"
-            @click="resetField('subY')"
-            title="重置 Y 偏移"
+            @click="resetTextColors"
+            title="重置文字色"
           >
-            {{ t('reset-0') }}
+            {{ t('reset-text-color') }}
           </button>
         </label>
-        <input
-          type="number"
-          id="inputSubY"
-          v-model.number="state.subY"
-          class="input-text"
-          placeholder="0"
-          @input="handleInput"
-        >
+        <ColorField
+          v-model="state.textColor"
+          :presets="TEXT_COLOR_PRESETS"
+          @update:modelValue="handleInput"
+        />
+      </div>
+
+      <!-- 独立十字与光环颜色 (可选独立定制) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-cross-color') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('crossColor')"
+              title="跟随强调色"
+            >
+              {{ t('reset-follow') }}
+            </button>
+          </label>
+          <div class="input-with-picker">
+            <input
+              type="text"
+              id="inputCrossColor"
+              v-model="state.crossColor"
+              class="input-text input-mono"
+              :placeholder="t('ph-cross-color')"
+              @input="handleInput"
+            >
+            <input
+              type="color"
+              id="pickerCrossColor"
+              :value="state.crossColor || state.accent"
+              class="native-color-picker mini-picker"
+              title="十字拾色器"
+              @input="handleCrossColorPicker"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-halo-color') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('haloColor')"
+              title="跟随文字色"
+            >
+              {{ t('reset-follow') }}
+            </button>
+          </label>
+          <div class="input-with-picker">
+            <input
+              type="text"
+              id="inputHaloColor"
+              v-model="state.haloColor"
+              class="input-text input-mono"
+              :placeholder="t('ph-halo-color')"
+              @input="handleInput"
+            >
+            <input
+              type="color"
+              id="pickerHaloColor"
+              :value="state.haloColor || state.textColor"
+              class="native-color-picker mini-picker"
+              title="光环拾色器"
+              @input="handleHaloColorPicker"
+            >
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 主题色彩 -->
-    <div class="form-group">
-      <label class="form-label">
-        <span>{{ t('label-accent') }}</span>
-        <button
-          type="button"
-          class="reset-badge"
-          @click="resetField('accent')"
-          title="重置强调色"
-        >
-          {{ t('reset-accent') }}
-        </button>
-      </label>
-      <ColorField
-        v-model="state.accent"
-        :presets="ACCENT_PRESETS"
-        @update:modelValue="handleInput"
-      />
-    </div>
-
-    <!-- 文字主题色彩 -->
-    <div class="form-group">
-      <label class="form-label">
-        <span>{{ t('label-text-color') }}</span>
-        <button
-          type="button"
-          class="reset-badge"
-          @click="resetTextColors"
-          title="重置文字色"
-        >
-          {{ t('reset-text-color') }}
-        </button>
-      </label>
-      <ColorField
-        v-model="state.textColor"
-        :presets="TEXT_COLOR_PRESETS"
-        @update:modelValue="handleInput"
-      />
-    </div>
-
-    <!-- 独立十字与光环颜色 (可选独立定制) -->
-    <div class="form-group">
-      <label class="form-label">
-        <span>{{ t('label-cross-color') }}</span>
-        <button
-          type="button"
-          class="reset-badge"
-          @click="resetField('crossColor')"
-          title="跟随强调色"
-        >
-          {{ t('reset-follow') }}
-        </button>
-      </label>
-      <div style="display: flex; gap: 8px;">
-        <input
-          type="text"
-          id="inputCrossColor"
-          v-model="state.crossColor"
-          class="input-text"
-          :placeholder="t('ph-cross-color')"
-          @input="handleInput"
-        >
-        <input
-          type="color"
-          id="pickerCrossColor"
-          :value="state.crossColor || state.accent"
-          title="十字拾色器"
-          @input="handleCrossColorPicker"
-        >
+    <!-- 03. 坐标与间距 -->
+    <div class="tactical-section">
+      <div class="section-divider">
+        <span class="section-tag">03 // 坐标与留白 (LAYOUT)</span>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">
-        <span>{{ t('label-halo-color') }}</span>
-        <button
-          type="button"
-          class="reset-badge"
-          @click="resetField('haloColor')"
-          title="跟随文字色"
-        >
-          {{ t('reset-follow') }}
-        </button>
-      </label>
-      <div style="display: flex; gap: 8px;">
-        <input
-          type="text"
-          id="inputHaloColor"
-          v-model="state.haloColor"
-          class="input-text"
-          :placeholder="t('ph-halo-color')"
-          @input="handleInput"
-        >
-        <input
-          type="color"
-          id="pickerHaloColor"
-          :value="state.haloColor || state.textColor"
-          title="光环拾色器"
-          @input="handleHaloColorPicker"
-        >
-      </div>
-    </div>
-
-    <!-- 坐标偏移 -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">
-          <span>{{ t('label-x-offset') }}</span>
-          <button
-            type="button"
-            class="reset-badge"
-            @click="resetField('x')"
-            title="重置 X 偏移"
+      <!-- 坐标偏移 -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-x-offset') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('x')"
+              title="重置 X 偏移"
+            >
+              {{ t('reset-x') }}
+            </button>
+          </label>
+          <input
+            type="number"
+            id="inputX"
+            v-model.number="state.x"
+            class="input-text input-mono"
+            placeholder="-15"
+            @input="handleInput"
           >
-            {{ t('reset-x') }}
-          </button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-y-offset') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('y')"
+              title="重置 Y 偏移"
+            >
+              {{ t('reset-0') }}
+            </button>
+          </label>
+          <input
+            type="number"
+            id="inputY"
+            v-model.number="state.y"
+            class="input-text input-mono"
+            placeholder="0"
+            @input="handleInput"
+          >
+        </div>
+      </div>
+
+      <!-- 两词间距与留白 -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-word-gap') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('wordGap')"
+              title="重置间距"
+            >
+              {{ t('reset-0') }}
+            </button>
+          </label>
+          <input
+            type="number"
+            id="inputWordGap"
+            v-model.number="state.wordGap"
+            class="input-text input-mono"
+            placeholder="0"
+            @input="handleInput"
+          >
+        </div>
+
+        <div class="form-group" id="paddingGroup">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-padding') }}</span>
+            <button
+              type="button"
+              class="reset-badge"
+              @click="resetField('padding')"
+              title="重置留白"
+            >
+              {{ t('reset-pad') }}
+            </button>
+          </label>
+          <input
+            type="text"
+            id="inputPadding"
+            v-model="state.padding"
+            class="input-text input-mono"
+            :placeholder="t('ph-padding')"
+            @input="handleInput"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- 04. 规格与开关 -->
+    <div class="tactical-section">
+      <div class="section-divider">
+        <span class="section-tag">04 // 导出与开关 (OUTPUT)</span>
+      </div>
+
+        <!-- 分辨率倍率 -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-scale') }}</span>
+          </label>
+          <div class="scale-pills" id="scalePills">
+            <button
+              v-for="item in SCALE_OPTIONS"
+              :key="item.value"
+              type="button"
+              class="pill-btn"
+              :class="{ active: state.scale === item.value }"
+              @click="handleScaleSelect(item.value)"
+            >
+              {{ item.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 导出格式 -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-text">{{ t('label-format') }}</span>
+          </label>
+          <div class="format-pills" id="formatPills">
+            <button
+              v-for="item in FORMAT_OPTIONS"
+              :key="item.format"
+              type="button"
+              class="pill-btn format-pill-btn"
+              :class="{ active: state.format === item.format }"
+              @click="handleFormatSelect(item.format)"
+            >
+              {{ t(item.i18nKey) }}
+            </button>
+          </div>
+        </div>
+
+      <!-- 开关项 -->
+      <div class="toggles-grid">
+        <label class="toggle-item">
+          <span>{{ t('toggle-tp') }}</span>
+          <div class="switch">
+            <input
+              type="checkbox"
+              id="toggleTp"
+              v-model="state.transparent"
+              @change="handleTransparentToggle"
+            >
+            <span class="slider"></span>
+          </div>
         </label>
-        <input
-          type="number"
-          id="inputX"
-          v-model.number="state.x"
-          class="input-text"
-          placeholder="-15"
-          @input="handleInput"
-        >
-      </div>
 
-      <div class="form-group">
-        <label class="form-label">
-          <span>{{ t('label-y-offset') }}</span>
-          <button
-            type="button"
-            class="reset-badge"
-            @click="resetField('y')"
-            title="重置 Y 偏移"
-          >
-            {{ t('reset-0') }}
-          </button>
+        <label class="toggle-item">
+          <span>{{ t('toggle-dark') }}</span>
+          <div class="switch">
+            <input
+              type="checkbox"
+              id="toggleDark"
+              v-model="state.dark"
+              @change="handleDarkToggle"
+            >
+            <span class="slider"></span>
+          </div>
         </label>
-        <input
-          type="number"
-          id="inputY"
-          v-model.number="state.y"
-          class="input-text"
-          placeholder="0"
-          @input="handleInput"
-        >
-      </div>
-    </div>
 
-    <!-- 两词间距与留白 -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">
-          <span>{{ t('label-word-gap') }}</span>
-          <button
-            type="button"
-            class="reset-badge"
-            @click="resetField('wordGap')"
-            title="重置间距"
-          >
-            {{ t('reset-0') }}
-          </button>
+        <label class="toggle-item">
+          <span>{{ t('toggle-swap') }}</span>
+          <div class="switch">
+            <input
+              type="checkbox"
+              id="toggleSwap"
+              v-model="state.swap"
+              @change="handleInput"
+            >
+            <span class="slider"></span>
+          </div>
         </label>
-        <input
-          type="number"
-          id="inputWordGap"
-          v-model.number="state.wordGap"
-          class="input-text"
-          placeholder="0"
-          @input="handleInput"
-        >
-      </div>
 
-      <div class="form-group" id="paddingGroup">
-        <label class="form-label">
-          <span>{{ t('label-padding') }}</span>
-          <button
-            type="button"
-            class="reset-badge"
-            @click="resetField('padding')"
-            title="重置留白"
-          >
-            {{ t('reset-pad') }}
-          </button>
+        <label class="toggle-item">
+          <span>{{ t('toggle-center') }}</span>
+          <div class="switch">
+            <input
+              type="checkbox"
+              id="toggleCenter"
+              v-model="state.center"
+              @change="handleInput"
+            >
+            <span class="slider"></span>
+          </div>
         </label>
-        <input
-          type="text"
-          id="inputPadding"
-          v-model="state.padding"
-          class="input-text"
-          :placeholder="t('ph-padding')"
-          @input="handleInput"
-        >
+
+        <label class="toggle-item toggle-fullwidth">
+          <span>{{ t('toggle-behind') }}</span>
+          <div class="switch">
+            <input
+              type="checkbox"
+              id="toggleBehind"
+              v-model="state.behind"
+              @change="handleInput"
+            >
+            <span class="slider"></span>
+          </div>
+        </label>
       </div>
-    </div>
-
-    <!-- 分辨率倍率 -->
-    <div class="form-group">
-      <label class="form-label">{{ t('label-scale') }}</label>
-      <div class="format-pills" id="scalePills">
-        <button
-          v-for="item in SCALE_OPTIONS"
-          :key="item.value"
-          type="button"
-          class="pill-btn"
-          :class="{ active: state.scale === item.value }"
-          @click="handleScaleSelect(item.value)"
-        >
-          {{ item.label }}
-        </button>
-      </div>
-    </div>
-
-    <!-- 导出格式 -->
-    <div class="form-group">
-      <label class="form-label">{{ t('label-format') }}</label>
-      <div class="format-pills" id="formatPills">
-        <button
-          v-for="item in FORMAT_OPTIONS"
-          :key="item.format"
-          type="button"
-          class="pill-btn"
-          :class="{ active: state.format === item.format }"
-          @click="handleFormatSelect(item.format)"
-        >
-          {{ t(item.i18nKey) }}
-        </button>
-      </div>
-    </div>
-
-    <!-- 开关项 -->
-    <div class="toggles-grid">
-      <label class="toggle-item">
-        <span>{{ t('toggle-tp') }}</span>
-        <div class="switch">
-          <input
-            type="checkbox"
-            id="toggleTp"
-            v-model="state.transparent"
-            @change="handleTransparentToggle"
-          >
-          <span class="slider"></span>
-        </div>
-      </label>
-
-      <label class="toggle-item">
-        <span>{{ t('toggle-dark') }}</span>
-        <div class="switch">
-          <input
-            type="checkbox"
-            id="toggleDark"
-            v-model="state.dark"
-            @change="handleDarkToggle"
-          >
-          <span class="slider"></span>
-        </div>
-      </label>
-
-      <label class="toggle-item">
-        <span>{{ t('toggle-swap') }}</span>
-        <div class="switch">
-          <input
-            type="checkbox"
-            id="toggleSwap"
-            v-model="state.swap"
-            @change="handleInput"
-          >
-          <span class="slider"></span>
-        </div>
-      </label>
-
-      <label class="toggle-item">
-        <span>{{ t('toggle-center') }}</span>
-        <div class="switch">
-          <input
-            type="checkbox"
-            id="toggleCenter"
-            v-model="state.center"
-            @change="handleInput"
-          >
-          <span class="slider"></span>
-        </div>
-      </label>
-
-      <label class="toggle-item">
-        <span>{{ t('toggle-behind') }}</span>
-        <div class="switch">
-          <input
-            type="checkbox"
-            id="toggleBehind"
-            v-model="state.behind"
-            @change="handleInput"
-          >
-          <span class="slider"></span>
-        </div>
-      </label>
     </div>
   </div>
 </template>

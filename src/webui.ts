@@ -13,25 +13,28 @@ export function getWebUIHtml(): string {
   <title>Blue Archive Logo Generator | API Console</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,600;0,700;0,800;0,900;1,700;1,900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+JP:wght@500;700;900&family=Noto+Sans+SC:wght@500;700;900&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #128AFA;
-      --primary-hover: #0c72d1;
-      --primary-light: #e8f4fd;
+      --primary-hover: #0E77D9;
+      --primary-light: #EBF5FD;
       --accent-gold: #FFE401;
-      --bg-color: #EAEFF5;
-      --card-bg: rgba(255, 255, 255, 0.96);
-      --card-border: #C7E4F6;
-      --text-main: #2B2B2B;
-      --text-muted: #5A6A7D;
+      --bg-color: #E8EEF5;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: #C5E0F5;
+      --text-main: #1E293B;
+      --text-muted: #556980;
       --focus-ring: #77DEFF;
       --focus-shadow: rgba(119, 222, 255, 0.45);
       --shadow-sm: 0 4px 12px rgba(40, 135, 200, 0.08);
       --shadow-md: 0 8px 24px rgba(40, 135, 200, 0.14);
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --font-main: 'Plus Jakarta Sans', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+      --font-hud: 'Rajdhani', 'Chakra Petch', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * {
@@ -41,7 +44,7 @@ export function getWebUIHtml(): string {
     }
 
     body {
-      font-family: 'Nunito Sans', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: var(--font-main);
       background-color: var(--bg-color);
       background-image: 
         radial-gradient(#b8d2e8 1px, transparent 1px),

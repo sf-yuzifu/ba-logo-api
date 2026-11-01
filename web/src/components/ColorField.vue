@@ -20,23 +20,29 @@ const handleColorInput = (event: Event) => {
 
 <template>
   <div class="color-picker-row">
-    <input
-      type="color"
-      :value="modelValue"
-      @input="handleColorInput"
-    >
+    <div class="color-picker-wrapper">
+      <input
+        type="color"
+        :value="modelValue"
+        class="native-color-picker"
+        @input="handleColorInput"
+      >
+      <span class="color-hex-tag">{{ (modelValue || '#000000').toUpperCase() }}</span>
+    </div>
     <div v-if="presets && presets.length" class="color-presets">
-      <div
+      <button
         v-for="preset in presets"
         :key="preset.color"
+        type="button"
         class="color-dot"
+        :class="{ active: modelValue.toLowerCase() === preset.color.toLowerCase() }"
         :style="{
           background: preset.color,
-          borderColor: preset.borderColor || '#fff'
+          borderColor: preset.borderColor || 'rgba(255,255,255,0.85)'
         }"
         :title="preset.name"
         @click="handlePresetClick(preset.color)"
-      ></div>
+      ></button>
     </div>
   </div>
 </template>

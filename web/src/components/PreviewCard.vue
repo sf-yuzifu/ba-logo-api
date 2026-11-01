@@ -21,19 +21,28 @@ const { t } = useI18n();
 
 <template>
   <div class="card preview-card">
+    <!-- 视口卡片头部 -->
     <div class="card-header">
-      <div class="card-title">{{ t('preview-title') }}</div>
+      <div class="card-title-group">
+        <div class="card-sec-tag">// SCHALE TACTICAL VIEWPORT</div>
+        <div class="card-title">
+          <span>{{ t('preview-title') }}</span>
+          <span class="card-title-slashes">///</span>
+        </div>
+      </div>
       <div class="meta-bar">
         <div class="meta-badge">
-          <span>{{ t('meta-size') }}</span>: <strong>{{ activePreview.width }} × {{ activePreview.height }}</strong>
+          <span class="meta-label">RES</span>
+          <strong>{{ activePreview.width }}×{{ activePreview.height }}</strong>
         </div>
         <div class="meta-badge">
-          <span>{{ t('meta-time') }}</span>: <strong>{{ activePreview.latencyMs }}ms</strong>
+          <span class="meta-label">TIME</span>
+          <strong>{{ activePreview.latencyMs }}ms</strong>
         </div>
       </div>
     </div>
 
-    <!-- 画布视口 -->
+    <!-- 战术取景器画布 -->
     <div
       class="preview-canvas-box"
       id="previewBox"
@@ -42,6 +51,13 @@ const { t } = useI18n();
         'dark-bg': state.dark && !state.transparent
       }"
     >
+      <!-- 战术取景框标线 -->
+      <div class="hud-reticle top-left">┌</div>
+      <div class="hud-reticle top-right">┐</div>
+      <div class="hud-reticle bottom-left">└</div>
+      <div class="hud-reticle bottom-right">┘</div>
+      <div class="hud-center-cross"></div>
+
       <img
         v-if="activePreview.blobUrl"
         id="previewImg"
@@ -49,9 +65,11 @@ const { t } = useI18n();
         alt="Logo Preview"
         :src="activePreview.blobUrl"
       >
+
+      <!-- 加载遮罩 -->
       <div class="preview-loading" id="previewLoading" :class="{ active: isLoading }">
         <div class="spinner"></div>
-        <div>{{ t('preview-loading') }}</div>
+        <div class="loading-text">{{ t('preview-loading') }}</div>
       </div>
     </div>
 
@@ -60,8 +78,9 @@ const { t } = useI18n();
       {{ activePreview.base64Data.dataUrl }}
     </div>
 
-    <!-- 实时 API URL -->
+    <!-- 实时 API URL 终端栏 -->
     <div class="url-box-container">
+      <span class="url-prefix">GET</span>
       <div class="url-text" id="apiUrlText">{{ activePreview.url || '/api/logo' }}</div>
       <button
         type="button"
@@ -69,11 +88,15 @@ const { t } = useI18n();
         id="btnCopyUrl"
         @click="emit('copyApiUrl')"
       >
-        {{ t('copy-api') }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span>{{ t('copy-api') }}</span>
       </button>
     </div>
 
-    <!-- 动作按钮组 -->
+    <!-- 动作命令按钮组 (Blue Archive 3D 触感按键) -->
     <div class="actions-grid">
       <button
         type="button"

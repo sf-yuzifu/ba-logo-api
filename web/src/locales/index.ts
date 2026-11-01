@@ -11,9 +11,9 @@ export const LOCALES: Record<SupportedLang, Record<string, string>> = {
   ja,
 };
 
-export const LANG_OPTIONS: { lang: SupportedLang; label: string }[] = [
-  { lang: 'zh', label: '简中' },
-  { lang: 'zh-tw', label: '繁中' },
-  { lang: 'en', label: 'EN' },
-  { lang: 'ja', label: '日本語' },
+export const LANG_OPTIONS: { lang: SupportedLang; label: string; enName: string }[] = [
+  { lang: 'zh', label: '简中', enName: 'Simplified Chinese' },
+  { lang: 'zh-tw', label: '繁中', enName: 'Traditional Chinese' },
+  { lang: 'en', label: 'English', enName: 'English' },
+  { lang: 'ja', label: '日本語', enName: 'Japanese' },
 ];
