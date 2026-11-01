@@ -228,6 +228,7 @@ export function getWebUIHtml(): string {
 
     .input-text {
       width: 100%;
+      box-sizing: border-box;
       padding: 10px 14px;
       font-size: 0.95rem;
       font-weight: 600;
@@ -289,27 +290,6 @@ export function getWebUIHtml(): string {
     input[type="color"]::-webkit-color-swatch {
       border: 1.5px solid var(--card-border);
       border-radius: var(--radius-sm);
-    }
-
-    /* 滑块控件 */
-    .range-group {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    input[type="range"] {
-      flex: 1;
-      accent-color: var(--primary);
-    }
-
-    .range-val {
-      font-size: 0.85rem;
-      font-weight: 800;
-      width: 44px;
-      text-align: right;
-      color: var(--primary);
-      font-family: monospace;
     }
 
     /* 开关 Toggles */
@@ -756,19 +736,19 @@ export function getWebUIHtml(): string {
 
       <!-- 坐标偏移 -->
       <div class="form-group">
-        <label class="form-label">光环 X 轴偏移量 (X OFFSET)</label>
-        <div class="range-group">
-          <input type="range" id="inputX" min="-60" max="60" value="-15">
-          <span class="range-val" id="valX">-15</span>
-        </div>
+        <label class="form-label">
+          <span>光环 X 轴偏移量 (X OFFSET)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">默认 -15px</span>
+        </label>
+        <input type="number" id="inputX" class="input-text" value="-15" placeholder="默认 -15">
       </div>
 
       <div class="form-group">
-        <label class="form-label">光环 Y 轴偏移量 (Y OFFSET)</label>
-        <div class="range-group">
-          <input type="range" id="inputY" min="-40" max="40" value="0">
-          <span class="range-val" id="valY">0</span>
-        </div>
+        <label class="form-label">
+          <span>光环 Y 轴偏移量 (Y OFFSET)</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">默认 0px</span>
+        </label>
+        <input type="number" id="inputY" class="input-text" value="0" placeholder="默认 0">
       </div>
 
       <!-- 留白边距 -->
@@ -777,9 +757,7 @@ export function getWebUIHtml(): string {
           <span>留白边距 (PADDING - 支持 CSS 语法)</span>
           <span style="font-weight: 500; font-size: 0.75rem;">如 2、10 20、10 20 30 40</span>
         </label>
-        <div class="form-row">
-          <input type="text" id="inputPadding" class="input-text" value="2" placeholder="默认 2px，或输入 CSS 边距如 10 20">
-        </div>
+        <input type="text" id="inputPadding" class="input-text" value="2" placeholder="默认 2px，或输入 CSS 边距如 10 20">
       </div>
 
       <!-- 分辨率倍率 -->
@@ -913,8 +891,6 @@ export function getWebUIHtml(): string {
     const elTextColor = document.getElementById('inputTextColor');
     const elX = document.getElementById('inputX');
     const elY = document.getElementById('inputY');
-    const valX = document.getElementById('valX');
-    const valY = document.getElementById('valY');
     const elPadding = document.getElementById('inputPadding');
     const elTp = document.getElementById('toggleTp');
     const elDark = document.getElementById('toggleDark');
@@ -1102,14 +1078,14 @@ export function getWebUIHtml(): string {
     });
 
     elX.addEventListener('input', (e) => {
-      state.x = Number(e.target.value);
-      valX.innerText = state.x;
+      const val = parseFloat(e.target.value);
+      state.x = Number.isFinite(val) ? val : -15;
       updatePreview();
     });
 
     elY.addEventListener('input', (e) => {
-      state.y = Number(e.target.value);
-      valY.innerText = state.y;
+      const val = parseFloat(e.target.value);
+      state.y = Number.isFinite(val) ? val : 0;
       updatePreview();
     });
 
