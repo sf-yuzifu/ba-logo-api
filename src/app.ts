@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia';
 import { cors } from '@elysiajs/cors';
+import { swagger } from '@elysiajs/swagger';
 import { renderLogoToBuffer, type RenderOptions, type OutputFormat } from './renderer.ts';
 import { LogoQuerySchema, type LogoQuery } from './schema.ts';
 
@@ -112,6 +113,27 @@ export function handleLogoRequest(query: Record<string, any>, set: any) {
 export function createApp() {
   const app = new Elysia()
     .use(cors())
+    .use(
+      swagger({
+        path: '/swagger',
+        documentation: {
+          info: {
+            title: 'Blue Archive Logo API',
+            version: '2.0.0',
+            description:
+              '高性能蔚蓝档案 (Blue Archive) 风格 Logo 生成器 API。基于 Bun + ElysiaJS + Skia Canvas 构建，支持毫秒级渲染、无损矢量光环、4K高清倍率、副标题排版、暗黑模式及多格式导出。',
+            license: {
+              name: 'MIT',
+              url: 'https://opensource.org/licenses/MIT',
+            },
+          },
+          tags: [
+            { name: 'Logo Generation', description: 'Logo 核心生成接口' },
+            { name: 'Health', description: '服务健康检查与状态探测' },
+          ],
+        },
+      })
+    )
 
     // 1. 旧版兼容路由 (GET /balogo)
     .get(
@@ -121,6 +143,12 @@ export function createApp() {
       },
       {
         query: LogoQuerySchema,
+        detail: {
+          tags: ['Logo Generation'],
+          summary: '旧版兼容接口（兼容 3 年前旧版参数 l, r, x, y, tp）',
+          description:
+            '完全兼容旧项目的请求参数，直接返回二进制图片流，平滑迁移老客户端或聊天机器人。',
+        },
       }
     )
 
@@ -132,18 +160,34 @@ export function createApp() {
       },
       {
         query: LogoQuerySchema,
+        detail: {
+          tags: ['Logo Generation'],
+          summary: '生成 Blue Archive 风格 Logo（RESTful 现代接口）',
+          description:
+            '接收完整的排版与色彩参数，使用 Skia 矢量引擎即时生成并返回图片二进制数据或 Base64 编码数据。',
+        },
       }
     )
 
     // 根路径健康检查/欢迎信息
-    .get('/', () => {
-      return {
-        name: 'ba-logo-api',
-        version: '2.0.0',
-        status: 'online',
-        endpoints: ['/api/logo', '/balogo'],
-      };
-    });
+    .get(
+      '/',
+      () => {
+        return {
+          name: 'ba-logo-api',
+          version: '2.0.0',
+          status: 'online',
+          docs: '/swagger',
+          endpoints: ['/api/logo', '/balogo'],
+        };
+      },
+      {
+        detail: {
+          tags: ['Health'],
+          summary: '服务状态与元数据探测',
+        },
+      }
+    );
 
   return app;
 }

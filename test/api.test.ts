@@ -59,4 +59,17 @@ describe('HTTP Route & Compatibility Tests', () => {
     );
     expect(res2.status).toBe(422);
   });
+
+  it('GET /swagger 与 /swagger/json 应当成功提供交互式文档及 OpenAPI 规范', async () => {
+    const htmlRes = await app.handle(new Request('http://localhost/swagger'));
+    expect(htmlRes.status).toBe(200);
+    expect(htmlRes.headers.get('content-type')).toContain('text/html');
+
+    const jsonRes = await app.handle(new Request('http://localhost/swagger/json'));
+    expect(jsonRes.status).toBe(200);
+    const spec = (await jsonRes.json()) as any;
+    expect(spec.openapi || spec.swagger).toBeDefined();
+    expect(spec.paths['/api/logo']).toBeDefined();
+    expect(spec.paths['/balogo']).toBeDefined();
+  });
 });
