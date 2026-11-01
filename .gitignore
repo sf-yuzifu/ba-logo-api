@@ -27,5 +27,7 @@ dist-ssr
 .netlify
 
 pic/*
+test-*.png
+test-output.png
 
 yarn.lock
