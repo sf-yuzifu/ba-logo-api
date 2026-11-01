@@ -15,18 +15,34 @@ import {
   COLORS,
 } from './constants.ts';
 
-export interface BaseRenderOptions {
+export interface RenderOptions {
   textL?: string;
   textR?: string;
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
   crop?: boolean; // 是否自动紧凑裁切两端多余空白（默认 true）
+  accentColor?: string; // 自定义主题强调色（默认 #128AFA）
+  darkMode?: boolean; // 是否开启暗黑模式（默认 false）
+  swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
 }
+
+export type BaseRenderOptions = RenderOptions;
 
 // 预先编译 SVG 矢量 Path2D 实例
 const haloPath = new Path2D(HALO_PATH_DATA);
 const crossPath = new Path2D(CROSS_PATH_DATA);
+
+/**
+ * 规范化十六进制颜色字符串（自动补充 # 前缀）
+ */
+function normalizeColor(color: string): string {
+  const trimmed = color.trim();
+  if (/^[0-9a-fA-F]{3,8}$/.test(trimmed)) {
+    return `#${trimmed}`;
+  }
+  return trimmed;
+}
 
 /**
  * 绘制缩放后的 SVG Path 矢量图形
@@ -51,7 +67,7 @@ function drawVectorShape(
 /**
  * 渲染 Blue Archive 基础 Logo
  */
-export function renderLogo(options: BaseRenderOptions = {}): Canvas {
+export function renderLogo(options: RenderOptions = {}): Canvas {
   // 确保字体已加载至内存
   loadFonts();
 
@@ -61,6 +77,18 @@ export function renderLogo(options: BaseRenderOptions = {}): Canvas {
   const offsetY = options.offsetY ?? DEFAULT_GRAPH_OFFSET.y;
   const transparent = options.transparent ?? false;
   const crop = options.crop ?? true;
+
+  // PR #6 色彩自定义与暗黑模式逻辑
+  const accentColor = options.accentColor ? normalizeColor(options.accentColor) : COLORS.blue;
+  const darkMode = options.darkMode ?? false;
+  const swapColors = options.swapColors ?? false;
+
+  const backgroundColor = darkMode ? COLORS.darkGray : COLORS.white;
+  const baseTextColor = darkMode ? COLORS.white : COLORS.darkGray;
+  const primaryColor = swapColors ? baseTextColor : accentColor;
+  const secondaryColor = swapColors ? accentColor : baseTextColor;
+  const haloColor = baseTextColor;
+  const crossColor = accentColor;
 
   const canvasHeight = BASE_CANVAS_HEIGHT;
   const initialWidth = BASE_CANVAS_WIDTH;
@@ -97,24 +125,24 @@ export function renderLogo(options: BaseRenderOptions = {}): Canvas {
   // 1. 清空并绘制背景
   ctx.clearRect(0, 0, totalCanvasWidth, canvasHeight);
   if (!transparent) {
-    ctx.fillStyle = COLORS.white;
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, totalCanvasWidth, canvasHeight);
   }
 
-  // 2. 绘制左侧蓝色文字 (textAlign = 'end')
+  // 2. 绘制左侧主文本 (textAlign = 'end')
   ctx.font = font;
-  ctx.fillStyle = COLORS.blue;
+  ctx.fillStyle = primaryColor;
   ctx.textAlign = 'end';
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
   ctx.fillText(textL, canvasWidthL, canvasHeight * TEXT_BASELINE);
   ctx.resetTransform();
 
-  // 3. 绘制深灰光环 (Halo)
+  // 3. 绘制光环 (Halo)
   const graphX = canvasWidthL - canvasHeight / 2 + offsetX;
   const graphY = offsetY;
-  drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, COLORS.darkGray);
+  drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, haloColor);
 
-  // 4. 绘制右侧文字 (深灰文字 + 白色描边裁切光环)
+  // 4. 绘制右侧文字 (次要颜色 + 描边裁切光环)
   ctx.font = font;
   ctx.textAlign = 'start';
 
@@ -122,14 +150,14 @@ export function renderLogo(options: BaseRenderOptions = {}): Canvas {
   if (transparent) {
     ctx.globalCompositeOperation = 'destination-out';
   }
-  ctx.strokeStyle = COLORS.white;
+  ctx.strokeStyle = backgroundColor;
   ctx.lineWidth = 12;
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
   ctx.strokeText(textR, canvasWidthL, canvasHeight * TEXT_BASELINE);
 
   // 填充文字实体颜色
   ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = COLORS.darkGray;
+  ctx.fillStyle = secondaryColor;
   ctx.fillText(textR, canvasWidthL, canvasHeight * TEXT_BASELINE);
   ctx.resetTransform();
 
@@ -150,12 +178,12 @@ export function renderLogo(options: BaseRenderOptions = {}): Canvas {
   if (transparent) {
     ctx.globalCompositeOperation = 'destination-out';
   }
-  ctx.fillStyle = COLORS.white;
+  ctx.fillStyle = backgroundColor;
   ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
 
   // 6. 绘制十字 (Cross)
-  drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, COLORS.blue);
+  drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, crossColor);
 
   // 7. 紧凑裁切边界（修复 PR #1 并兼顾短文本光环完整性）
   if (crop) {
