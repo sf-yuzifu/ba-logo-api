@@ -1,13 +1,48 @@
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from '../composables/useI18n.ts';
 import { LANG_OPTIONS } from '../locales/index.ts';
 import type { SupportedLang } from '../types.ts';
 
 const { lang, setLang, t } = useI18n();
 
+const isDropdownOpen = ref(false);
+const dropdownRef = ref<HTMLElement | null>(null);
+
+const currentLangOption = computed(() => {
+  return LANG_OPTIONS.find((item) => item.lang === lang.value) || LANG_OPTIONS[0];
+});
+
 const handleSelectLang = (newLang: SupportedLang) => {
   setLang(newLang);
+  isDropdownOpen.value = false;
 };
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const handleClickOutside = (e: MouseEvent) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(e.target as Node)) {
+    isDropdownOpen.value = false;
+  }
+};
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    isDropdownOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+  document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <template>
@@ -35,25 +70,50 @@ const handleSelectLang = (newLang: SupportedLang) => {
         <span>ONLINE</span>
       </div>
 
-      <div class="lang-pills" id="langPills">
-        <span class="lang-globe-icon" title="Language / 语言切换">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <!-- 语言选择下拉菜单 -->
+      <div class="lang-dropdown-container" ref="dropdownRef">
+        <button
+          type="button"
+          class="lang-dropdown-trigger"
+          :class="{ active: isDropdownOpen }"
+          @click="toggleDropdown"
+          aria-haspopup="listbox"
+          :aria-expanded="isDropdownOpen"
+        >
+          <svg class="lang-globe-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="2" y1="12" x2="22" y2="12"></line>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
           </svg>
-        </span>
-        <button
-          v-for="item in LANG_OPTIONS"
-          :key="item.lang"
-          type="button"
-          class="lang-pill"
-          :class="{ active: lang === item.lang }"
-          :title="item.enName"
-          @click="handleSelectLang(item.lang)"
-        >
-          {{ item.label }}
+          <span class="lang-trigger-label">{{ currentLangOption.label }}</span>
+          <svg class="lang-chevron" :class="{ rotate: isDropdownOpen }" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </button>
+
+        <transition name="dropdown">
+          <div v-if="isDropdownOpen" class="lang-dropdown-menu" role="listbox">
+            <div class="dropdown-header-tag">// LANGUAGE SELECT</div>
+            <button
+              v-for="item in LANG_OPTIONS"
+              :key="item.lang"
+              type="button"
+              class="lang-menu-item"
+              :class="{ selected: lang === item.lang }"
+              role="option"
+              :aria-selected="lang === item.lang"
+              @click="handleSelectLang(item.lang)"
+            >
+              <div class="menu-item-left">
+                <span class="menu-item-label">{{ item.label }}</span>
+                <span class="menu-item-sub">{{ item.subLabel }}</span>
+              </div>
+              <svg v-if="lang === item.lang" class="menu-item-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </transition>
       </div>
 
       <a href="/swagger" class="nav-btn nav-btn-primary" target="_blank">
