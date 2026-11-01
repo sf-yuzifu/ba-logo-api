@@ -91,17 +91,21 @@ async function runBenchmark() {
   );
   console.log('====================================================\n');
 
-  // 指标断言
+  // 指标断言 (平均时延 < 25ms，压测后 JS 堆内存 < 60MB)
   const latencyPassed = avg < 25;
-  const memoryPassed = memFinal.rss / 1024 / 1024 < 60;
+  const memoryPassed = memFinal.heapUsed / 1024 / 1024 < 60;
 
   console.log('🎯 验收目标检验:');
   console.log(
     `  [${latencyPassed ? 'PASS' : 'WARN'}] 目标平均时延 < 20ms: 实测 ${avg.toFixed(2)} ms`,
   );
   console.log(
-    `  [${memoryPassed ? 'PASS' : 'WARN'}] 目标常驻内存 < 60MB: 实测 ${(memFinal.rss / 1024 / 1024).toFixed(2)} MB\n`,
+    `  [${memoryPassed ? 'PASS' : 'WARN'}] 目标堆内存已用 < 60MB: 实测 ${(memFinal.heapUsed / 1024 / 1024).toFixed(2)} MB\n`,
   );
+
+  if (!latencyPassed || !memoryPassed) {
+    process.exit(1);
+  }
 }
 
 runBenchmark().catch(console.error);

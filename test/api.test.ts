@@ -125,6 +125,54 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(buf.byteLength).toBeGreaterThan(1000);
   });
 
+  it('新旧路由与长短参数别名应当完全等价并输出相同二进制结果', async () => {
+    // 1. /api/logo 全称长参数 vs /api/logo 短别名
+    const resLong = await app.handle(
+      new Request(
+        'http://localhost/api/logo?left=Blue&right=Archive&subtitle=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subtitleColor=4A90E2&subtitleOffsetX=15&subtitleOffsetY=-8&scale=2&wordGap=20&offsetX=10&offsetY=-5&transparent=true&accentColor=FF5722&textColor=333333&crossColor=FFD700&haloColor=9C27B0&motifsBehindText=true&padding=10',
+      ),
+    );
+    const resShort = await app.handle(
+      new Request(
+        'http://localhost/api/logo?l=Blue&r=Archive&sub=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subColor=4A90E2&subX=15&subY=-8&s=2&gap=20&x=10&y=-5&tp=true&accent=FF5722&tc=333333&cross=FFD700&halo=9C27B0&behind=true&pad=10',
+      ),
+    );
+
+    expect(resLong.status).toBe(200);
+    expect(resShort.status).toBe(200);
+    const bufLong = Buffer.from(await resLong.arrayBuffer());
+    const bufShort = Buffer.from(await resShort.arrayBuffer());
+    expect(bufLong.equals(bufShort)).toBe(true);
+
+    // 2. /balogo 兼容路由 vs /api/logo 现代路由
+    const resBalogo = await app.handle(
+      new Request('http://localhost/balogo?l=蔚蓝&r=档案&s=2&dark=true&swap=true'),
+    );
+    const resApi = await app.handle(
+      new Request(
+        'http://localhost/api/logo?left=蔚蓝&right=档案&scale=2&darkMode=true&swapColors=true',
+      ),
+    );
+    expect(resBalogo.status).toBe(200);
+    expect(resApi.status).toBe(200);
+    const bufBalogo = Buffer.from(await resBalogo.arrayBuffer());
+    const bufApi = Buffer.from(await resApi.arrayBuffer());
+    expect(bufBalogo.equals(bufApi)).toBe(true);
+
+    // 3. 方向留白别名等价性 (paddingTop vs pt, paddingLeft vs pl)
+    const resPadLong = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&paddingTop=14&paddingLeft=22'),
+    );
+    const resPadShort = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&pt=14&pl=22'),
+    );
+    expect(resPadLong.status).toBe(200);
+    expect(resPadShort.status).toBe(200);
+    const bufPadLong = Buffer.from(await resPadLong.arrayBuffer());
+    const bufPadShort = Buffer.from(await resPadShort.arrayBuffer());
+    expect(bufPadLong.equals(bufPadShort)).toBe(true);
+  });
+
   it('GET /api/logo?format=svg 应当返回纯矢量 SVG 文件', async () => {
     const res = await app.handle(
       new Request('http://localhost/api/logo?left=Blue&right=Archive&format=svg'),

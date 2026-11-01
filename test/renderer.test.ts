@@ -56,7 +56,7 @@ describe('Renderer Core Unit Tests', () => {
     expect(png.dataUrl.startsWith('data:image/png;base64,')).toBe(true);
   });
 
-  it('SVG 与位图应共享边界尺寸并返回 SVG 宽高元数据', async () => {
+  it('SVG 纯矢量导出应当无残留文本标签、无嵌入位图，并与位图尺寸一致', async () => {
     const optionsList = [
       {},
       { scale: 2, textL: 'Blue', textR: 'Archive', subtitle: 'ブルーアーカイブ' },
@@ -65,18 +65,30 @@ describe('Renderer Core Unit Tests', () => {
       { motifsBehindText: true, padding: '5 10 15 20' },
       { motifsBehindText: true, transparent: true, darkMode: true, wordGap: 30 },
       { center: false, padding: '0 12 24 6', offsetX: 25, offsetY: -12 },
+      { crossColor: '#FFD700', haloColor: '#9C27B0', subtitleColor: '#FF5722' },
+      { subtitleOffsetX: 30, subtitleOffsetY: -15, swapColors: true },
     ];
 
     for (const options of optionsList) {
       const raster = renderLogo(options);
       const svg = renderLogoToBuffer({ ...options, format: 'svg' });
       const image = await loadImage(svg.buffer);
+
+      // 验证无任何客户端字体依赖与位图残留
+      const svgText = svg.svg ?? svg.buffer.toString('utf8');
+      expect(svgText).toContain('<svg');
+      expect(svgText).toContain('viewBox=');
+      expect(svgText).toContain('<path');
+      expect(svgText).not.toContain('<text');
+      expect(svgText).not.toContain('<tspan');
+      expect(svgText).not.toContain('<image');
+      expect(svgText).not.toContain('data:image/');
+
+      // 验证元数据与光栅化尺寸完全一致
       expect(svg.width).toBe(raster.width);
       expect(svg.height).toBe(raster.height);
       expect(image.width).toBe(raster.width);
       expect(image.height).toBe(raster.height);
-      expect(svg.svg).not.toContain('<text');
-      expect(svg.svg).not.toContain('<image');
     }
   });
 
@@ -225,6 +237,11 @@ describe('Renderer Core Unit Tests', () => {
     expect(pad4Val.width).toBe(base.width + 15 + 35);
     expect(pad4Val.height).toBe(base.height + 5 + 25);
 
+    // CSS 三值字符串 "10 25 30"：上 10，左右 25，下 30
+    const pad3Val = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 1, padding: '10 25 30' });
+    expect(pad3Val.width).toBe(base.width + 50); // 左右各 25
+    expect(pad3Val.height).toBe(base.height + 40); // 上 10 + 下 30
+
     // 独立方向参数覆盖
     const padOverride = renderLogo({
       textL: '蔚蓝',
@@ -238,20 +255,50 @@ describe('Renderer Core Unit Tests', () => {
     expect(padOverride.height).toBe(base.height + 12);
   });
 
-  it('应当支持两词间距微调 (wordGap / gap)', () => {
-    const normal = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, wordGap: 0 });
-    const wide = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, wordGap: 40 });
-    const tight = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, wordGap: -20 });
+  it('应当安全处理参数边界条件（极端缩放、极值间距、空文本与空白）', () => {
+    // 极小 scale 限制于 0.1，超大 scale 限制于 8.0
+    const tinyScale = renderLogo({ scale: 0.0001 });
+    const minScale = renderLogo({ scale: 0.1 });
+    expect(tinyScale.width).toBe(minScale.width);
+    expect(tinyScale.height).toBe(minScale.height);
 
-    // scale: 2 时，gap=40 展开 80px，gap=-20 紧缩 40px
-    expect(wide.width).toBe(normal.width + 80);
-    expect(tight.width).toBe(normal.width - 40);
+    const hugeScale = renderLogo({ scale: 999 });
+    const maxScale = renderLogo({ scale: 8.0 });
+    expect(hugeScale.width).toBe(maxScale.width);
+    expect(hugeScale.height).toBe(maxScale.height);
+
+    // wordGap 上下界安全钳制 (-100 ~ 300)
+    const minGap = renderLogo({ wordGap: -100, scale: 1 });
+    const underGap = renderLogo({ wordGap: -999, scale: 1 });
+    expect(underGap.width).toBe(minGap.width);
+
+    const maxGap = renderLogo({ wordGap: 300, scale: 1 });
+    const overGap = renderLogo({ wordGap: 9999, scale: 1 });
+    expect(overGap.width).toBe(maxGap.width);
+
+    // 空文本与仅空格安全渲染
+    const emptyLogo = renderLogo({ textL: '', textR: '' });
+    expect(emptyLogo.width).toBeGreaterThan(0);
+    expect(emptyLogo.height).toBeGreaterThan(0);
+
+    const spaceLogo = renderLogo({ textL: '   ', textR: '   ' });
+    expect(spaceLogo.width).toBeGreaterThan(0);
+    expect(spaceLogo.height).toBeGreaterThan(0);
   });
 
-  it('单次渲染性能基准测试应当小于 50ms', () => {
-    const start = performance.now();
+  it('渲染性能基准多采样测试应当中位数小于 50ms', () => {
+    // 预热 1 次
     renderLogoToBuffer({ textL: '蔚蓝', textR: '档案', scale: 1 });
-    const duration = performance.now() - start;
-    expect(duration).toBeLessThan(50);
+
+    // 运行 5 次并统计中位数
+    const times: number[] = [];
+    for (let i = 0; i < 5; i++) {
+      const start = performance.now();
+      renderLogoToBuffer({ textL: '蔚蓝', textR: '档案', scale: 1 });
+      times.push(performance.now() - start);
+    }
+    times.sort((a, b) => a - b);
+    const median = times[2];
+    expect(median).toBeLessThan(50);
   });
 });

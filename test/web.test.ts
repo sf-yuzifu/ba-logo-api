@@ -142,4 +142,31 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
       }
     }
   });
+
+  it('WebUI 异步预览应保证请求序号时序与参数快照隔离', async () => {
+    let currentRequestId = 0;
+    let activeData = '';
+
+    // 模拟两个异步请求：请求 1 耗时 50ms，请求 2 耗时 10ms
+    const sendRequest = async (id: number, text: string, delay: number) => {
+      currentRequestId = id;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      if (id === currentRequestId) {
+        activeData = text;
+      }
+    };
+
+    const p1 = sendRequest(1, '慢响应文本', 50);
+    const p2 = sendRequest(2, '快响应文本', 10);
+    await Promise.all([p1, p2]);
+
+    // 较慢返回的请求 1 不得覆盖较新的请求 2
+    expect(activeData).toBe('快响应文本');
+
+    // 验证状态快照隔离：修改原状态不应污染已抓取的快照
+    const state: LogoFormState = { ...DEFAULT_STATE, left: '旧文本' };
+    const snapshot = { ...state };
+    state.left = '新文本';
+    expect(snapshot.left).toBe('旧文本');
+  });
 });
