@@ -29,6 +29,6 @@ dist-ssr
 pic/*
 test-*.png
 test-output.png
-samples/
+
 
 yarn.lock
