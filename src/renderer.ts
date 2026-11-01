@@ -16,6 +16,8 @@ import {
   COLORS,
 } from './constants.ts';
 
+export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64';
+
 export interface RenderOptions {
   textL?: string;
   textR?: string;
@@ -29,9 +31,20 @@ export interface RenderOptions {
   darkMode?: boolean; // 是否开启暗黑模式（默认 false）
   swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
   scale?: number; // 分辨率缩放倍率（默认 1，支持 2x, 3x, 4x 等高清水印与海报分辨率）
+  format?: OutputFormat; // 输出格式（'png' | 'webp' | 'jpeg' | 'jpg' | 'base64'，默认 'png'）
 }
 
 export type BaseRenderOptions = RenderOptions;
+
+export interface RenderResult {
+  canvas: Canvas;
+  buffer: Buffer;
+  mimeType: string;
+  dataUrl: string;
+  base64: string;
+  width: number;
+  height: number;
+}
 
 // 预先编译 SVG 矢量 Path2D 实例
 const haloPath = new Path2D(HALO_PATH_DATA);
@@ -265,4 +278,47 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   }
 
   return canvas;
+}
+
+/**
+ * 渲染并导出指定格式的 Logo 图片数据包（支持 png, webp, jpeg, base64）
+ */
+export function renderLogoToBuffer(options: RenderOptions = {}): RenderResult {
+  const format = (options.format ?? 'png').toLowerCase() as OutputFormat;
+  const isJpeg = format === 'jpeg' || format === 'jpg';
+
+  // JPEG 格式不支持 alpha 透明度通道，遇透明设置强制关闭以规避黑底瑕疵
+  const actualTransparent = isJpeg ? false : (options.transparent ?? false);
+  const canvas = renderLogo({
+    ...options,
+    transparent: actualTransparent,
+  });
+
+  let buffer: Buffer;
+  let mimeType: string;
+
+  if (isJpeg) {
+    mimeType = 'image/jpeg';
+    buffer = canvas.toBuffer('image/jpeg', 90);
+  } else if (format === 'webp') {
+    mimeType = 'image/webp';
+    buffer = canvas.toBuffer('image/webp', 90);
+  } else {
+    // png 以及 base64 默认使用高质量 png 编码
+    mimeType = 'image/png';
+    buffer = canvas.toBuffer('image/png');
+  }
+
+  const base64 = buffer.toString('base64');
+  const dataUrl = `data:${mimeType};base64,${base64}`;
+
+  return {
+    canvas,
+    buffer,
+    mimeType,
+    dataUrl,
+    base64,
+    width: canvas.width,
+    height: canvas.height,
+  };
 }
