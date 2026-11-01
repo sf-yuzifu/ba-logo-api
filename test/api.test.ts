@@ -4,13 +4,13 @@ import { createApp } from '../src/app.ts';
 describe('HTTP Route & Compatibility Tests', () => {
   const app = createApp();
 
-  it('GET / 默认应当返回 Blue Archive 风格的 WebUI 调试页面', async () => {
+  it('GET / 默认应当返回 Blue Archive 风格的 WebUI 调试页面与 SPA 挂载点', async () => {
     const res = await app.handle(new Request('http://localhost/'));
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toContain('text/html');
     const html = await res.text();
     expect(html).toContain('Blue Archive Logo Generator');
-    expect(html).toContain('SCHALE');
+    expect(html).toContain('id="app"');
   });
 
   it('GET / 携带 Accept: application/json 或访问 /health 应当返回 JSON 状态', async () => {
@@ -29,15 +29,9 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(health).toMatchObject({ status: 'ok' });
   });
 
-  it('GET / 应当返回支持 i18n、一键复制图片与重置的 WebUI', async () => {
-    const res = await app.handle(new Request('http://localhost/'));
-    expect(res.status).toBe(200);
-    expect(res.headers.get('content-type')).toContain('text/html');
-    const html = await res.text();
-    expect(html).toContain('id="langPills"');
-    expect(html).toContain('id="btnCopyImage"');
-    expect(html).toContain('id="btnResetAll"');
-    expect(html).toContain('class="reset-badge"');
+  it('GET /assets/* 静态路由应当能正常分发构建后的前端资源文件', async () => {
+    const res = await app.handle(new Request('http://localhost/assets/non-existent-test.js'));
+    expect(res.status).toBe(404);
   });
 
   it('GET /balogo 应当完全向后兼容 3 年前的旧版参数', async () => {

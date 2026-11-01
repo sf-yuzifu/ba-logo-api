@@ -1,9 +1,13 @@
+import path from 'node:path';
 import { cors } from '@elysiajs/cors';
 import { swagger } from '@elysiajs/swagger';
 import { type Context, Elysia } from 'elysia';
 import { type OutputFormat, type RenderOptions, renderLogoToBuffer } from './renderer.ts';
 import { type LogoQuery, LogoQuerySchema } from './schema.ts';
 import { getWebUIHtml } from './webui.ts';
+
+const WEB_DIST_DIR = path.resolve(import.meta.dir, '../dist/web');
+const WEB_INDEX_PATH = path.join(WEB_DIST_DIR, 'index.html');
 
 /**
  * 将 Query 查询参数解析并标准化为 RenderOptions
@@ -238,7 +242,7 @@ export function createApp() {
     // 3. 根路径：默认呈现 Blue Archive 风格交互式 WebUI 调试页
     .get(
       '/',
-      ({ headers, set }) => {
+      async ({ headers, set }) => {
         const accept = headers.accept ?? '';
         if (accept.includes('application/json')) {
           return {
@@ -248,6 +252,11 @@ export function createApp() {
             docs: '/swagger',
             endpoints: ['/api/logo', '/balogo'],
           };
+        }
+        const distFile = Bun.file(WEB_INDEX_PATH);
+        if (await distFile.exists()) {
+          set.headers['content-type'] = 'text/html; charset=utf-8';
+          return distFile;
         }
         set.headers['content-type'] = 'text/html; charset=utf-8';
         return getWebUIHtml();
@@ -260,7 +269,27 @@ export function createApp() {
       },
     )
 
-    // 4. 健康检查探测接口
+    // 4. WebUI 静态前端资源分发
+    .get(
+      '/assets/*',
+      async ({ params, set }) => {
+        const filePath = path.join(WEB_DIST_DIR, 'assets', params['*']);
+        const file = Bun.file(filePath);
+        if (!(await file.exists())) {
+          set.status = 404;
+          return 'Asset Not Found';
+        }
+        return file;
+      },
+      {
+        detail: {
+          tags: ['Health'],
+          summary: 'WebUI 前端静态资源路由',
+        },
+      },
+    )
+
+    // 5. 健康检查探测接口
     .get(
       '/health',
       () => {

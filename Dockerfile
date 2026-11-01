@@ -5,12 +5,31 @@ ARG BUN_VERSION=1.3.14
 FROM oven/bun:${BUN_VERSION}-alpine AS deps
 WORKDIR /app
 
-# 拷贝依赖配置并安装纯生产依赖
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+# ==========================================
+# 阶段 2: 前端构建阶段 (Vue 3 + Vite)
+# ==========================================
+FROM oven/bun:${BUN_VERSION}-alpine AS web-builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json bun.lock ./
+COPY web ./web
+RUN bun run build:web
+
+# ==========================================
+# 阶段 3: 纯生产依赖安装
+# ==========================================
+FROM oven/bun:${BUN_VERSION}-alpine AS prod-deps
+WORKDIR /app
+
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 
 # ==========================================
-# 阶段 2: 极简运行镜像
+# 阶段 4: 极简运行镜像
 # ==========================================
 FROM oven/bun:${BUN_VERSION}-alpine AS runner
 WORKDIR /app
@@ -18,8 +37,9 @@ WORKDIR /app
 ENV NODE_ENV=production \
     PORT=3000
 
-# 拷贝生产依赖、核心源码与字体资产
-COPY --from=deps /app/node_modules ./node_modules
+# 拷贝纯生产依赖、前端静态产物、核心源码与字体资产
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=web-builder /app/dist/web ./dist/web
 COPY package.json ./
 COPY assets ./assets
 COPY src ./src

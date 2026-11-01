@@ -6,9 +6,29 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts", "*.json"],
+    "includes": [
+      "src/**/*.ts",
+      "scripts/**/*.ts",
+      "test/**/*.ts",
+      "web/**/*.ts",
+      "web/**/*.vue",
+      "*.json"
+    ],
     "ignoreUnknown": true
   },
+  "overrides": [
+    {
+      "includes": ["**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ],
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
