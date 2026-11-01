@@ -25,6 +25,7 @@ export interface RenderOptions {
   accentColor?: string; // 自定义主题强调色（默认 #128AFA）
   darkMode?: boolean; // 是否开启暗黑模式（默认 false）
   swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
+  scale?: number; // 分辨率缩放倍率（默认 1，支持 2x, 3x, 4x 等高清水印与海报分辨率）
 }
 
 export type BaseRenderOptions = RenderOptions;
@@ -90,9 +91,16 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const haloColor = baseTextColor;
   const crossColor = accentColor;
 
-  const canvasHeight = BASE_CANVAS_HEIGHT;
-  const initialWidth = BASE_CANVAS_WIDTH;
-  const font = `${BASE_FONT_SIZE}px "${FONT_FAMILY}"`;
+  // PR #9 高清缩放倍率 (支持 0.1 ~ 8x，默认 1)
+  const rawScale = Number(options.scale ?? 1);
+  const scale = Number.isFinite(rawScale) ? Math.min(Math.max(rawScale, 0.1), 8) : 1;
+
+  const canvasHeight = Math.round(BASE_CANVAS_HEIGHT * scale);
+  const initialWidth = Math.round(BASE_CANVAS_WIDTH * scale);
+  const fontSize = Math.round(BASE_FONT_SIZE * scale);
+  const paddingX = Math.round(PADDING_X * scale);
+  const strokeWidth = 12 * scale;
+  const font = `${fontSize}px "${FONT_FAMILY}"`;
 
   // 创建测量用临时画布与测量上下文
   const measureCanvas = createCanvas(initialWidth, canvasHeight);
@@ -103,10 +111,10 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const textMetricsR = measureCtx.measureText(textR);
 
   // 计算斜体排版引起的文字宽度扩展
-  const ascentL = textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74;
-  const descentL = textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10;
-  const ascentR = textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74;
-  const descentR = textMetricsR.fontBoundingBoxDescent ?? textMetricsR.actualBoundingBoxDescent ?? 10;
+  const ascentL = textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
+  const descentL = textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
+  const ascentR = textMetricsR.fontBoundingBoxAscent ?? textMetricsR.actualBoundingBoxAscent ?? 74 * scale;
+  const descentR = textMetricsR.fontBoundingBoxDescent ?? textMetricsR.actualBoundingBoxDescent ?? 10 * scale;
 
   const textWidthL =
     textMetricsL.width - (TEXT_BASELINE * canvasHeight + descentL) * HORIZONTAL_TILT;
@@ -114,8 +122,8 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     textMetricsR.width + (TEXT_BASELINE * canvasHeight - ascentR) * HORIZONTAL_TILT;
 
   // 根据文字长度动态计算画布左右分界线
-  const canvasWidthL = Math.max(textWidthL + PADDING_X, initialWidth / 2);
-  const canvasWidthR = Math.max(textWidthR + PADDING_X, initialWidth / 2);
+  const canvasWidthL = Math.max(textWidthL + paddingX, initialWidth / 2);
+  const canvasWidthR = Math.max(textWidthR + paddingX, initialWidth / 2);
   const totalCanvasWidth = canvasWidthL + canvasWidthR;
 
   // 创建正式绘制画布
@@ -138,8 +146,10 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   ctx.resetTransform();
 
   // 3. 绘制光环 (Halo)
-  const graphX = canvasWidthL - canvasHeight / 2 + offsetX;
-  const graphY = offsetY;
+  const scaledOffsetX = offsetX * scale;
+  const scaledOffsetY = offsetY * scale;
+  const graphX = canvasWidthL - canvasHeight / 2 + scaledOffsetX;
+  const graphY = scaledOffsetY;
   drawVectorShape(ctx, haloPath, graphX, graphY, canvasHeight, haloColor);
 
   // 4. 绘制右侧文字 (次要颜色 + 描边裁切光环)
@@ -151,7 +161,7 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     ctx.globalCompositeOperation = 'destination-out';
   }
   ctx.strokeStyle = backgroundColor;
-  ctx.lineWidth = 12;
+  ctx.lineWidth = strokeWidth;
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
   ctx.strokeText(textR, canvasWidthL, canvasHeight * TEXT_BASELINE);
 
@@ -189,11 +199,11 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   if (crop) {
     const graphRight = graphX + canvasHeight;
     // 安全裁切左边界：确保同时容纳最左侧倾斜文字以及光环/十字左侧边缘
-    const safeLeft = Math.max(0, Math.floor(Math.min(canvasWidthL - textWidthL - PADDING_X, graphX)));
+    const safeLeft = Math.max(0, Math.floor(Math.min(canvasWidthL - textWidthL - paddingX, graphX)));
     // 安全裁切右边界：确保同时容纳最右侧倾斜文字以及光环/十字右侧边缘
     const safeRight = Math.min(
       totalCanvasWidth,
-      Math.ceil(Math.max(canvasWidthL + textWidthR + PADDING_X, graphRight))
+      Math.ceil(Math.max(canvasWidthL + textWidthR + paddingX, graphRight))
     );
     const croppedWidth = safeRight - safeLeft;
 
