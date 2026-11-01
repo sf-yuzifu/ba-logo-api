@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { loadImage } from '@napi-rs/canvas';
 import { renderLogo, renderLogoToBuffer } from '../src/renderer.ts';
 
 describe('Renderer Core Unit Tests', () => {
@@ -43,6 +44,30 @@ describe('Renderer Core Unit Tests', () => {
     const base64Result = renderLogoToBuffer({ format: 'base64' });
     expect(base64Result.base64).toBeDefined();
     expect(base64Result.dataUrl.startsWith('data:image/png;base64,')).toBe(true);
+  });
+
+  it('SVG 与位图应共享边界尺寸并返回 SVG 宽高元数据', async () => {
+    const optionsList = [
+      {},
+      { scale: 2, textL: 'Blue', textR: 'Archive', subtitle: 'ブルーアーカイブ' },
+      { transparent: true },
+      { transparent: true, padding: '3 8 11 17', subtitle: '長い副タイトル' },
+      { motifsBehindText: true, padding: '5 10 15 20' },
+      { motifsBehindText: true, transparent: true, darkMode: true, wordGap: 30 },
+      { center: false, padding: '0 12 24 6', offsetX: 25, offsetY: -12 },
+    ];
+
+    for (const options of optionsList) {
+      const raster = renderLogo(options);
+      const svg = renderLogoToBuffer({ ...options, format: 'svg' });
+      const image = await loadImage(svg.buffer);
+      expect(svg.width).toBe(raster.width);
+      expect(svg.height).toBe(raster.height);
+      expect(image.width).toBe(raster.width);
+      expect(image.height).toBe(raster.height);
+      expect(svg.svg).not.toContain('<text');
+      expect(svg.svg).not.toContain('<image');
+    }
   });
 
   it('应当支持分辨率等比例缩放 (scale)', () => {
