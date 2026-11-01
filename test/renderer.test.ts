@@ -42,20 +42,15 @@ describe('Renderer Core Unit Tests', () => {
   });
 
   it('应当支持分辨率等比例缩放 (scale)', () => {
-    // 开启 crop: false 时高度严格等于 BASE_CANVAS_HEIGHT * scale
-    const raw1x = renderLogo({ scale: 1, crop: false });
-    const raw2x = renderLogo({ scale: 2, crop: false });
-    const raw3x = renderLogo({ scale: 3, crop: false });
-
-    expect(raw1x.height).toBe(250);
-    expect(raw2x.height).toBe(500);
-    expect(raw3x.height).toBe(750);
-
-    // 默认 crop: true 紧凑裁切模式下，各倍率尺寸也应当严格保持成倍放大
+    // 紧凑裁切模式下，各倍率尺寸应当严格保持成倍放大
     const logo1x = renderLogo({ scale: 1 });
     const logo2x = renderLogo({ scale: 2 });
+    const logo3x = renderLogo({ scale: 3 });
+
     expect(Math.abs(logo2x.width - logo1x.width * 2)).toBeLessThan(10);
     expect(Math.abs(logo2x.height - logo1x.height * 2)).toBeLessThan(10);
+    expect(Math.abs(logo3x.width - logo1x.width * 3)).toBeLessThan(15);
+    expect(Math.abs(logo3x.height - logo1x.height * 3)).toBeLessThan(15);
   });
 
   it('应当支持色彩自定义、暗黑模式与颜色互换', () => {
@@ -102,10 +97,6 @@ describe('Renderer Core Unit Tests', () => {
       textR: '超长第二段文字演示',
     });
     expect(longText.width).toBeGreaterThan(800);
-
-    // 关闭 crop 应当保留初始总宽度
-    const uncropped = renderLogo({ crop: false });
-    expect(uncropped.width).toBeGreaterThanOrEqual(900);
   });
 
   it('纯色或与背景同色（如白字白底）应当保持精确裁剪且尺寸一致', () => {

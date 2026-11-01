@@ -113,8 +113,7 @@ export const LogoQuerySchema = t.Object({
   color: t.Optional(t.String({ description: 'textColor 别名' })),
   tc: t.Optional(t.String({ description: 'textColor 别名' })),
 
-  // 裁切与留白边距
-  crop: t.Optional(FlexibleBoolean),
+  // 留白边距
   padding: t.Optional(
     t.Numeric({
       description: '内容边缘留白边距像素（默认 2px，随 scale 缩放）',

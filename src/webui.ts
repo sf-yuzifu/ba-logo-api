@@ -772,10 +772,10 @@ export function getWebUIHtml(): string {
       </div>
 
       <!-- 紧凑边距 -->
-      <div class="form-group" id="paddingGroup" style="transition: opacity 0.2s ease;">
+      <div class="form-group" id="paddingGroup">
         <label class="form-label">
           <span>边缘留白边距 (PADDING)</span>
-          <span id="paddingHint" style="font-weight: 500; font-size: 0.75rem;">默认 2px 贴边</span>
+          <span style="font-weight: 500; font-size: 0.75rem;">默认 2px 贴边</span>
         </label>
         <div class="range-group">
           <input type="range" id="inputPadding" min="0" max="60" value="2">
@@ -827,14 +827,6 @@ export function getWebUIHtml(): string {
           <span>颜色互换</span>
           <div class="switch">
             <input type="checkbox" id="toggleSwap">
-            <span class="slider"></span>
-          </div>
-        </label>
-
-        <label class="toggle-item">
-          <span>自动紧凑裁切</span>
-          <div class="switch">
-            <input type="checkbox" id="toggleCrop" checked>
             <span class="slider"></span>
           </div>
         </label>
@@ -909,7 +901,6 @@ export function getWebUIHtml(): string {
       transparent: false,
       dark: false,
       swap: false,
-      crop: true,
       padding: 2,
       center: true
     };
@@ -930,7 +921,6 @@ export function getWebUIHtml(): string {
     const elTp = document.getElementById('toggleTp');
     const elDark = document.getElementById('toggleDark');
     const elSwap = document.getElementById('toggleSwap');
-    const elCrop = document.getElementById('toggleCrop');
     const elCenter = document.getElementById('toggleCenter');
 
     const previewImg = document.getElementById('previewImg');
@@ -972,8 +962,7 @@ export function getWebUIHtml(): string {
         if (state.dark) params.set('dark', 'true');
         if (state.swap) params.set('swap', 'true');
         if (state.format !== 'png') params.set('format', state.format);
-        if (!state.crop) params.set('crop', 'false');
-        if (state.crop && state.padding !== 2) params.set('padding', state.padding);
+        if (state.padding !== 2) params.set('padding', state.padding);
         if (state.center !== !state.transparent) params.set('center', String(state.center));
         const qs = params.toString();
         return '/balogo' + (qs ? '?' + qs : '');
@@ -998,8 +987,7 @@ export function getWebUIHtml(): string {
       if (state.transparent) params.set('transparent', 'true');
       if (state.dark) params.set('darkMode', 'true');
       if (state.swap) params.set('swapColors', 'true');
-      if (!state.crop) params.set('crop', 'false');
-      if (state.crop && state.padding !== 2) params.set('padding', state.padding);
+      if (state.padding !== 2) params.set('padding', state.padding);
       if (state.center !== !state.transparent) {
         params.set('center', String(state.center));
       }
@@ -1162,15 +1150,6 @@ export function getWebUIHtml(): string {
       updatePreview();
     });
     elSwap.addEventListener('change', (e) => { state.swap = e.target.checked; updatePreview(); });
-    elCrop.addEventListener('change', (e) => {
-      state.crop = e.target.checked;
-      elPadding.disabled = !state.crop;
-      const padGroup = document.getElementById('paddingGroup');
-      const padHint = document.getElementById('paddingHint');
-      if (padGroup) padGroup.style.opacity = state.crop ? '1' : '0.4';
-      if (padHint) padHint.innerText = state.crop ? '默认 2px 贴边' : '(裁切已关闭，留白不生效)';
-      updatePreview();
-    });
     elCenter.addEventListener('change', (e) => { state.center = e.target.checked; updatePreview(); });
 
     // Endpoint Pills

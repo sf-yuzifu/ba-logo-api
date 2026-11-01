@@ -47,15 +47,7 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   const accentColor = query.accentColor ?? query.accent;
   const textColor = query.textColor ?? query.color ?? query.tc;
 
-  // 紧凑裁切与留白边距
-  const rawCrop = query.crop;
-  const crop =
-    typeof rawCrop === 'boolean'
-      ? rawCrop
-      : rawCrop !== undefined
-      ? rawCrop !== 'false' && rawCrop !== '0'
-      : true;
-
+  // 留白边距
   const rawPad = query.padding ?? query.pad;
   const padding =
     rawPad !== undefined && !Number.isNaN(Number(rawPad)) ? Number(rawPad) : undefined;
@@ -84,7 +76,6 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
     swapColors,
     accentColor,
     textColor,
-    crop,
     padding,
     center,
     format,

@@ -96,7 +96,6 @@ bun run bench
 | `swapColors` | `swap` | boolean | `false` | `true`, `false`, `1`, `0` | 是否对调左右文字的主次颜色 |
 | `offsetX` | `x` | number | `-15` | `0`, `10`, `-20` | 光环与十字 X 轴偏移量（像素） |
 | `offsetY` | `y` | number | `0` | `5`, `-5` | 光环与十字 Y 轴偏移量（像素） |
-| `crop` | - | boolean | `true` | `true`, `false` | 是否自动紧凑裁切两侧多余空白（默认 true） |
 | `padding` | `pad` | number | `2` | `2`, `0`, `10` | 紧凑裁切边缘留白边距（像素，随 scale 等比缩放） |
 | `center` | `vcenter`| boolean | *智能自适应* | `true`, `false` | **文本垂直视觉居中**（非透明模式默认 true，透明模式默认 false） |
 

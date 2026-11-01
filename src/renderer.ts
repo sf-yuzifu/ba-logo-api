@@ -26,7 +26,6 @@ export interface RenderOptions {
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
-  crop?: boolean; // 是否自动紧凑裁切两端多余空白（默认 true）
   padding?: number; // 紧凑裁切留白边距（像素，默认 2，随 scale 缩放）
   center?: boolean; // 文本垂直视觉居中（有背景时默认 true，透明模式默认 false）
   accentColor?: string; // 主强调色（左文字、十字架，默认 #128AFA）
@@ -209,7 +208,6 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const offsetX = options.offsetX ?? DEFAULT_GRAPH_OFFSET.x;
   const offsetY = options.offsetY ?? DEFAULT_GRAPH_OFFSET.y;
   const transparent = options.transparent ?? false;
-  const crop = options.crop ?? true;
 
   // PR #6 色彩自定义与暗黑模式逻辑
   const accentColor = options.accentColor ? normalizeColor(options.accentColor) : COLORS.blue;
@@ -354,23 +352,9 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   }
 
   // 7. 紧凑像素级包围盒裁切（默认贴合到边缘 2px，支持自定义 padding 与文本居中）
-  if (crop) {
-    const isCenter = options.center ?? !transparent;
-    const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
-    return trimCanvas(canvas, userPad, transparent, isCenter, textCenterY, backgroundColor);
-  }
-
-  // 未启用紧凑裁切时，如非透明模式则补充合成背景底色
-  if (!transparent) {
-    const bgCanvas = createCanvas(totalCanvasWidth, canvasHeight);
-    const bgCtx = bgCanvas.getContext('2d');
-    bgCtx.fillStyle = backgroundColor;
-    bgCtx.fillRect(0, 0, totalCanvasWidth, canvasHeight);
-    bgCtx.drawImage(canvas, 0, 0);
-    return bgCanvas;
-  }
-
-  return canvas;
+  const isCenter = options.center ?? !transparent;
+  const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
+  return trimCanvas(canvas, userPad, transparent, isCenter, textCenterY, backgroundColor);
 }
 
 /**
