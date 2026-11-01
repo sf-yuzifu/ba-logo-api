@@ -6,7 +6,7 @@ describe('Renderer Core Unit Tests', () => {
   it('应当正常渲染默认参数并生成有效图片', () => {
     const result = renderLogoToBuffer();
     expect(result.width).toBeGreaterThan(0);
-    expect(result.height).toBe(BASE_CANVAS_HEIGHT);
+    expect(result.height).toBeGreaterThan(0);
     expect(result.mimeType).toBe('image/png');
     expect(result.buffer.length).toBeGreaterThan(1000);
     expect(result.base64.length).toBeGreaterThan(1000);
@@ -42,16 +42,20 @@ describe('Renderer Core Unit Tests', () => {
   });
 
   it('应当支持分辨率等比例缩放 (scale)', () => {
+    // 开启 crop: false 时高度严格等于 BASE_CANVAS_HEIGHT * scale
+    const raw1x = renderLogo({ scale: 1, crop: false });
+    const raw2x = renderLogo({ scale: 2, crop: false });
+    const raw3x = renderLogo({ scale: 3, crop: false });
+
+    expect(raw1x.height).toBe(250);
+    expect(raw2x.height).toBe(500);
+    expect(raw3x.height).toBe(750);
+
+    // 默认 crop: true 紧凑裁切模式下，各倍率尺寸也应当严格保持成倍放大
     const logo1x = renderLogo({ scale: 1 });
     const logo2x = renderLogo({ scale: 2 });
-    const logo3x = renderLogo({ scale: 3 });
-
-    expect(logo1x.height).toBe(250);
-    expect(logo2x.height).toBe(500);
-    expect(logo3x.height).toBe(750);
-
-    // 2x 宽度应当约为 1x 宽度的 2 倍
     expect(Math.abs(logo2x.width - logo1x.width * 2)).toBeLessThan(10);
+    expect(Math.abs(logo2x.height - logo1x.height * 2)).toBeLessThan(10);
   });
 
   it('应当支持色彩自定义、暗黑模式与颜色互换', () => {
@@ -88,9 +92,9 @@ describe('Renderer Core Unit Tests', () => {
   });
 
   it('长短文本边界与裁剪安全性', () => {
-    // 极短文本：保证光环不被裁剪
+    // 极短文本：保证光环不被裁剪，带有恰当边距
     const shortText = renderLogo({ textL: 'A', textR: 'B' });
-    expect(shortText.width).toBeGreaterThanOrEqual(250);
+    expect(shortText.width).toBeGreaterThanOrEqual(200);
 
     // 极长文本：应当动态拉伸而不报错
     const longText = renderLogo({

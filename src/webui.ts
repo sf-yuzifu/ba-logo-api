@@ -684,6 +684,15 @@ export function getWebUIHtml(): string {
         </div>
       </div>
 
+      <!-- 紧凑边距 -->
+      <div class="form-group">
+        <label class="form-label">边缘紧凑留白 (PADDING，默认 2px 极致贴边)</label>
+        <div class="range-group">
+          <input type="range" id="inputPadding" min="0" max="40" value="2">
+          <span class="range-val" id="valPadding">2px</span>
+        </div>
+      </div>
+
       <!-- 分辨率倍率 -->
       <div class="form-group">
         <label class="form-label">分辨率倍率 (SCALE)</label>
@@ -735,6 +744,14 @@ export function getWebUIHtml(): string {
           <span>自动紧凑裁切</span>
           <div class="switch">
             <input type="checkbox" id="toggleCrop" checked>
+            <span class="slider"></span>
+          </div>
+        </label>
+
+        <label class="toggle-item">
+          <span>文本视觉居中</span>
+          <div class="switch">
+            <input type="checkbox" id="toggleCenter" checked>
             <span class="slider"></span>
           </div>
         </label>
@@ -792,7 +809,9 @@ export function getWebUIHtml(): string {
       transparent: false,
       dark: false,
       swap: false,
-      crop: true
+      crop: true,
+      padding: 2,
+      center: true
     };
 
     // DOM 元素引用
@@ -804,10 +823,13 @@ export function getWebUIHtml(): string {
     const elY = document.getElementById('inputY');
     const valX = document.getElementById('valX');
     const valY = document.getElementById('valY');
+    const elPadding = document.getElementById('inputPadding');
+    const valPadding = document.getElementById('valPadding');
     const elTp = document.getElementById('toggleTp');
     const elDark = document.getElementById('toggleDark');
     const elSwap = document.getElementById('toggleSwap');
     const elCrop = document.getElementById('toggleCrop');
+    const elCenter = document.getElementById('toggleCenter');
 
     const previewImg = document.getElementById('previewImg');
     const previewBox = document.getElementById('previewBox');
@@ -837,6 +859,8 @@ export function getWebUIHtml(): string {
       if (state.dark) params.set('dark', 'true');
       if (state.swap) params.set('swap', 'true');
       if (!state.crop) params.set('crop', 'false');
+      if (state.padding !== 2) params.set('padding', state.padding);
+      if (!state.center) params.set('center', 'false');
 
       const qs = params.toString();
       return '/api/logo' + (qs ? '?' + qs : '');
@@ -901,10 +925,22 @@ export function getWebUIHtml(): string {
       updatePreview();
     });
 
-    elTp.addEventListener('change', (e) => { state.transparent = e.target.checked; updatePreview(); });
+    elPadding.addEventListener('input', (e) => {
+      state.padding = Number(e.target.value);
+      valPadding.innerText = state.padding + 'px';
+      updatePreview();
+    });
+
+    elTp.addEventListener('change', (e) => {
+      state.transparent = e.target.checked;
+      state.center = !state.transparent;
+      elCenter.checked = state.center;
+      updatePreview();
+    });
     elDark.addEventListener('change', (e) => { state.dark = e.target.checked; updatePreview(); });
     elSwap.addEventListener('change', (e) => { state.swap = e.target.checked; updatePreview(); });
     elCrop.addEventListener('change', (e) => { state.crop = e.target.checked; updatePreview(); });
+    elCenter.addEventListener('change', (e) => { state.center = e.target.checked; updatePreview(); });
 
     // Scale Pills
     document.querySelectorAll('#scalePills .pill-btn').forEach(btn => {

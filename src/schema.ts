@@ -110,8 +110,28 @@ export const LogoQuerySchema = t.Object({
   ),
   accent: t.Optional(t.String({ description: 'accentColor 别名' })),
 
-  // 裁切与格式
+  // 裁切与留白边距
   crop: t.Optional(FlexibleBoolean),
+  padding: t.Optional(
+    t.Numeric({
+      description: '内容边缘留白边距像素（默认 2px，随 scale 缩放）',
+      default: 2,
+      minimum: 0,
+      maximum: 200,
+      examples: [2, 0, 10],
+    })
+  ),
+  pad: t.Optional(
+    t.Numeric({
+      description: 'padding 别名',
+      minimum: 0,
+      maximum: 200,
+    })
+  ),
+  center: t.Optional(
+    FlexibleBoolean
+  ),
+  vcenter: t.Optional(FlexibleBoolean),
 
   format: t.Optional(
     t.Union(

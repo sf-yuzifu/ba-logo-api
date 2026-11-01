@@ -46,7 +46,7 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
   // 强调色
   const accentColor = query.accentColor ?? query.accent;
 
-  // 紧凑裁切
+  // 紧凑裁切与留白边距
   const rawCrop = query.crop;
   const crop =
     typeof rawCrop === 'boolean'
@@ -54,6 +54,18 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
       : rawCrop !== undefined
       ? rawCrop !== 'false' && rawCrop !== '0'
       : true;
+
+  const rawPad = query.padding ?? query.pad;
+  const padding =
+    rawPad !== undefined && !Number.isNaN(Number(rawPad)) ? Number(rawPad) : undefined;
+
+  const rawCenter = query.center ?? query.vcenter;
+  const center =
+    typeof rawCenter === 'boolean'
+      ? rawCenter
+      : rawCenter !== undefined
+      ? rawCenter === 'true' || rawCenter === '1'
+      : undefined;
 
   // 格式
   const format = (query.format ?? 'png').toLowerCase() as OutputFormat;
@@ -71,6 +83,8 @@ export function parseLogoQuery(query: Record<string, any>): RenderOptions {
     swapColors,
     accentColor,
     crop,
+    padding,
+    center,
     format,
   };
 }

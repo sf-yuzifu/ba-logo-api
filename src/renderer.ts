@@ -27,6 +27,8 @@ export interface RenderOptions {
   offsetY?: number;
   transparent?: boolean;
   crop?: boolean; // 是否自动紧凑裁切两端多余空白（默认 true）
+  padding?: number; // 紧凑裁切留白边距（像素，默认 2，随 scale 缩放）
+  center?: boolean; // 文本垂直视觉居中（有背景时默认 true，透明模式默认 false）
   accentColor?: string; // 自定义主题强调色（默认 #128AFA）
   darkMode?: boolean; // 是否开启暗黑模式（默认 false）
   swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
@@ -93,6 +95,107 @@ function drawVectorShape(
   ctx.scale(scale, scale);
   ctx.fill(path);
   ctx.restore();
+}
+
+/**
+ * 基于像素分析计算实际图形边界，并精确保留指定 padding 边缘（默认 2px）
+ * 当 center 为 true 时，以文本视觉中心对称计算纵向留白，避免文字下沉
+ */
+function trimCanvas(
+  canvas: Canvas,
+  padding: number,
+  transparent: boolean,
+  center: boolean,
+  textCenterY: number,
+  bgColor: string
+): Canvas {
+  const w = canvas.width;
+  const h = canvas.height;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const u32 = new Uint32Array(imgData.data.buffer);
+  const bg = transparent ? 0 : u32[0];
+
+  let minY = 0, maxY = h - 1, minX = 0, maxX = w - 1;
+  let found = false;
+
+  // 1. 从上往下扫描 minY
+  topLoop: for (let y = 0; y < h; y++) {
+    const row = y * w;
+    for (let x = 0; x < w; x++) {
+      const p = u32[row + x];
+      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+        minY = y;
+        found = true;
+        break topLoop;
+      }
+    }
+  }
+
+  if (!found) {
+    return canvas;
+  }
+
+  // 2. 从下往上扫描 maxY
+  bottomLoop: for (let y = h - 1; y >= minY; y--) {
+    const row = y * w;
+    for (let x = 0; x < w; x++) {
+      const p = u32[row + x];
+      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+        maxY = y;
+        break bottomLoop;
+      }
+    }
+  }
+
+  // 3. 从左往右扫描 minX
+  leftLoop: for (let x = 0; x < w; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      const p = u32[y * w + x];
+      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+        minX = x;
+        break leftLoop;
+      }
+    }
+  }
+
+  // 4. 从右往左扫描 maxX
+  rightLoop: for (let x = w - 1; x >= minX; x--) {
+    for (let y = minY; y <= maxY; y++) {
+      const p = u32[y * w + x];
+      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+        maxX = x;
+        break rightLoop;
+      }
+    }
+  }
+
+  // 如果启用 center 文本视觉居中（对称上下留白，消除文字下沉感）
+  let effMaxY = maxY;
+  if (center) {
+    const distTop = textCenterY - minY;
+    if (distTop > 0) {
+      effMaxY = Math.max(maxY, Math.round(textCenterY + distTop));
+    }
+  }
+
+  const cropX = Math.max(0, minX - padding);
+  const cropY = Math.max(0, minY - padding);
+  const cropW = Math.min(w - cropX, maxX - minX + 1 + padding * 2);
+  const cropH = effMaxY - minY + 1 + padding * 2;
+
+  if (cropW === w && cropH === h && cropX === 0 && cropY === 0) {
+    return canvas;
+  }
+
+  const trimmed = createCanvas(cropW, cropH);
+  const tCtx = trimmed.getContext('2d');
+  if (!transparent) {
+    tCtx.fillStyle = bgColor;
+    tCtx.fillRect(0, 0, cropW, cropH);
+  }
+  tCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+  return trimmed;
 }
 
 /**
@@ -278,6 +381,17 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     const subY = canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale;
     ctx.fillText(subtitle, subtitleX, subY);
     ctx.resetTransform();
+  }
+
+  // 7. 紧凑像素级包围盒裁切（默认贴合到边缘 2px，支持自定义 padding）
+  if (crop) {
+    const rawPad = Number(options.padding ?? 2);
+    const safePad = Number.isFinite(rawPad)
+      ? Math.max(0, Math.round(rawPad * scale))
+      : Math.round(2 * scale);
+    const isCenter = options.center ?? !transparent;
+    const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
+    return trimCanvas(canvas, safePad, transparent, isCenter, textCenterY, backgroundColor);
   }
 
   return canvas;
