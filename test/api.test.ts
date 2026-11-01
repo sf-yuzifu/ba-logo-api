@@ -4,12 +4,30 @@ import { createApp } from '../src/app.ts';
 describe('HTTP Route & Compatibility Tests', () => {
   const app = createApp();
 
-  it('GET / 应当返回服务运行状态', async () => {
+  it('GET / 默认应当返回 Blue Archive 风格的 WebUI 调试页面', async () => {
     const res = await app.handle(new Request('http://localhost/'));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('text/html');
+    const html = await res.text();
+    expect(html).toContain('Blue Archive Logo Generator');
+    expect(html).toContain('SCHALE');
+  });
+
+  it('GET / 携带 Accept: application/json 或访问 /health 应当返回 JSON 状态', async () => {
+    const res = await app.handle(
+      new Request('http://localhost/', {
+        headers: { Accept: 'application/json' },
+      })
+    );
     expect(res.status).toBe(200);
     const body = (await res.json()) as any;
     expect(body.status).toBe('online');
     expect(body.name).toBe('ba-logo-api');
+
+    const healthRes = await app.handle(new Request('http://localhost/health'));
+    expect(healthRes.status).toBe(200);
+    const health = (await healthRes.json()) as any;
+    expect(health.status).toBe('ok');
   });
 
   it('GET /balogo 应当完全向后兼容 3 年前的旧版参数', async () => {

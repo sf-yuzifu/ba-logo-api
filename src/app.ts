@@ -3,6 +3,7 @@ import { cors } from '@elysiajs/cors';
 import { swagger } from '@elysiajs/swagger';
 import { renderLogoToBuffer, type RenderOptions, type OutputFormat } from './renderer.ts';
 import { LogoQuerySchema, type LogoQuery } from './schema.ts';
+import { getWebUIHtml } from './webui.ts';
 
 /**
  * 将 Query 查询参数解析并标准化为 RenderOptions
@@ -169,22 +170,45 @@ export function createApp() {
       }
     )
 
-    // 根路径健康检查/欢迎信息
+    // 3. 根路径：默认呈现 Blue Archive 风格交互式 WebUI 调试页
     .get(
       '/',
+      ({ headers, set }) => {
+        const accept = headers['accept'] ?? '';
+        if (accept.includes('application/json')) {
+          return {
+            name: 'ba-logo-api',
+            version: '2.0.0',
+            status: 'online',
+            docs: '/swagger',
+            endpoints: ['/api/logo', '/balogo'],
+          };
+        }
+        set.headers['content-type'] = 'text/html; charset=utf-8';
+        return getWebUIHtml();
+      },
+      {
+        detail: {
+          tags: ['Health'],
+          summary: '在线交互式控制台 / 服务探测',
+        },
+      }
+    )
+
+    // 4. 健康检查探测接口
+    .get(
+      '/health',
       () => {
         return {
-          name: 'ba-logo-api',
-          version: '2.0.0',
-          status: 'online',
-          docs: '/swagger',
-          endpoints: ['/api/logo', '/balogo'],
+          status: 'ok',
+          uptime: process.uptime(),
+          timestamp: Date.now(),
         };
       },
       {
         detail: {
           tags: ['Health'],
-          summary: '服务状态与元数据探测',
+          summary: '集群健康探测探针',
         },
       }
     );
