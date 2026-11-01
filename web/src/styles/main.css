@@ -1,6 +1,6 @@
 :root {
   /* ========================================================
-     Kivotos & Schale 色彩体系
+     Kivotos & Schale 浅色色彩体系 (参考 BA-style-homepage & astro-theme-AronaNote)
      ======================================================== */
   --primary: #128AFA;
   --primary-hover: #0E77D9;
@@ -14,17 +14,28 @@
   --accent-amber-hover: #D97706;
   --accent-amber-bottom: #B45309;
 
-  --bg-kivotos: #E8EEF5;
+  --bg-kivotos: #EAEFF5; /* astro-theme-AronaNote 浅色底色 */
+  --bg-stripes: rgba(18, 138, 250, 0.035);
+  --bg-dots: #90BFE4;
   --card-bg: rgba(255, 255, 255, 0.96);
-  --card-border: #C4E2F8;
+  --card-border: #C7E4F6; /* astro-theme-AronaNote 浅色边框色 */
   --card-border-glow: #77DEFF;
   --card-border-strong: #8AC5F0;
+  --header-bg: rgba(255, 255, 255, 0.92);
+
+  --input-bg: #F8FAFD;
+  --input-border: #C7E4F6;
+  --tag-dark-bg: #E2E8F0;
+  --tag-dark-color: #1E293B;
 
   --text-main: #1E293B;
-  --text-muted: #556980;
+  --text-muted: #4C5866; /* astro-theme-AronaNote 灰色文字 */
   --text-light: #8A9CAE;
-  --dark-bg: #16202C;
-  --dark-surface: #1E2B3C;
+
+  --viewport-bg: #FFFFFF;
+  --viewport-border: #C7E4F6;
+  --scrollbar-thumb: #B4DCF8;
+  --scrollbar-thumb-hover: #128AFA;
 
   /* 字体族系 */
   --font-main: 'Plus Jakarta Sans', 'Noto Sans SC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -43,6 +54,48 @@
   --radius-lg: 14px;
 }
 
+html[data-theme='dark'] {
+  /* ========================================================
+     暗色主题 - 严格取自 sf-yuzifu/astro-theme-AronaNote 与 BA-style-homepage
+     以 Astroblog 标志性 Plana 普拉娜紫为主色调 (#9D7CD8 / #8770D2 / #624398)
+     ======================================================== */
+  --primary: #9D7CD8; /* AronaNote --icon-color */
+  --primary-hover: #AF8EE8;
+  --primary-active: #624398; /* AronaNote --dot-active */
+  --primary-light: rgba(157, 124, 216, 0.16);
+  --primary-glow: rgba(157, 124, 216, 0.42);
+  --primary-subtle: rgba(157, 124, 216, 0.08);
+
+  --accent-gold: #CFC6FF; /* AronaNote --font-color-gold / 普拉娜淡紫金 */
+  --accent-amber: #F59E0B;
+  --accent-amber-hover: #D97706;
+  --accent-amber-bottom: #92400E;
+
+  /* 暗色主题底色与卡片 - 严格取自 astro-theme-AronaNote 暗色变量 */
+  --bg-kivotos: #0F0F16; /* AronaNote --general-background-color */
+  --bg-stripes: rgba(157, 124, 216, 0.045);
+  --bg-dots: rgba(150, 149, 149, 0.22);
+  --card-bg: rgba(31, 31, 44, 0.94); /* AronaNote --foreground-color #1f1f2c */
+  --card-border: #383852; /* AronaNote --search-dialog-border */
+  --card-border-glow: #8770D2; /* AronaNote --pot-border-left rgba(135, 112, 210) */
+  --card-border-strong: #514A6A; /* AronaNote --gitalk-border-left */
+  --header-bg: rgba(22, 22, 34, 0.94);
+
+  --input-bg: #2A2A3A; /* AronaNote --search-input-bg */
+  --input-border: #383852;
+  --tag-dark-bg: #383852;
+  --tag-dark-color: #ECECF5;
+
+  --text-main: #ECECF5; /* AronaNote --welcome-text-color */
+  --text-muted: #C8C8DC; /* AronaNote --font-color-grey */
+  --text-light: #7E7E8D;
+
+  --viewport-bg: #161622;
+  --viewport-border: #383852;
+  --scrollbar-thumb: #474766;
+  --scrollbar-thumb-hover: #9D7CD8;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -54,7 +107,7 @@
    ======================================================== */
 html {
   scrollbar-width: thin;
-  scrollbar-color: #B4DCF8 transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -67,24 +120,23 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #B4DCF8;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
   transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--scrollbar-thumb-hover);
 }
 
 body {
   font-family: var(--font-main);
   background-color: var(--bg-kivotos);
-  /* Kivotos 天空战术底纹：点阵 + 45° 微弱条纹 */
+  /* Kivotos 天空/暗夜战术底纹：点阵 + 45° 微弱条纹 */
   background-image: 
-    radial-gradient(#90BFE4 1.5px, transparent 1.5px),
-    repeating-linear-gradient(-45deg, rgba(18, 138, 250, 0.035) 0px, rgba(18, 138, 250, 0.035) 16px, transparent 16px, transparent 32px),
-    linear-gradient(135deg, #E6EFF8 0%, #D4E3F3 100%);
-  background-size: 28px 28px, 45px 45px, 100% 100%;
+    radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px),
+    repeating-linear-gradient(-45deg, var(--bg-stripes) 0px, var(--bg-stripes) 16px, transparent 16px, transparent 32px);
+  background-size: 28px 28px, 45px 45px;
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -92,13 +144,15 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--duration-normal) var(--ease-out),
+              color var(--duration-normal) var(--ease-out);
 }
 
 /* ========================================================
    顶部导航栏 - Schale Tactical HUD Header
    ======================================================== */
 header {
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--header-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 2px solid var(--card-border);
@@ -111,6 +165,8 @@ header {
   top: 0;
   z-index: 100;
   box-shadow: 0 4px 16px rgba(18, 138, 250, 0.06);
+  transition: background-color var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
 }
 
 .brand {
@@ -191,7 +247,7 @@ header {
 }
 
 /* 统一规范所有顶部导航项基准高度为 36px */
-.sys-status-badge,
+.theme-toggle-btn,
 .lang-dropdown-trigger,
 .nav-btn {
   height: 36px;
@@ -208,27 +264,36 @@ header {
   gap: 7px;
 }
 
-.sys-status-badge {
+.theme-toggle-btn {
   background: rgba(235, 244, 253, 0.9);
   border: 1.5px solid var(--card-border);
-  color: var(--primary);
+  color: var(--text-main);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: transform var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle-btn:hover {
+    border-color: var(--primary);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(18, 138, 250, 0.15);
+  }
+}
+
+.theme-label {
+  font-family: var(--font-hud);
+  font-size: 0.82rem;
+  font-weight: 800;
   letter-spacing: 0.06em;
-  margin: 0;
-}
-
-.sys-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 6px #10B981;
-  animation: pulse-dot 2s infinite;
-  flex-shrink: 0;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
 }
 
 .nav-btn {
@@ -1347,4 +1412,186 @@ input:checked + .slider:before {
 #toast.show {
   opacity: 1;
   transform: translateY(0) scale(1);
+}
+
+/* ========================================================
+   暗色主题深入适配 (Dark Mode Component Overrides)
+   ======================================================== */
+html[data-theme='dark'] .card {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(135, 112, 210, 0.18);
+}
+
+html[data-theme='dark'] .theme-toggle-btn,
+html[data-theme='dark'] .lang-dropdown-trigger {
+  background: rgba(42, 42, 58, 0.95);
+  color: var(--text-main);
+  border-color: var(--card-border);
+}
+
+html[data-theme='dark'] .theme-toggle-btn:hover,
+html[data-theme='dark'] .lang-dropdown-trigger:hover,
+html[data-theme='dark'] .lang-dropdown-trigger.active {
+  background: #252538;
+  border-color: var(--primary);
+}
+
+html[data-theme='dark'] .nav-btn-default {
+  background: rgba(42, 42, 58, 0.95);
+  color: var(--text-main);
+  border-color: var(--card-border);
+}
+
+html[data-theme='dark'] .nav-btn-default:hover {
+  background: #252538;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+html[data-theme='dark'] .input-text {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-main);
+}
+
+html[data-theme='dark'] .input-text:focus {
+  background: #222232;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(157, 124, 216, 0.25), 0 0 12px rgba(135, 112, 210, 0.3);
+}
+
+html[data-theme='dark'] .color-picker-row {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+}
+
+html[data-theme='dark'] .pill-btn {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-muted);
+}
+
+html[data-theme='dark'] .pill-btn:hover:not(.active) {
+  background: #252538;
+  color: var(--text-main);
+  border-color: var(--primary);
+}
+
+html[data-theme='dark'] .pill-btn.active {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+  box-shadow: 0 3px 12px var(--primary-glow);
+}
+
+html[data-theme='dark'] .toggle-item {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+}
+
+html[data-theme='dark'] .toggle-item:hover {
+  background: #252538;
+  border-color: var(--primary);
+}
+
+html[data-theme='dark'] .slider {
+  background-color: #383852;
+}
+
+html[data-theme='dark'] .preview-canvas-box {
+  background: var(--viewport-bg);
+  border-color: var(--viewport-border);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .url-box-container {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+}
+
+html[data-theme='dark'] .url-prefix {
+  background: rgba(157, 124, 216, 0.18);
+  color: var(--primary);
+}
+
+/* 核心下载按键 (暗色下转换为 Astroblog 标志性 Plana 普拉娜紫 3D 实体键) */
+html[data-theme='dark'] .action-btn-primary {
+  background: linear-gradient(180deg, #A78BFA 0%, #8B5CF6 100%);
+  border: 1.5px solid #8B5CF6;
+  border-bottom: 4px solid #624398;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+}
+
+html[data-theme='dark'] .action-btn-primary:active {
+  border-bottom-width: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme='dark'] .action-btn-primary:hover {
+    background: linear-gradient(180deg, #BFA4FF 0%, #9D7CD8 100%);
+    box-shadow: 0 6px 20px rgba(157, 124, 216, 0.5);
+  }
+}
+
+html[data-theme='dark'] .action-btn-secondary {
+  background: #252538;
+  color: var(--text-main);
+  border-color: var(--card-border);
+  border-bottom-color: var(--card-border-strong);
+}
+
+html[data-theme='dark'] .action-btn-secondary:hover {
+  background: #2F2F45;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+html[data-theme='dark'] .lang-dropdown-menu {
+  background: rgba(31, 31, 44, 0.98);
+  border-color: var(--card-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(135, 112, 210, 0.25);
+}
+
+html[data-theme='dark'] .lang-menu-item:hover {
+  background: rgba(157, 124, 216, 0.15);
+}
+
+html[data-theme='dark'] .meta-badge {
+  background: rgba(42, 42, 58, 0.9);
+  border-color: var(--card-border);
+}
+
+html[data-theme='dark'] .meta-label {
+  color: var(--primary);
+}
+
+html[data-theme='dark'] .tag-dark {
+  background: #383852;
+  color: #ECECF5;
+  border-color: #514A6A;
+}
+
+html[data-theme='dark'] .tag-blue {
+  background: rgba(157, 124, 216, 0.18);
+  color: var(--primary);
+  border-color: rgba(157, 124, 216, 0.35);
+}
+
+html[data-theme='dark'] .reset-badge {
+  background: rgba(157, 124, 216, 0.15);
+  border-color: rgba(157, 124, 216, 0.35);
+  color: var(--primary);
+}
+
+html[data-theme='dark'] .reset-badge:hover {
+  background: #252538;
+  border-color: var(--primary);
+}
+
+html[data-theme='dark'] .copy-url-btn {
+  background: var(--primary);
+  box-shadow: 0 2px 8px rgba(157, 124, 216, 0.35);
+}
+
+html[data-theme='dark'] .copy-url-btn:hover {
+  background: var(--primary-hover);
 }

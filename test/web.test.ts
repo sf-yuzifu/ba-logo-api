@@ -169,4 +169,24 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     state.left = '新文本';
     expect(snapshot.left).toBe('旧文本');
   });
+
+  it('useTheme 应当正确管理主题模式并支持 cycleTheme 轮转', async () => {
+    const { useTheme } = await import('../web/src/composables/useTheme.ts');
+    const theme = useTheme();
+
+    theme.setThemeMode('light');
+    expect(theme.themeMode.value).toBe('light');
+    expect(theme.resolvedTheme.value).toBe('light');
+
+    theme.cycleTheme();
+    expect(theme.themeMode.value).toBe('dark');
+    expect(theme.resolvedTheme.value).toBe('dark');
+
+    theme.cycleTheme();
+    expect(theme.themeMode.value).toBe('auto');
+
+    // 重置回 auto
+    theme.setThemeMode('auto');
+    expect(theme.themeMode.value).toBe('auto');
+  });
 });

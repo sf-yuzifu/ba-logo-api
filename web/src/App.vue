@@ -5,10 +5,12 @@ import ControlPanel from './components/ControlPanel.vue';
 import PreviewCard from './components/PreviewCard.vue';
 import { useI18n } from './composables/useI18n.ts';
 import { useLogoPreview } from './composables/useLogoPreview.ts';
+import { useTheme } from './composables/useTheme.ts';
 import { DEFAULT_STATE } from './constants.ts';
 import type { LogoFormState } from './types.ts';
 
 const { t } = useI18n();
+const { initTheme } = useTheme();
 
 const state = reactive<LogoFormState>({
   ...DEFAULT_STATE,
@@ -38,6 +40,7 @@ const handleChange = () => {
 };
 
 onMounted(() => {
+  initTheme();
   triggerPreview();
 });
 </script>

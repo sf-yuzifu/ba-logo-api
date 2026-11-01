@@ -1,16 +1,30 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from '../composables/useI18n.ts';
+import { useTheme } from '../composables/useTheme.ts';
 import { LANG_OPTIONS } from '../locales/index.ts';
 import type { SupportedLang } from '../types.ts';
 
 const { lang, setLang, t } = useI18n();
+const { themeMode, cycleTheme } = useTheme();
 
 const isDropdownOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
 
 const currentLangOption = computed(() => {
   return LANG_OPTIONS.find((item) => item.lang === lang.value) || LANG_OPTIONS[0];
+});
+
+const themeTitle = computed(() => {
+  if (themeMode.value === 'auto') return '主题: 跟随系统 (点击切换)';
+  if (themeMode.value === 'light') return '主题: 浅色模式 (点击切换)';
+  return '主题: 暗色模式 (点击切换)';
+});
+
+const themeLabel = computed(() => {
+  if (themeMode.value === 'auto') return 'AUTO';
+  if (themeMode.value === 'light') return 'LIGHT';
+  return 'DARK';
 });
 
 const handleSelectLang = (newLang: SupportedLang) => {
@@ -65,10 +79,37 @@ onUnmounted(() => {
     </a>
 
     <div class="nav-links">
-      <div class="sys-status-badge">
-        <span class="sys-status-dot"></span>
-        <span>ONLINE</span>
-      </div>
+      <!-- 主题模式切换按钮 (跟随系统 / 亮色 / 暗色) -->
+      <button
+        type="button"
+        class="theme-toggle-btn"
+        :title="themeTitle"
+        @click="cycleTheme"
+        aria-label="Toggle Color Theme"
+      >
+        <!-- 自动 (Auto) -->
+        <svg v-if="themeMode === 'auto'" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a10 10 0 0 1 0 20V2z" fill="currentColor"></path>
+        </svg>
+        <!-- 浅色 (Light) -->
+        <svg v-else-if="themeMode === 'light'" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <!-- 暗色 (Dark) -->
+        <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span class="theme-label">{{ themeLabel }}</span>
+      </button>
 
       <!-- 语言选择下拉菜单 -->
       <div class="lang-dropdown-container" ref="dropdownRef">
