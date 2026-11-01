@@ -21,6 +21,7 @@ export interface BaseRenderOptions {
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
+  crop?: boolean; // 是否自动紧凑裁切两端多余空白（默认 true）
 }
 
 // 预先编译 SVG 矢量 Path2D 实例
@@ -59,6 +60,7 @@ export function renderLogo(options: BaseRenderOptions = {}): Canvas {
   const offsetX = options.offsetX ?? DEFAULT_GRAPH_OFFSET.x;
   const offsetY = options.offsetY ?? DEFAULT_GRAPH_OFFSET.y;
   const transparent = options.transparent ?? false;
+  const crop = options.crop ?? true;
 
   const canvasHeight = BASE_CANVAS_HEIGHT;
   const initialWidth = BASE_CANVAS_WIDTH;
@@ -154,6 +156,36 @@ export function renderLogo(options: BaseRenderOptions = {}): Canvas {
 
   // 6. 绘制十字 (Cross)
   drawVectorShape(ctx, crossPath, graphX, graphY, canvasHeight, COLORS.blue);
+
+  // 7. 紧凑裁切边界（修复 PR #1 并兼顾短文本光环完整性）
+  if (crop) {
+    const graphRight = graphX + canvasHeight;
+    // 安全裁切左边界：确保同时容纳最左侧倾斜文字以及光环/十字左侧边缘
+    const safeLeft = Math.max(0, Math.floor(Math.min(canvasWidthL - textWidthL - PADDING_X, graphX)));
+    // 安全裁切右边界：确保同时容纳最右侧倾斜文字以及光环/十字右侧边缘
+    const safeRight = Math.min(
+      totalCanvasWidth,
+      Math.ceil(Math.max(canvasWidthL + textWidthR + PADDING_X, graphRight))
+    );
+    const croppedWidth = safeRight - safeLeft;
+
+    if (croppedWidth < totalCanvasWidth) {
+      const croppedCanvas = createCanvas(croppedWidth, canvasHeight);
+      const croppedCtx = croppedCanvas.getContext('2d');
+      croppedCtx.drawImage(
+        canvas,
+        safeLeft,
+        0,
+        croppedWidth,
+        canvasHeight,
+        0,
+        0,
+        croppedWidth,
+        canvasHeight
+      );
+      return croppedCanvas;
+    }
+  }
 
   return canvas;
 }
