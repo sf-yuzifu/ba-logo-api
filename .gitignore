@@ -1,34 +1,24 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Dependencies
+node_modules/
 
-node_modules
-dist
-dist-ssr
+# Production build outputs
+dist/
+dist-ssr/
 *.local
 
-# Editor directories and files
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Editor & OS files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
 
-# Local Netlify folder
-.netlify
-
-pic/*
+# Test outputs & temporary files
 test-*.png
 test-output.png
-
-
-yarn.lock
+tmp-*

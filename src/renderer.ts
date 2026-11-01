@@ -86,7 +86,7 @@ let sharedMeasureCanvas: Canvas | null = null;
 let sharedMeasureCtx: SKRSContext2D | null = null;
 
 /**
- * 获取单例 1x1 文本度量上下文（避免每次请求重复开辟大画布测量，节约 90% 测量内存）
+ * 获取单例 1x1 文本度量上下文（避免每次请求重复开辟大画布测量，减少临时画布与内存分配）
  */
 function getMeasureCtx(): SKRSContext2D {
   if (!sharedMeasureCtx) {
