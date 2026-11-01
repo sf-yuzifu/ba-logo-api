@@ -108,6 +108,32 @@ describe('Renderer Core Unit Tests', () => {
     expect(uncropped.width).toBeGreaterThanOrEqual(900);
   });
 
+  it('纯色或与背景同色（如白字白底）应当保持精确裁剪且尺寸一致', () => {
+    const normal = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2 });
+    const whiteOnWhite = renderLogo({
+      textL: '蔚蓝',
+      textR: '档案',
+      accentColor: '#FFFFFF',
+      textColor: '#FFFFFF',
+      scale: 2,
+    });
+    // 白字在白底上通过 Alpha 通道计算，尺寸应当与正常色彩完全一致
+    expect(whiteOnWhite.width).toBe(normal.width);
+    expect(whiteOnWhite.height).toBe(normal.height);
+
+    const normalTp = renderLogo({ textL: '蔚蓝', textR: '档案', scale: 2, transparent: true });
+    const whiteTp = renderLogo({
+      textL: '蔚蓝',
+      textR: '档案',
+      accentColor: '#FFFFFF',
+      textColor: '#FFFFFF',
+      scale: 2,
+      transparent: true,
+    });
+    expect(whiteTp.width).toBe(normalTp.width);
+    expect(whiteTp.height).toBe(normalTp.height);
+  });
+
   it('单次渲染性能基准测试应当小于 50ms', () => {
     const start = performance.now();
     renderLogoToBuffer({ textL: '蔚蓝', textR: '档案', scale: 1 });

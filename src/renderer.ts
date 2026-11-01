@@ -115,17 +115,15 @@ function trimCanvas(
   const ctx = canvas.getContext('2d');
   const imgData = ctx.getImageData(0, 0, w, h);
   const u32 = new Uint32Array(imgData.data.buffer);
-  const bg = transparent ? 0 : u32[0];
 
   let minY = 0, maxY = h - 1, minX = 0, maxX = w - 1;
   let found = false;
 
-  // 1. 从上往下扫描 minY
+  // 1. 从上往下扫描 minY（统一基于 Alpha 透明通道检测，免疫前景色与背景色相同导致的检测失效）
   topLoop: for (let y = 0; y < h; y++) {
     const row = y * w;
     for (let x = 0; x < w; x++) {
-      const p = u32[row + x];
-      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+      if ((u32[row + x] >>> 24) > 10) {
         minY = y;
         found = true;
         break topLoop;
@@ -134,6 +132,13 @@ function trimCanvas(
   }
 
   if (!found) {
+    if (!transparent) {
+      const bgCanvas = createCanvas(w, h);
+      const bgCtx = bgCanvas.getContext('2d');
+      bgCtx.fillStyle = bgColor;
+      bgCtx.fillRect(0, 0, w, h);
+      return bgCanvas;
+    }
     return canvas;
   }
 
@@ -141,8 +146,7 @@ function trimCanvas(
   bottomLoop: for (let y = h - 1; y >= minY; y--) {
     const row = y * w;
     for (let x = 0; x < w; x++) {
-      const p = u32[row + x];
-      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+      if ((u32[row + x] >>> 24) > 10) {
         maxY = y;
         break bottomLoop;
       }
@@ -152,8 +156,7 @@ function trimCanvas(
   // 3. 从左往右扫描 minX
   leftLoop: for (let x = 0; x < w; x++) {
     for (let y = minY; y <= maxY; y++) {
-      const p = u32[y * w + x];
-      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+      if ((u32[y * w + x] >>> 24) > 10) {
         minX = x;
         break leftLoop;
       }
@@ -163,8 +166,7 @@ function trimCanvas(
   // 4. 从右往左扫描 maxX
   rightLoop: for (let x = w - 1; x >= minX; x--) {
     for (let y = minY; y <= maxY; y++) {
-      const p = u32[y * w + x];
-      if (transparent ? (p >>> 24) > 10 : p !== bg) {
+      if ((u32[y * w + x] >>> 24) > 10) {
         maxX = x;
         break rightLoop;
       }
@@ -184,10 +186,6 @@ function trimCanvas(
   const cropY = Math.max(0, minY - padding);
   const cropW = Math.min(w - cropX, maxX - minX + 1 + padding * 2);
   const cropH = effMaxY - minY + 1 + padding * 2;
-
-  if (cropW === w && cropH === h && cropX === 0 && cropY === 0) {
-    return canvas;
-  }
 
   const trimmed = createCanvas(cropW, cropH);
   const tCtx = trimmed.getContext('2d');
@@ -289,16 +287,10 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const midX = canvasWidthL;
   const subtitleX = canvasWidthL + textWidthR + subtitleFontSize;
 
-  // 创建绘制基底画布
+  // 创建绘制基底画布（始终在透明通道绘制图元，由裁切层统一负责背景填充与包围盒计算）
   const canvas = createCanvas(totalCanvasWidth, canvasHeight);
   const ctx = canvas.getContext('2d');
-
-  // 1. 清空并绘制背景
   ctx.clearRect(0, 0, totalCanvasWidth, canvasHeight);
-  if (!transparent) {
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, totalCanvasWidth, canvasHeight);
-  }
 
   // 2. 绘制左侧主文本 (textAlign = 'end')
   ctx.font = font;
@@ -315,11 +307,9 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   ctx.font = font;
   ctx.textAlign = 'start';
 
-  // 如果是透明背景，使用 destination-out 擦除下方图层，实现镂空光环
-  if (transparent) {
-    ctx.globalCompositeOperation = 'destination-out';
-  }
-  ctx.strokeStyle = backgroundColor;
+  // 使用 destination-out 擦除下方图层，实现镂空光环
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.strokeStyle = '#000000';
   ctx.lineWidth = strokeWidth;
   ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
   ctx.strokeText(textR, midX, canvasHeight * TEXT_BASELINE);
@@ -344,10 +334,8 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   }
   ctx.closePath();
 
-  if (transparent) {
-    ctx.globalCompositeOperation = 'destination-out';
-  }
-  ctx.fillStyle = backgroundColor;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = '#000000';
   ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
 
@@ -370,6 +358,16 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
     const isCenter = options.center ?? !transparent;
     const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
     return trimCanvas(canvas, userPad, transparent, isCenter, textCenterY, backgroundColor);
+  }
+
+  // 未启用紧凑裁切时，如非透明模式则补充合成背景底色
+  if (!transparent) {
+    const bgCanvas = createCanvas(totalCanvasWidth, canvasHeight);
+    const bgCtx = bgCanvas.getContext('2d');
+    bgCtx.fillStyle = backgroundColor;
+    bgCtx.fillRect(0, 0, totalCanvasWidth, canvasHeight);
+    bgCtx.drawImage(canvas, 0, 0);
+    return bgCanvas;
   }
 
   return canvas;

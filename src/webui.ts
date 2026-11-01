@@ -151,13 +151,14 @@ export function getWebUIHtml(): string {
       margin: 0 auto;
       padding: 2rem;
       display: grid;
-      grid-template-columns: 480px 1fr;
+      grid-template-columns: 480px minmax(0, 1fr);
       gap: 2rem;
+      min-width: 0;
     }
 
     @media (max-width: 1024px) {
       main {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         padding: 1.25rem;
       }
     }
@@ -171,6 +172,8 @@ export function getWebUIHtml(): string {
       box-shadow: var(--shadow-sm);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .card-header {
@@ -575,6 +578,10 @@ export function getWebUIHtml(): string {
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     .url-text {
@@ -583,8 +590,25 @@ export function getWebUIHtml(): string {
       color: var(--text-muted);
       overflow-x: auto;
       white-space: nowrap;
-      text-overflow: ellipsis;
       user-select: all;
+      min-width: 0;
+      flex: 1;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .url-text::-webkit-scrollbar {
+      height: 4px;
+    }
+    .url-text::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .url-text::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+    .url-text::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
 
     .copy-url-btn {
@@ -597,6 +621,7 @@ export function getWebUIHtml(): string {
       font-weight: 800;
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.2s ease;
     }
 
@@ -704,7 +729,7 @@ export function getWebUIHtml(): string {
         <label class="form-label">强调色 (ACCENT COLOR - 左文字与十字)</label>
         <div class="color-picker-row">
           <input type="color" id="inputAccent" value="#128AFA">
-          <div class="color-presets">
+          <div class="color-presets" id="accentPresets">
             <div class="color-dot" style="background: #128AFA;" data-color="#128AFA" title="官方经典蓝"></div>
             <div class="color-dot" style="background: #FF5722;" data-color="#FF5722" title="阿里乌斯橙红"></div>
             <div class="color-dot" style="background: #00E5FF;" data-color="#00E5FF" title="千年数码青"></div>
@@ -719,12 +744,12 @@ export function getWebUIHtml(): string {
         <label class="form-label">文字主题色 (TEXT COLOR - 右文字与光环)</label>
         <div class="color-picker-row">
           <input type="color" id="inputTextColor" value="#2B2B2B">
-          <div class="color-presets">
-            <div class="color-dot text-color-dot" style="background: #2B2B2B;" data-color="#2B2B2B" title="官方深灰黑"></div>
-            <div class="color-dot text-color-dot" style="background: #000000;" data-color="#000000" title="纯黑"></div>
-            <div class="color-dot text-color-dot" style="background: #FFFFFF; border-color: #cbd5e1;" data-color="#FFFFFF" title="纯白"></div>
-            <div class="color-dot text-color-dot" style="background: #4C5866;" data-color="#4C5866" title="石板灰"></div>
-            <div class="color-dot text-color-dot" style="background: #128AFA;" data-color="#128AFA" title="同色天蓝"></div>
+          <div class="color-presets" id="textColorPresets">
+            <div class="color-dot" style="background: #2B2B2B;" data-color="#2B2B2B" title="官方深灰黑"></div>
+            <div class="color-dot" style="background: #000000;" data-color="#000000" title="纯黑"></div>
+            <div class="color-dot" style="background: #FFFFFF; border-color: #cbd5e1;" data-color="#FFFFFF" title="纯白"></div>
+            <div class="color-dot" style="background: #4C5866;" data-color="#4C5866" title="石板灰"></div>
+            <div class="color-dot" style="background: #128AFA;" data-color="#128AFA" title="同色天蓝"></div>
           </div>
         </div>
       </div>
@@ -1077,7 +1102,7 @@ export function getWebUIHtml(): string {
     elAccent.addEventListener('input', (e) => { state.accent = e.target.value; updatePreview(); });
     elSubColor.addEventListener('input', (e) => { state.subtitleColor = e.target.value; updatePreview(); });
 
-    document.querySelectorAll('.color-dot').forEach(dot => {
+    document.querySelectorAll('#accentPresets .color-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         const c = dot.dataset.color;
         elAccent.value = c;
@@ -1109,7 +1134,7 @@ export function getWebUIHtml(): string {
       updatePreview();
     });
 
-    document.querySelectorAll('.text-color-dot').forEach(dot => {
+    document.querySelectorAll('#textColorPresets .color-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         const c = dot.dataset.color;
         elTextColor.value = c;
