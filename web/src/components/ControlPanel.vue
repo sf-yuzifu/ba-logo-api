@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from '../composables/useI18n.ts';
+import { getDefaultTextPair } from '../constants/textPairs.ts';
 import {
   ACCENT_PRESETS,
   DEFAULT_STATE,
@@ -8,7 +9,7 @@ import {
   SCALE_OPTIONS,
   TEXT_COLOR_PRESETS,
 } from '../constants.ts';
-import type { EndpointType, LogoFormState, OutputFormat, SupportedLang } from '../types.ts';
+import type { EndpointType, LogoFormState, OutputFormat } from '../types.ts';
 import ColorField from './ColorField.vue';
 
 const props = defineProps<{
@@ -18,14 +19,6 @@ const props = defineProps<{
 const emit = defineEmits<(e: 'change') => void>();
 
 const { lang, t } = useI18n();
-
-const DEFAULT_TEXT_PAIRS: Record<SupportedLang, { left: string; right: string }> = {
-  zh: { left: '蔚蓝', right: '档案' },
-  'zh-tw': { left: '蔚藍', right: '檔案' },
-  en: { left: 'Blue', right: 'Archive' },
-  ja: { left: 'ブルー', right: 'アーカイブ' },
-  ko: { left: '블루', right: '아카이브' },
-};
 
 // IME 输入法防抖合成状态
 const isComposing = ref(false);
@@ -51,7 +44,7 @@ const resetField = <K extends keyof LogoFormState>(key: K) => {
 };
 
 const resetTitleText = () => {
-  const pair = DEFAULT_TEXT_PAIRS[lang.value] ?? DEFAULT_TEXT_PAIRS.zh;
+  const pair = getDefaultTextPair(lang.value);
   props.state.left = pair.left;
   props.state.right = pair.right;
   emit('change');

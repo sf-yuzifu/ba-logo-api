@@ -1,10 +1,24 @@
 import { describe, expect, it } from 'bun:test';
+import {
+  getDefaultTextPair,
+  getTextPairAfterLanguageChange,
+} from '../web/src/constants/textPairs.ts';
 import { DEFAULT_STATE } from '../web/src/constants.ts';
 import { LOCALES } from '../web/src/locales/index.ts';
 import type { LogoFormState } from '../web/src/types.ts';
 import { buildLogoUrl } from '../web/src/utils/url.ts';
 
 describe('WebUI Frontend Architecture & Logic Tests', () => {
+  it('默认标题随语言切换和重置更新，并保留用户自定义标题', () => {
+    expect(getDefaultTextPair('ko')).toEqual({ left: '블루', right: '아카이브' });
+    expect(getTextPairAfterLanguageChange(getDefaultTextPair('zh'), 'ja')).toEqual({
+      left: 'ブルー',
+      right: 'アーカイブ',
+    });
+    expect(getTextPairAfterLanguageChange({ left: 'My', right: 'Logo' }, 'ko')).toBeNull();
+    expect(getDefaultTextPair('en')).toEqual({ left: 'Blue', right: 'Archive' });
+  });
+
   it('DEFAULT_STATE 应当包含完整的初始控制台字段且不可变', () => {
     expect(DEFAULT_STATE.endpoint).toBe('api');
     expect(DEFAULT_STATE.left).toBe('蔚蓝');
