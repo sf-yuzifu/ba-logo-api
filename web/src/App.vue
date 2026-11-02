@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import AppHeader from './components/AppHeader.vue';
 import ControlPanel from './components/ControlPanel.vue';
 import PreviewCard from './components/PreviewCard.vue';
 import { useI18n } from './composables/useI18n.ts';
 import { useLogoPreview } from './composables/useLogoPreview.ts';
 import { useTheme } from './composables/useTheme.ts';
-import { getDefaultTextPair, getTextPairAfterLanguageChange } from './constants/textPairs.ts';
+import { getDefaultTextPair, getTextPairOnLanguageChange } from './constants/textPairs.ts';
 import { DEFAULT_STATE } from './constants.ts';
 import type { LogoFormState } from './types.ts';
 
@@ -21,8 +21,10 @@ const state = reactive<LogoFormState>({
   right: initialPair.right,
 });
 
+const titleEditedByUser = ref(false);
+
 watch(lang, (newLang) => {
-  const nextPair = getTextPairAfterLanguageChange(state, newLang);
+  const nextPair = getTextPairOnLanguageChange(titleEditedByUser.value, newLang);
   if (nextPair) {
     state.left = nextPair.left;
     state.right = nextPair.right;
@@ -45,6 +47,7 @@ const {
 
 const handleResetAll = () => {
   const currentPair = getDefaultTextPair(lang.value);
+  titleEditedByUser.value = false;
   Object.assign(state, DEFAULT_STATE, {
     left: currentPair.left,
     right: currentPair.right,
@@ -57,6 +60,16 @@ const handleChange = () => {
   triggerPreview();
 };
 
+const handleTitleInput = () => {
+  titleEditedByUser.value = true;
+  triggerPreview();
+};
+
+const handleTitleReset = () => {
+  titleEditedByUser.value = false;
+  triggerPreview();
+};
+
 onMounted(() => {
   initTheme();
   triggerPreview();
@@ -66,7 +79,12 @@ onMounted(() => {
 <template>
   <AppHeader />
   <main>
-    <ControlPanel :state="state" @change="handleChange" />
+    <ControlPanel
+      :state="state"
+      @change="handleChange"
+      @title-input="handleTitleInput"
+      @title-reset="handleTitleReset"
+    />
     <PreviewCard
       :state="state"
       :active-preview="activePreview"

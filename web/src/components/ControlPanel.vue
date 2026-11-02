@@ -16,7 +16,11 @@ const props = defineProps<{
   state: LogoFormState;
 }>();
 
-const emit = defineEmits<(e: 'change') => void>();
+const emit = defineEmits<{
+  (e: 'change'): void;
+  (e: 'titleInput'): void;
+  (e: 'titleReset'): void;
+}>();
 
 const { lang, t } = useI18n();
 
@@ -54,6 +58,23 @@ const resetTitleText = () => {
   props.state.left = pair.left;
   props.state.right = pair.right;
   emit('change');
+  emit('titleReset');
+};
+
+const handleTitleInput = () => {
+  handleInput();
+  if (!isComposing.value) emit('titleInput');
+};
+
+const handleTitleCompositionEnd = () => {
+  handleCompositionEnd();
+  emit('titleInput');
+};
+
+const titleInputHandlers = {
+  input: handleTitleInput,
+  compositionstart: handleCompositionStart,
+  compositionend: handleTitleCompositionEnd,
 };
 
 const resetTextColors = () => {
@@ -157,7 +178,7 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
               v-model="state.left"
               class="input-text"
               :placeholder="t('ph-left')"
-              v-on="imeInputHandlers"
+              v-on="titleInputHandlers"
             >
           </div>
           <div class="input-with-tag">
@@ -168,7 +189,7 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
               v-model="state.right"
               class="input-text"
               :placeholder="t('ph-right')"
-              v-on="imeInputHandlers"
+              v-on="titleInputHandlers"
             >
           </div>
         </div>

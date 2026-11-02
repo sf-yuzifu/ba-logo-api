@@ -1,21 +1,19 @@
 import { describe, expect, it } from 'bun:test';
-import {
-  getDefaultTextPair,
-  getTextPairAfterLanguageChange,
-} from '../web/src/constants/textPairs.ts';
+import { getDefaultTextPair, getTextPairOnLanguageChange } from '../web/src/constants/textPairs.ts';
 import { DEFAULT_STATE } from '../web/src/constants.ts';
 import { LOCALES } from '../web/src/locales/index.ts';
 import type { LogoFormState } from '../web/src/types.ts';
 import { buildLogoUrl } from '../web/src/utils/url.ts';
 
 describe('WebUI Frontend Architecture & Logic Tests', () => {
-  it('默认标题随语言切换和重置更新，并保留用户自定义标题', () => {
+  it('默认标题随语言切换；用户编辑后不因语言切换而被覆盖', () => {
     expect(getDefaultTextPair('ko')).toEqual({ left: '블루', right: '아카이브' });
-    expect(getTextPairAfterLanguageChange(getDefaultTextPair('zh'), 'ja')).toEqual({
+    expect(getTextPairOnLanguageChange(false, 'ja')).toEqual({
       left: 'ブルー',
       right: 'アーカイブ',
     });
-    expect(getTextPairAfterLanguageChange({ left: 'My', right: 'Logo' }, 'ko')).toBeNull();
+    // 即使用户输入恰好等于另一语言的默认标题，也视为自定义输入，不应再被自动替换。
+    expect(getTextPairOnLanguageChange(true, 'ko')).toBeNull();
     expect(getDefaultTextPair('en')).toEqual({ left: 'Blue', right: 'Archive' });
   });
 

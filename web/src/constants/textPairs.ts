@@ -12,12 +12,6 @@ export function getDefaultTextPair(lang: SupportedLang) {
   return DEFAULT_TEXT_PAIRS[lang] ?? DEFAULT_TEXT_PAIRS.zh;
 }
 
-export function getTextPairAfterLanguageChange(
-  current: { left: string; right: string },
-  lang: SupportedLang,
-) {
-  const isDefaultPair = Object.values(DEFAULT_TEXT_PAIRS).some(
-    (pair) => pair.left === current.left && pair.right === current.right,
-  );
-  return isDefaultPair ? getDefaultTextPair(lang) : null;
+export function getTextPairOnLanguageChange(titleEditedByUser: boolean, lang: SupportedLang) {
+  return titleEditedByUser ? null : getDefaultTextPair(lang);
 }
