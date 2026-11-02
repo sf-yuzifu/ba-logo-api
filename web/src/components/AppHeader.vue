@@ -168,7 +168,7 @@ onUnmounted(() => {
         <span>{{ t('nav-swagger') }}</span>
       </a>
 
-      <a href="https://ba-logo.subrecovery.top/" class="nav-btn nav-btn-default" target="_blank" rel="noopener noreferrer">
+      <a href="https://lab.nulla.top/ba-logo/" class="nav-btn nav-btn-default" target="_blank" rel="noopener noreferrer">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
           <polyline points="15 3 21 3 21 9"></polyline>

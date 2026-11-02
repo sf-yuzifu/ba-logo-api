@@ -252,7 +252,7 @@ docker run -d \
 本项目采用 [MIT License](LICENSE) 协议开源。
 
 特别感谢以下开源项目与贡献者为蔚蓝档案同人生态做出的杰出贡献：
-- **[@nulla2011](https://github.com/nulla2011)**：创造了标杆级的 Canvas 前端项目 [nulla2011/bluearchive-logo](https://github.com/nulla2011/bluearchive-logo)，奠定了排版与几何数学模型基础；
+- **[@nulla2011](https://github.com/nulla2011)**：创造了标杆级的 Canvas 前端项目 [nulla2011/bluearchive-logo](https://github.com/nulla2011/bluearchive-logo)（[原版在线页面](https://lab.nulla.top/ba-logo/)），奠定了排版与几何数学模型基础；
 - **[@jozsefsallai](https://github.com/jozsefsallai)**（PR #6）：贡献了光环与十字架的高精度 SVG 矢量路径数据以及暗黑模式与色彩自定义概念；
 - **[@WUGqnwvMQPzl](https://github.com/WUGqnwvMQPzl)**（PR #9）：提出了画布高分辨率等比例缩放的构想；
 - **[@sf-yuzifu](https://github.com/sf-yuzifu)**（PR #12）：贡献了副标题排版对齐设计；

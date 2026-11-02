@@ -204,6 +204,16 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     }
   });
 
+  it('AppHeader 导航外链应正确指向 Swagger 与官方原版前端', () => {
+    const headerContent = readFileSync(
+      new URL('../web/src/components/AppHeader.vue', import.meta.url),
+      'utf8',
+    );
+    expect(headerContent).toContain('href="/swagger"');
+    expect(headerContent).toContain('href="https://lab.nulla.top/ba-logo/"');
+    expect(headerContent).not.toContain('subrecovery.top');
+  });
+
   it('主题样式应同时定义明暗主题变量，并让组件通过变量引用主题色', () => {
     const css = readFileSync(new URL('../web/src/styles/main.css', import.meta.url), 'utf8');
     const darkTheme = css.slice(
