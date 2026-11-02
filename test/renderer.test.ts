@@ -92,6 +92,27 @@ describe('Renderer Core Unit Tests', () => {
     }
   });
 
+  it('SVG viewBox 与导出尺寸应基于位图渲染的同一 alpha bounds', () => {
+    const optionsList = [
+      {},
+      { transparent: true },
+      { transparent: true, padding: '3 8 11 17', subtitle: '長い副タイトル' },
+      { motifsBehindText: true, padding: '5 10 15 20' },
+      { motifsBehindText: true, transparent: true, darkMode: true, wordGap: 30 },
+      { center: false, padding: '0 12 24 6', offsetX: 25, offsetY: -12 },
+      { scale: 3, textL: 'Blue', textR: 'Archive', subtitle: 'ブルーアーカイブ' },
+      { crossColor: '#FFD700', haloColor: '#9C27B0', swapColors: true },
+    ];
+
+    for (const options of optionsList) {
+      const bitmap = renderLogo(options);
+      const vector = renderLogoToBuffer({ ...options, format: 'svg' });
+      expect(vector.width).toBe(bitmap.width);
+      expect(vector.height).toBe(bitmap.height);
+      expect(vector.svg).toContain(`width="${bitmap.width}" height="${bitmap.height}"`);
+    }
+  });
+
   it('应当支持分辨率等比例缩放 (scale)', () => {
     // 紧凑裁切模式下，各倍率尺寸应当严格保持成倍放大
     const logo1x = renderLogo({ scale: 1 });

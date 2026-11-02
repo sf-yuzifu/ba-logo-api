@@ -18,8 +18,12 @@ import {
 } from './constants.ts';
 import { FONT_FAMILY, loadFonts } from './font.ts';
 import { findAlphaBounds, trimCanvas as trimCanvasShared } from './render/bounds.ts';
-import { computeLogoLayout } from './render/layout.ts';
-import { normalizeRenderOptions, parsePadding as parsePaddingShared } from './render/options.ts';
+import { computeLogoLayout, type LogoLayout } from './render/layout.ts';
+import {
+  type NormalizedRenderOptions,
+  normalizeRenderOptions,
+  parsePadding as parsePaddingShared,
+} from './render/options.ts';
 
 export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64' | 'svg';
 
@@ -140,13 +144,8 @@ function trimCanvas(
 /**
  * 渲染 Blue Archive 基础 Logo
  */
-export function renderLogo(options: RenderOptions = {}): Canvas {
-  // 确保字体已加载至内存
-  loadFonts();
-  const normalized = normalizeRenderOptions(options);
-  const layout = computeLogoLayout(normalized);
-
-  const { textL, textR, transparent, backgroundColor, primaryColor, secondaryColor } = normalized;
+function drawLogoCanvas(normalized: NormalizedRenderOptions, layout: LogoLayout): Canvas {
+  const { textL, textR, primaryColor, secondaryColor } = normalized;
   const haloColor = normalized.haloColor;
   const crossColor = normalized.crossColor;
   const motifsBehindText = normalized.motifsBehindText;
@@ -169,17 +168,8 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   const measureCtx = getMeasureCtx();
   measureCtx.font = font;
 
-  const textMetricsL = measureCtx.measureText(textL);
+  measureCtx.measureText(textL);
   measureCtx.measureText(textR);
-
-  // 计算斜体排版引起的文字宽度扩展
-  const ascentL =
-    textMetricsL.fontBoundingBoxAscent ?? textMetricsL.actualBoundingBoxAscent ?? 74 * scale;
-  const descentL =
-    textMetricsL.fontBoundingBoxDescent ?? textMetricsL.actualBoundingBoxDescent ?? 10 * scale;
-
-  // 计算用户自定义 padding，支持数字、CSS 语法或独立方向参数
-  const padBox = normalized.padding;
 
   // 综合主文字、副标题、光环偏移量与词间距，动态计算基底画布左右所需空间（防止超长副标题被截断）
   const totalCanvasWidth = layout.totalCanvasWidth;
@@ -301,9 +291,22 @@ export function renderLogo(options: RenderOptions = {}): Canvas {
   }
 
   // 7. 紧凑像素级包围盒裁切（支持四周 CSS 独立 padding 留白与文本视觉居中）
-  const isCenter = options.center ?? !transparent;
-  const textCenterY = canvasHeight * TEXT_BASELINE - (ascentL - descentL) / 2;
-  return trimCanvas(canvas, padBox, transparent, isCenter, textCenterY, backgroundColor);
+  return canvas;
+}
+
+export function renderLogo(options: RenderOptions = {}): Canvas {
+  loadFonts();
+  const normalized = normalizeRenderOptions(options);
+  const layout = computeLogoLayout(normalized);
+  const canvas = drawLogoCanvas(normalized, layout);
+  return trimCanvas(
+    canvas,
+    normalized.padding,
+    normalized.transparent,
+    normalized.center,
+    layout.textCenterY,
+    normalized.backgroundColor,
+  );
 }
 
 function escapeXml(str: string): string {
@@ -380,88 +383,17 @@ export function renderLogoSvg(options: RenderOptions = {}): SvgRenderResult {
   const vectorR = textToVectorSvg(textR, fontSize, 'start');
   const vectorSub = subtitle ? textToVectorSvg(subtitle, subtitleFontSize, 'end') : '';
 
-  const scanCanvas = createCanvas(layout.totalCanvasWidth, layout.totalCanvasHeight);
-  const scanContext = scanCanvas.getContext('2d');
-  scanContext.font = `${fontSize}px "${FONT_FAMILY}"`;
-  scanContext.fillStyle = '#fff';
-  scanContext.textAlign = 'end';
-  scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  scanContext.fillText(textL, layout.leftTextX, baseL);
-  scanContext.resetTransform();
-  scanContext.save();
-  scanContext.translate(graphX, graphY);
-  scanContext.scale(canvasHeight / SVG_VIEWBOX_SIZE, canvasHeight / SVG_VIEWBOX_SIZE);
-  scanContext.fill(new Path2D(HALO_PATH_DATA));
-  scanContext.restore();
-  if (!motifsBehindText) {
-    scanContext.font = `${fontSize}px "${FONT_FAMILY}"`;
-    scanContext.textAlign = 'start';
-    scanContext.globalCompositeOperation = 'destination-out';
-    scanContext.lineWidth = strokeWidth;
-    scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-    scanContext.strokeText(textR, layout.rightTextX, baseL);
-    scanContext.globalCompositeOperation = 'source-over';
-  }
-  scanContext.font = `${fontSize}px "${FONT_FAMILY}"`;
-  scanContext.textAlign = 'start';
-  scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  scanContext.fillText(textR, layout.rightTextX, baseL);
-  scanContext.resetTransform();
-  scanContext.beginPath();
-  scanContext.moveTo(
-    (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight + graphX,
-    (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight + graphY,
-  );
-  for (const [x, y] of HOLLOW_POLYGON.slice(1)) {
-    scanContext.lineTo(
-      (x / SVG_VIEWBOX_SIZE) * canvasHeight + graphX,
-      (y / SVG_VIEWBOX_SIZE) * canvasHeight + graphY,
-    );
-  }
-  scanContext.closePath();
-  scanContext.globalCompositeOperation = 'destination-out';
-  scanContext.fill();
-  scanContext.globalCompositeOperation = 'source-over';
-  scanContext.save();
-  scanContext.translate(graphX, graphY);
-  scanContext.scale(canvasHeight / SVG_VIEWBOX_SIZE, canvasHeight / SVG_VIEWBOX_SIZE);
-  scanContext.fill(new Path2D(CROSS_PATH_DATA));
-  scanContext.restore();
-  if (motifsBehindText) {
-    scanContext.font = `${fontSize}px "${FONT_FAMILY}"`;
-    scanContext.textAlign = 'end';
-    scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-    scanContext.fillText(textL, layout.leftTextX, baseL);
-    scanContext.resetTransform();
-    scanContext.font = `${fontSize}px "${FONT_FAMILY}"`;
-    scanContext.textAlign = 'start';
-    scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-    scanContext.fillText(textR, layout.rightTextX, baseL);
-    scanContext.resetTransform();
-  }
-  scanContext.font = `${fontSize}px "${FONT_FAMILY}"`;
-  scanContext.textAlign = 'start';
-  scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-  scanContext.fillText(textR, layout.rightTextX, baseL);
-  scanContext.resetTransform();
-  if (subtitle) {
-    scanContext.font = `${subtitleFontSize}px "${FONT_FAMILY}"`;
-    scanContext.textAlign = 'end';
-    scanContext.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
-    scanContext.fillText(subtitle, layout.subtitleX, subY);
-    scanContext.resetTransform();
-  }
-  const scanImage = scanContext.getImageData(0, 0, scanCanvas.width, scanCanvas.height);
+  const renderedCanvas = drawLogoCanvas(normalized, layout);
+  const scanContext = renderedCanvas.getContext('2d');
   const bounds = findAlphaBounds(
-    scanImage.data,
-    scanCanvas.width,
-    scanCanvas.height,
+    scanContext.getImageData(0, 0, renderedCanvas.width, renderedCanvas.height).data,
+    renderedCanvas.width,
+    renderedCanvas.height,
     normalized.center,
     layout.textCenterY,
   );
-  const referenceCanvas = renderLogo({ ...normalized, padding: options.padding });
-  const finalW = referenceCanvas.width;
-  const finalH = referenceCanvas.height;
+  const finalW = bounds ? bounds.width + padBox.left + padBox.right : layout.totalCanvasWidth;
+  const finalH = bounds ? bounds.height + padBox.top + padBox.bottom : layout.totalCanvasHeight;
   const vx = ((bounds?.minX ?? 0) - padBox.left).toFixed(2);
   const vy = ((bounds?.minY ?? 0) - padBox.top).toFixed(2);
 
