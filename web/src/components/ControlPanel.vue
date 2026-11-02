@@ -37,6 +37,12 @@ const handleCompositionEnd = () => {
   emit('change');
 };
 
+const imeInputHandlers = {
+  input: handleInput,
+  compositionstart: handleCompositionStart,
+  compositionend: handleCompositionEnd,
+};
+
 // 重置单字段逻辑 - 严格基于 DEFAULT_STATE
 const resetField = <K extends keyof LogoFormState>(key: K) => {
   props.state[key] = DEFAULT_STATE[key];
@@ -85,15 +91,9 @@ const handleFormatSelect = (fmt: OutputFormat) => {
   emit('change');
 };
 
-const handleCrossColorPicker = (e: Event) => {
+const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
   const target = e.target as HTMLInputElement;
-  props.state.crossColor = target.value;
-  emit('change');
-};
-
-const handleHaloColorPicker = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  props.state.haloColor = target.value;
+  props.state[key] = target.value;
   emit('change');
 };
 </script>
@@ -157,9 +157,7 @@ const handleHaloColorPicker = (e: Event) => {
               v-model="state.left"
               class="input-text"
               :placeholder="t('ph-left')"
-              @input="handleInput"
-              @compositionstart="handleCompositionStart"
-              @compositionend="handleCompositionEnd"
+              v-on="imeInputHandlers"
             >
           </div>
           <div class="input-with-tag">
@@ -170,9 +168,7 @@ const handleHaloColorPicker = (e: Event) => {
               v-model="state.right"
               class="input-text"
               :placeholder="t('ph-right')"
-              @input="handleInput"
-              @compositionstart="handleCompositionStart"
-              @compositionend="handleCompositionEnd"
+              v-on="imeInputHandlers"
             >
           </div>
         </div>
@@ -198,9 +194,7 @@ const handleHaloColorPicker = (e: Event) => {
             v-model="state.subtitle"
             class="input-text"
             :placeholder="t('ph-sub')"
-            @input="handleInput"
-            @compositionstart="handleCompositionStart"
-            @compositionend="handleCompositionEnd"
+            v-on="imeInputHandlers"
           >
           <div class="color-picker-mini-wrapper" :title="t('tip-sub-color')">
             <input
@@ -337,7 +331,7 @@ const handleHaloColorPicker = (e: Event) => {
               :value="state.crossColor || state.accent"
               class="native-color-picker mini-picker"
               :title="t('tip-cross-picker')"
-              @input="handleCrossColorPicker"
+              @input="handleColorPicker('crossColor', $event)"
             >
           </div>
         </div>
@@ -369,7 +363,7 @@ const handleHaloColorPicker = (e: Event) => {
               :value="state.haloColor || state.textColor"
               class="native-color-picker mini-picker"
               :title="t('tip-halo-picker')"
-              @input="handleHaloColorPicker"
+              @input="handleColorPicker('haloColor', $event)"
             >
           </div>
         </div>
