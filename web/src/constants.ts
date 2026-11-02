@@ -1,7 +1,6 @@
 import type { ColorPreset, LogoFormState, OutputFormat } from './types.ts';
 
 export const DEFAULT_STATE: Readonly<LogoFormState> = Object.freeze({
-  endpoint: 'api',
   left: '蔚蓝',
   right: '档案',
   subtitle: '',

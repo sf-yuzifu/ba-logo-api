@@ -5,8 +5,6 @@ export default {
 
   // コンソールカードとセクション
   'console-title': 'パラメータ設定',
-  'ep-restful': 'RESTful',
-  'ep-legacy': '旧版互換',
   'sec-text': '01 // テキスト設定 (TEXT)',
   'sec-colors': '02 // カラー設定 (COLORS)',
   'sec-layout': '03 // 座標と余白 (LAYOUT)',

@@ -9,7 +9,7 @@ import {
   SCALE_OPTIONS,
   TEXT_COLOR_PRESETS,
 } from '../constants.ts';
-import type { EndpointType, LogoFormState, OutputFormat } from '../types.ts';
+import type { LogoFormState, OutputFormat } from '../types.ts';
 import ColorField from './ColorField.vue';
 
 const props = defineProps<{
@@ -97,11 +97,6 @@ const handleDarkToggle = () => {
   emit('change');
 };
 
-const handleEndpointSelect = (ep: EndpointType) => {
-  props.state.endpoint = ep;
-  emit('change');
-};
-
 const handleScaleSelect = (scale: number) => {
   props.state.scale = scale;
   emit('change');
@@ -129,24 +124,6 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
           <span>{{ t('console-title') }}</span>
           <span class="card-title-slashes">///</span>
         </div>
-      </div>
-      <div class="endpoint-pills" id="endpointPills">
-        <button
-          type="button"
-          class="pill-btn"
-          :class="{ active: state.endpoint === 'api' }"
-          @click="handleEndpointSelect('api')"
-        >
-          {{ t('ep-restful') }}
-        </button>
-        <button
-          type="button"
-          class="pill-btn"
-          :class="{ active: state.endpoint === 'balogo' }"
-          @click="handleEndpointSelect('balogo')"
-        >
-          {{ t('ep-legacy') }}
-        </button>
       </div>
     </div>
 

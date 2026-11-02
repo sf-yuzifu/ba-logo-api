@@ -5,8 +5,6 @@ export default {
 
   // Console card & sections
   'console-title': 'Parameter Console',
-  'ep-restful': 'RESTful',
-  'ep-legacy': 'Legacy',
   'sec-text': '01 // TYPOGRAPHY (TEXT)',
   'sec-colors': '02 // COLOR PALETTE (COLORS)',
   'sec-layout': '03 // POSITION & SPACING (LAYOUT)',

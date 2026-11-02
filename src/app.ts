@@ -185,19 +185,20 @@ export function createApp() {
       }),
     )
 
-    // 1. 旧版兼容路由 (GET /balogo)
+    // 1. 旧版兼容路由 (GET /balogo 永久重定向至 /api/logo)
     .get(
       '/balogo',
-      ({ query, set, headers }) => {
-        return handleLogoRequest(query, set, headers);
+      ({ request, redirect }) => {
+        const url = new URL(request.url);
+        return redirect(`/api/logo${url.search}`, 308);
       },
       {
         query: LogoQuerySchema,
         detail: {
           tags: ['Logo Generation'],
-          summary: '旧版兼容接口（兼容 3 年前旧版参数 l, r, x, y, tp）',
+          summary: '旧版兼容接口（永久重定向 308 至 /api/logo）',
           description:
-            '完全兼容旧项目的请求参数，直接返回二进制图片流，平滑迁移老客户端或聊天机器人。',
+            '旧版 /balogo 请求将自动 308 永久重定向至现代 RESTful /api/logo 接口，完整保留原始查询参数。',
         },
       },
     )

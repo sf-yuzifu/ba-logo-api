@@ -5,8 +5,6 @@ export default {
 
   // 控制台卡片與分段
   'console-title': '參數控制台',
-  'ep-restful': 'RESTful',
-  'ep-legacy': '舊版相容',
   'sec-text': '01 // 文字排版 (TEXT)',
   'sec-colors': '02 // 色彩自訂 (COLORS)',
   'sec-layout': '03 // 座標與留白 (LAYOUT)',

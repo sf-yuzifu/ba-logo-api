@@ -935,25 +935,6 @@ main {
   gap: 8px;
 }
 
-.endpoint-pills {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.endpoint-pills .pill-btn {
-  flex: 0 0 auto;
-  min-width: 76px;
-  padding: 6px 12px;
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .pill-btn {
   flex: 1;
   padding: 8px 6px;

@@ -20,7 +20,6 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
   });
 
   it('DEFAULT_STATE 应当包含完整的初始控制台字段且不可变', () => {
-    expect(DEFAULT_STATE.endpoint).toBe('api');
     expect(DEFAULT_STATE.left).toBe('蔚蓝');
     expect(DEFAULT_STATE.right).toBe('档案');
     expect(DEFAULT_STATE.accent).toBe('#128AFA');
@@ -89,10 +88,9 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(parsed.searchParams.get('center')).toBe('true');
   });
 
-  it('buildLogoUrl 应当正确序列化旧版兼容 /balogo 查询参数并补齐 subColor', () => {
+  it('buildLogoUrl 应当正确序列化 RESTful /api/logo 查询参数并规范化十六进制色值', () => {
     const state: LogoFormState = {
       ...DEFAULT_STATE,
-      endpoint: 'balogo',
       left: '碧蓝',
       right: '航线',
       subtitle: 'アズールレーン',
@@ -115,27 +113,27 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     };
 
     const url = buildLogoUrl(state);
-    expect(url.startsWith('/balogo?')).toBe(true);
+    expect(url.startsWith('/api/logo?')).toBe(true);
 
     const parsed = new URL(`http://localhost${url}`);
-    expect(parsed.searchParams.get('l')).toBe('碧蓝');
-    expect(parsed.searchParams.get('r')).toBe('航线');
-    expect(parsed.searchParams.get('sub')).toBe('アズールレーン');
-    expect(parsed.searchParams.get('subColor')).toBe('123456');
+    expect(parsed.searchParams.get('left')).toBe('碧蓝');
+    expect(parsed.searchParams.get('right')).toBe('航线');
+    expect(parsed.searchParams.get('subtitle')).toBe('アズールレーン');
+    expect(parsed.searchParams.get('subtitleColor')).toBe('123456');
     expect(parsed.searchParams.get('subX')).toBe('15');
     expect(parsed.searchParams.get('subY')).toBe('8');
     expect(parsed.searchParams.get('accent')).toBe('FF9800');
-    expect(parsed.searchParams.get('cross')).toBe('E91E63');
-    expect(parsed.searchParams.get('halo')).toBe('3F51B5');
-    expect(parsed.searchParams.get('behind')).toBe('true');
-    expect(parsed.searchParams.get('x')).toBe('-20');
-    expect(parsed.searchParams.get('y')).toBe('12');
-    expect(parsed.searchParams.get('gap')).toBe('18');
+    expect(parsed.searchParams.get('crossColor')).toBe('E91E63');
+    expect(parsed.searchParams.get('haloColor')).toBe('3F51B5');
+    expect(parsed.searchParams.get('motifsBehindText')).toBe('true');
+    expect(parsed.searchParams.get('offsetX')).toBe('-20');
+    expect(parsed.searchParams.get('offsetY')).toBe('12');
+    expect(parsed.searchParams.get('wordGap')).toBe('18');
     expect(parsed.searchParams.get('scale')).toBeNull(); // scale=1 时省略默认值
     expect(parsed.searchParams.get('format')).toBe('webp');
-    expect(parsed.searchParams.get('tp')).toBe('true');
-    expect(parsed.searchParams.get('dark')).toBe('true');
-    expect(parsed.searchParams.get('swap')).toBe('true');
+    expect(parsed.searchParams.get('transparent')).toBe('true');
+    expect(parsed.searchParams.get('darkMode')).toBe('true');
+    expect(parsed.searchParams.get('swapColors')).toBe('true');
     expect(parsed.searchParams.get('padding')).toBe('5');
   });
 
@@ -143,12 +141,12 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     const url = buildLogoUrl(DEFAULT_STATE);
     expect(url).toBe('/api/logo?left=%E8%94%9A%E8%93%9D&right=%E6%A1%A3%E6%A1%88&scale=2');
 
-    const absoluteLegacy = buildLogoUrl(
-      { ...DEFAULT_STATE, endpoint: 'balogo', subtitle: '', center: true },
+    const absoluteUrl = buildLogoUrl(
+      { ...DEFAULT_STATE, subtitle: '', center: true },
       'https://example.com',
     );
-    expect(absoluteLegacy).toBe(
-      'https://example.com/balogo?l=%E8%94%9A%E8%93%9D&r=%E6%A1%A3%E6%A1%88&scale=2',
+    expect(absoluteUrl).toBe(
+      'https://example.com/api/logo?left=%E8%94%9A%E8%93%9D&right=%E6%A1%A3%E6%A1%88&scale=2',
     );
   });
 

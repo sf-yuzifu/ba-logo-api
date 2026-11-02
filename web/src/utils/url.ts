@@ -1,9 +1,9 @@
 import type { LogoFormState } from '../types.ts';
 
-type LogoParameter = keyof Omit<LogoFormState, 'endpoint'>;
+type LogoParameter = keyof LogoFormState;
 type ParameterNames = Partial<Record<LogoParameter, string>>;
 
-const COMMON_NAMES: ParameterNames = {
+const PARAM_NAMES: ParameterNames = {
   left: 'left',
   right: 'right',
   subtitle: 'subtitle',
@@ -27,26 +27,6 @@ const COMMON_NAMES: ParameterNames = {
   center: 'center',
 };
 
-const LEGACY_NAMES: ParameterNames = {
-  ...COMMON_NAMES,
-  left: 'l',
-  right: 'r',
-  subtitle: 'sub',
-  subtitleColor: 'subColor',
-  accent: 'accent',
-  crossColor: 'cross',
-  haloColor: 'halo',
-  behind: 'behind',
-  x: 'x',
-  y: 'y',
-  wordGap: 'gap',
-  scale: 'scale',
-  format: 'format',
-  transparent: 'tp',
-  dark: 'dark',
-  swap: 'swap',
-};
-
 function cleanHex(color: string): string {
   return color.replace(/^#/, '').trim();
 }
@@ -55,13 +35,11 @@ function addParam(params: URLSearchParams, name: string, value: unknown): void {
   params.set(name, String(value));
 }
 
-/** Build an API URL while keeping endpoint-specific names in one mapping. */
+/** 构造 RESTful /api/logo 请求 URL */
 export function buildLogoUrl(state: Readonly<LogoFormState>, origin = ''): string {
-  const legacy = state.endpoint === 'balogo';
-  const names = legacy ? LEGACY_NAMES : COMMON_NAMES;
   const params = new URLSearchParams();
   const set = (key: LogoParameter, value: unknown) => {
-    const name = names[key];
+    const name = PARAM_NAMES[key];
     if (name) addParam(params, name, value);
   };
 
@@ -98,5 +76,5 @@ export function buildLogoUrl(state: Readonly<LogoFormState>, origin = ''): strin
   if (state.center !== !state.transparent) set('center', String(state.center));
 
   const query = params.toString();
-  return `${origin}${legacy ? '/balogo' : '/api/logo'}${query ? `?${query}` : ''}`;
+  return `${origin}/api/logo${query ? `?${query}` : ''}`;
 }

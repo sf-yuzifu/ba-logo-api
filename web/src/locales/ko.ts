@@ -5,8 +5,6 @@ export default {
 
   // 콘솔 카드 및 섹션
   'console-title': '파라미터 콘솔',
-  'ep-restful': 'RESTful',
-  'ep-legacy': '레거시',
   'sec-text': '01 // 텍스트 설정 (TEXT)',
   'sec-colors': '02 // 컬러 설정 (COLORS)',
   'sec-layout': '03 // 위치 및 여백 (LAYOUT)',

@@ -60,13 +60,19 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(res.status).toBe(404);
   });
 
-  it('GET /balogo 应当完全向后兼容 3 年前的旧版参数', async () => {
-    const res = await app.handle(
-      new Request('http://localhost/balogo?l=碧蓝&r=档案&x=-10&y=5&tp=true'),
-    );
-    expect(res.status).toBe(200);
-    expect(res.headers.get('content-type')).toBe('image/png');
-    const buf = await res.arrayBuffer();
+  it('GET /balogo 应当通过 HTTP 308 永久重定向至 /api/logo 并保留旧版参数', async () => {
+    const rawQuery = 'l=%E7%A2%A7%E8%93%9D&r=%E6%A1%A3%E6%A1%88&x=-10&y=5&tp=true';
+    const res = await app.handle(new Request(`http://localhost/balogo?${rawQuery}`));
+    expect(res.status).toBe(308);
+    expect(res.headers.get('location')).toBe(`/api/logo?${rawQuery}`);
+
+    // 跟随重定向请求 /api/logo 应正常渲染图片
+    const location = res.headers.get('location');
+    expect(location).toBeDefined();
+    const redirectRes = await app.handle(new Request(`http://localhost${location}`));
+    expect(redirectRes.status).toBe(200);
+    expect(redirectRes.headers.get('content-type')).toBe('image/png');
+    const buf = await redirectRes.arrayBuffer();
     expect(buf.byteLength).toBeGreaterThan(1000);
   });
 
@@ -145,18 +151,26 @@ describe('HTTP Route & Compatibility Tests', () => {
     const bufShort = Buffer.from(await resShort.arrayBuffer());
     expect(bufLong.equals(bufShort)).toBe(true);
 
-    // 2. /balogo 兼容路由 vs /api/logo 现代路由
+    // 2. /balogo 兼容路由 308 重定向后 vs /api/logo 现代路由
     const resBalogo = await app.handle(
       new Request('http://localhost/balogo?l=蔚蓝&r=档案&s=2&dark=true&swap=true'),
     );
+    expect(resBalogo.status).toBe(308);
+    const location = resBalogo.headers.get('location');
+    expect(location).toBeDefined();
+    expect(decodeURIComponent(location ?? '')).toBe(
+      '/api/logo?l=蔚蓝&r=档案&s=2&dark=true&swap=true',
+    );
+
+    const resRedirected = await app.handle(new Request(`http://localhost${location}`));
     const resApi = await app.handle(
       new Request(
         'http://localhost/api/logo?left=蔚蓝&right=档案&scale=2&darkMode=true&swapColors=true',
       ),
     );
-    expect(resBalogo.status).toBe(200);
+    expect(resRedirected.status).toBe(200);
     expect(resApi.status).toBe(200);
-    const bufBalogo = Buffer.from(await resBalogo.arrayBuffer());
+    const bufBalogo = Buffer.from(await resRedirected.arrayBuffer());
     const bufApi = Buffer.from(await resApi.arrayBuffer());
     expect(bufBalogo.equals(bufApi)).toBe(true);
 
