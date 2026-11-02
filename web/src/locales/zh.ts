@@ -3,10 +3,14 @@ export default {
   'nav-swagger': 'Swagger API',
   'nav-upstream': '原版前端',
 
-  // 控制台卡片
+  // 控制台卡片与分段
   'console-title': '参数控制台',
   'ep-restful': 'RESTful',
   'ep-legacy': '旧版兼容',
+  'sec-text': '01 // 文本排版 (TEXT)',
+  'sec-colors': '02 // 色彩定制 (COLORS)',
+  'sec-layout': '03 // 坐标与留白 (LAYOUT)',
+  'sec-output': '04 // 导出与开关 (OUTPUT)',
 
   // 标题文字
   'label-title': '标题文字 (左 / 右)',
@@ -28,9 +32,9 @@ export default {
   'label-text-color': '文字色 (右字与光环)',
   'reset-text-color': '默认深 ↺',
   'label-cross-color': '十字独立色彩',
-  'ph-cross-color': '跟随强调色，或 Hex 如 #FFD700',
+  'ph-cross-color': '跟随强调色，或 #HEX',
   'label-halo-color': '光环独立色彩',
-  'ph-halo-color': '跟随文字色，或 Hex 如 #9C27B0',
+  'ph-halo-color': '跟随文字色，或 #HEX',
   'reset-follow': '跟随 ↺',
 
   // 坐标与间距
@@ -74,4 +78,22 @@ export default {
   'toast-img-copied': '图片已写入系统剪贴板！',
   'toast-reset': '已重置所有参数为初始值！',
   'toast-copy-failed': '复制失败，请手动长按或选中复制',
+
+  // 悬浮提示 Tooltips
+  'tip-reset-text': '重置文字',
+  'tip-clear-sub': '清空副标题',
+  'tip-sub-color': '副标题颜色',
+  'tip-reset-x': '重置 X 偏移',
+  'tip-reset-y': '重置 Y 偏移',
+  'tip-reset-accent': '重置强调色',
+  'tip-reset-text-color': '重置文字色',
+  'tip-follow-accent': '跟随强调色',
+  'tip-cross-picker': '十字拾色器',
+  'tip-follow-text-color': '跟随文字色',
+  'tip-halo-picker': '光环拾色器',
+  'tip-reset-gap': '重置间距',
+  'tip-reset-pad': '重置留白',
+  'theme-tip-auto': '主题: 跟随系统 (点击切换)',
+  'theme-tip-light': '主题: 浅色模式 (点击切换)',
+  'theme-tip-dark': '主题: 暗色模式 (点击切换)',
 };

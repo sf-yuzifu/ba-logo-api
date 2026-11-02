@@ -129,7 +129,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     const zhKeys = Object.keys(LOCALES.zh).sort();
     expect(zhKeys.length).toBeGreaterThan(30);
 
-    const targetLangs = ['zh-tw', 'en', 'ja'] as const;
+    const targetLangs = ['zh-tw', 'en', 'ja', 'ko'] as const;
     for (const lang of targetLangs) {
       const dict = LOCALES[lang];
       expect(dict).toBeDefined();

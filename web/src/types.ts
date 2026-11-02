@@ -1,6 +1,6 @@
 export type OutputFormat = 'png' | 'webp' | 'svg' | 'jpeg' | 'base64';
 
-export type SupportedLang = 'zh' | 'zh-tw' | 'en' | 'ja';
+export type SupportedLang = 'zh' | 'zh-tw' | 'en' | 'ja' | 'ko';
 
 export type EndpointType = 'api' | 'balogo';
 

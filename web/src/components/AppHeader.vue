@@ -16,9 +16,9 @@ const currentLangOption = computed(() => {
 });
 
 const themeTitle = computed(() => {
-  if (themeMode.value === 'auto') return '主题: 跟随系统 (点击切换)';
-  if (themeMode.value === 'light') return '主题: 浅色模式 (点击切换)';
-  return '主题: 暗色模式 (点击切换)';
+  if (themeMode.value === 'auto') return t('theme-tip-auto');
+  if (themeMode.value === 'light') return t('theme-tip-light');
+  return t('theme-tip-dark');
 });
 
 const themeLabel = computed(() => {

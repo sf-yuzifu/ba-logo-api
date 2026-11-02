@@ -1,6 +1,7 @@
 import type { SupportedLang } from '../types.ts';
 import en from './en.ts';
 import ja from './ja.ts';
+import ko from './ko.ts';
 import zh from './zh.ts';
 import zhTw from './zh-tw.ts';
 
@@ -9,6 +10,7 @@ export const LOCALES: Record<SupportedLang, Record<string, string>> = {
   'zh-tw': zhTw,
   en,
   ja,
+  ko,
 };
 
 export const LANG_OPTIONS: { lang: SupportedLang; label: string; subLabel: string }[] = [
@@ -16,4 +18,5 @@ export const LANG_OPTIONS: { lang: SupportedLang; label: string; subLabel: strin
   { lang: 'zh-tw', label: '繁體中文', subLabel: 'Traditional Chinese' },
   { lang: 'en', label: 'English', subLabel: 'English' },
   { lang: 'ja', label: '日本語', subLabel: 'Japanese' },
+  { lang: 'ko', label: '한국어', subLabel: 'Korean' },
 ];

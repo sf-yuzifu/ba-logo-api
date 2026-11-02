@@ -3,10 +3,14 @@ export default {
   'nav-swagger': 'Swagger API',
   'nav-upstream': 'Original Web',
 
-  // Console card
+  // Console card & sections
   'console-title': 'Parameter Console',
   'ep-restful': 'RESTful',
   'ep-legacy': 'Legacy',
+  'sec-text': '01 // TYPOGRAPHY (TEXT)',
+  'sec-colors': '02 // COLOR PALETTE (COLORS)',
+  'sec-layout': '03 // POSITION & SPACING (LAYOUT)',
+  'sec-output': '04 // EXPORT & OPTIONS (OUTPUT)',
 
   // Title text
   'label-title': 'Title Text (L / R)',
@@ -28,9 +32,9 @@ export default {
   'label-text-color': 'Text Color (Right & Halo)',
   'reset-text-color': 'Default ↺',
   'label-cross-color': 'Cross Custom Color',
-  'ph-cross-color': 'Follows accent, or Hex like #FFD700',
+  'ph-cross-color': 'Follows accent, or #HEX',
   'label-halo-color': 'Halo Custom Color',
-  'ph-halo-color': 'Follows text color, or Hex like #9C27B0',
+  'ph-halo-color': 'Follows text, or #HEX',
   'reset-follow': 'Follow ↺',
 
   // Offsets and gap
@@ -69,9 +73,27 @@ export default {
   'btn-copy-md': 'Copy Markdown',
   'btn-reset-all': 'Reset All Settings',
 
-  // Toasts and alerts
+  // Toast messages
   'toast-copied': 'API URL copied to clipboard!',
   'toast-img-copied': 'Image copied to clipboard!',
-  'toast-reset': 'All settings restored to defaults!',
+  'toast-reset': 'All settings reset to defaults!',
   'toast-copy-failed': 'Copy failed, please copy manually',
+
+  // Tooltips
+  'tip-reset-text': 'Reset text',
+  'tip-clear-sub': 'Clear subtitle',
+  'tip-sub-color': 'Subtitle color',
+  'tip-reset-x': 'Reset X offset',
+  'tip-reset-y': 'Reset Y offset',
+  'tip-reset-accent': 'Reset accent color',
+  'tip-reset-text-color': 'Reset text color',
+  'tip-follow-accent': 'Follow accent color',
+  'tip-cross-picker': 'Cross color picker',
+  'tip-follow-text-color': 'Follow text color',
+  'tip-halo-picker': 'Halo color picker',
+  'tip-reset-gap': 'Reset word gap',
+  'tip-reset-pad': 'Reset padding',
+  'theme-tip-auto': 'Theme: Auto (Click to switch)',
+  'theme-tip-light': 'Theme: Light mode (Click to switch)',
+  'theme-tip-dark': 'Theme: Dark mode (Click to switch)',
 };

@@ -37,9 +37,11 @@
   --scrollbar-thumb: #B4DCF8;
   --scrollbar-thumb-hover: #128AFA;
 
-  /* 全站统一纯净字体体系 - 100% 专一使用 HarmonyOS Sans (华为鸿蒙高清屏幕字体) */
-  --font-main: 'HarmonyOS Sans SC', 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-hud: 'HarmonyOS Sans SC', 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* 全站统一纯净字体体系 - 100% 专一使用 HarmonyOS Sans (华为鸿蒙高清屏幕字体) 配合系统原生微调 */
+  --font-main: 'HarmonyOS Sans SC', 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+               'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-hud: 'HarmonyOS Sans SC', 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+              'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --font-mono: 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'JetBrains Mono', Consolas, Monaco, monospace;
 
   /* Emil Kowalski 动效标准 */
@@ -575,6 +577,8 @@ main {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 2px solid var(--primary-light);
@@ -880,9 +884,22 @@ main {
 }
 
 .endpoint-pills {
-  width: 190px;
-  display: flex;
-  gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.endpoint-pills .pill-btn {
+  flex: 0 0 auto;
+  min-width: 76px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pill-btn {

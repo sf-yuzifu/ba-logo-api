@@ -3,10 +3,14 @@ export default {
   'nav-swagger': 'Swagger API',
   'nav-upstream': '元フロントエンド',
 
-  // コンソールカード
+  // コンソールカードとセクション
   'console-title': 'パラメータ設定',
   'ep-restful': 'RESTful',
   'ep-legacy': '旧版互換',
+  'sec-text': '01 // テキスト設定 (TEXT)',
+  'sec-colors': '02 // カラー設定 (COLORS)',
+  'sec-layout': '03 // 座標と余白 (LAYOUT)',
+  'sec-output': '04 // 出力とスイッチ (OUTPUT)',
 
   // タイトル文字
   'label-title': 'タイトル文字 (左 / 右)',
@@ -28,9 +32,9 @@ export default {
   'label-text-color': 'メイン文字色 (右文字・光輪)',
   'reset-text-color': '既定濃 ↺',
   'label-cross-color': '十字の個別カラー',
-  'ph-cross-color': 'アクセント色連動、または #FFD700',
+  'ph-cross-color': 'アクセント連動、又は #HEX',
   'label-halo-color': '光輪の個別カラー',
-  'ph-halo-color': '文字色連動、または #9C27B0',
+  'ph-halo-color': '文字色連動、又は #HEX',
   'reset-follow': '連動 ↺',
 
   // 座標と間隔
@@ -74,4 +78,22 @@ export default {
   'toast-img-copied': '画像をクリップボードにコピーしました！',
   'toast-reset': 'すべての設定を初期値に戻しました！',
   'toast-copy-failed': 'コピーに失敗しました。手動でコピーしてください',
+
+  // ツールチップ Tooltips
+  'tip-reset-text': 'テキストをリセット',
+  'tip-clear-sub': 'サブタイトルをクリア',
+  'tip-sub-color': 'サブタイトルの色',
+  'tip-reset-x': 'Xオフセットをリセット',
+  'tip-reset-y': 'Yオフセットをリセット',
+  'tip-reset-accent': 'アクセント色をリセット',
+  'tip-reset-text-color': '文字色をリセット',
+  'tip-follow-accent': 'アクセント色に連動',
+  'tip-cross-picker': '十字カラーピッカー',
+  'tip-follow-text-color': '文字色に連動',
+  'tip-halo-picker': '光輪カラーピッカー',
+  'tip-reset-gap': '単語間隔をリセット',
+  'tip-reset-pad': '余白をリセット',
+  'theme-tip-auto': 'テーマ: システム連動 (クリックで切替)',
+  'theme-tip-light': 'テーマ: ライトモード (クリックで切替)',
+  'theme-tip-dark': 'テーマ: ダークモード (クリックで切替)',
 };

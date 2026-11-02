@@ -8,7 +8,7 @@ import {
   SCALE_OPTIONS,
   TEXT_COLOR_PRESETS,
 } from '../constants.ts';
-import type { EndpointType, LogoFormState, OutputFormat } from '../types.ts';
+import type { EndpointType, LogoFormState, OutputFormat, SupportedLang } from '../types.ts';
 import ColorField from './ColorField.vue';
 
 const props = defineProps<{
@@ -17,7 +17,15 @@ const props = defineProps<{
 
 const emit = defineEmits<(e: 'change') => void>();
 
-const { t } = useI18n();
+const { lang, t } = useI18n();
+
+const DEFAULT_TEXT_PAIRS: Record<SupportedLang, { left: string; right: string }> = {
+  zh: { left: '蔚蓝', right: '档案' },
+  'zh-tw': { left: '蔚藍', right: '檔案' },
+  en: { left: 'Blue', right: 'Archive' },
+  ja: { left: 'ブルー', right: 'アーカイブ' },
+  ko: { left: '블루', right: '아카이브' },
+};
 
 // IME 输入法防抖合成状态
 const isComposing = ref(false);
@@ -39,6 +47,13 @@ const handleCompositionEnd = () => {
 // 重置单字段逻辑 - 严格基于 DEFAULT_STATE
 const resetField = <K extends keyof LogoFormState>(key: K) => {
   props.state[key] = DEFAULT_STATE[key];
+  emit('change');
+};
+
+const resetTitleText = () => {
+  const pair = DEFAULT_TEXT_PAIRS[lang.value] ?? DEFAULT_TEXT_PAIRS.zh;
+  props.state.left = pair.left;
+  props.state.right = pair.right;
   emit('change');
 };
 
@@ -124,7 +139,7 @@ const handleHaloColorPicker = (e: Event) => {
     <!-- 01. 文本排版 -->
     <div class="tactical-section">
       <div class="section-divider">
-        <span class="section-tag">01 // 文本排版 (TEXT)</span>
+        <span class="section-tag">{{ t('sec-text') }}</span>
       </div>
 
       <!-- 标题文字 -->
@@ -134,8 +149,8 @@ const handleHaloColorPicker = (e: Event) => {
           <button
             type="button"
             class="reset-badge"
-            @click="() => { resetField('left'); resetField('right'); }"
-            title="重置文字"
+            @click="resetTitleText"
+            :title="t('tip-reset-text')"
           >
             {{ t('reset-text') }}
           </button>
@@ -178,7 +193,7 @@ const handleHaloColorPicker = (e: Event) => {
             type="button"
             class="reset-badge"
             @click="resetField('subtitle')"
-            title="清空副标题"
+            :title="t('tip-clear-sub')"
           >
             {{ t('reset-clear') }}
           </button>
@@ -194,7 +209,7 @@ const handleHaloColorPicker = (e: Event) => {
             @compositionstart="handleCompositionStart"
             @compositionend="handleCompositionEnd"
           >
-          <div class="color-picker-mini-wrapper" title="副标题颜色">
+          <div class="color-picker-mini-wrapper" :title="t('tip-sub-color')">
             <input
               type="color"
               id="inputSubColor"
@@ -215,7 +230,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('subX')"
-              title="重置 X 偏移"
+              :title="t('tip-reset-x')"
             >
               {{ t('reset-0') }}
             </button>
@@ -237,7 +252,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('subY')"
-              title="重置 Y 偏移"
+              :title="t('tip-reset-y')"
             >
               {{ t('reset-0') }}
             </button>
@@ -257,7 +272,7 @@ const handleHaloColorPicker = (e: Event) => {
     <!-- 02. 色彩配置 -->
     <div class="tactical-section">
       <div class="section-divider">
-        <span class="section-tag">02 // 色彩定制 (COLORS)</span>
+        <span class="section-tag">{{ t('sec-colors') }}</span>
       </div>
 
       <!-- 主题色彩 -->
@@ -268,7 +283,7 @@ const handleHaloColorPicker = (e: Event) => {
             type="button"
             class="reset-badge"
             @click="resetField('accent')"
-            title="重置强调色"
+            :title="t('tip-reset-accent')"
           >
             {{ t('reset-accent') }}
           </button>
@@ -288,7 +303,7 @@ const handleHaloColorPicker = (e: Event) => {
             type="button"
             class="reset-badge"
             @click="resetTextColors"
-            title="重置文字色"
+            :title="t('tip-reset-text-color')"
           >
             {{ t('reset-text-color') }}
           </button>
@@ -309,7 +324,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('crossColor')"
-              title="跟随强调色"
+              :title="t('tip-follow-accent')"
             >
               {{ t('reset-follow') }}
             </button>
@@ -328,7 +343,7 @@ const handleHaloColorPicker = (e: Event) => {
               id="pickerCrossColor"
               :value="state.crossColor || state.accent"
               class="native-color-picker mini-picker"
-              title="十字拾色器"
+              :title="t('tip-cross-picker')"
               @input="handleCrossColorPicker"
             >
           </div>
@@ -341,7 +356,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('haloColor')"
-              title="跟随文字色"
+              :title="t('tip-follow-text-color')"
             >
               {{ t('reset-follow') }}
             </button>
@@ -360,7 +375,7 @@ const handleHaloColorPicker = (e: Event) => {
               id="pickerHaloColor"
               :value="state.haloColor || state.textColor"
               class="native-color-picker mini-picker"
-              title="光环拾色器"
+              :title="t('tip-halo-picker')"
               @input="handleHaloColorPicker"
             >
           </div>
@@ -371,7 +386,7 @@ const handleHaloColorPicker = (e: Event) => {
     <!-- 03. 坐标与间距 -->
     <div class="tactical-section">
       <div class="section-divider">
-        <span class="section-tag">03 // 坐标与留白 (LAYOUT)</span>
+        <span class="section-tag">{{ t('sec-layout') }}</span>
       </div>
 
       <!-- 坐标偏移 -->
@@ -383,7 +398,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('x')"
-              title="重置 X 偏移"
+              :title="t('tip-reset-x')"
             >
               {{ t('reset-x') }}
             </button>
@@ -405,7 +420,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('y')"
-              title="重置 Y 偏移"
+              :title="t('tip-reset-y')"
             >
               {{ t('reset-0') }}
             </button>
@@ -430,7 +445,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('wordGap')"
-              title="重置间距"
+              :title="t('tip-reset-gap')"
             >
               {{ t('reset-0') }}
             </button>
@@ -452,7 +467,7 @@ const handleHaloColorPicker = (e: Event) => {
               type="button"
               class="reset-badge"
               @click="resetField('padding')"
-              title="重置留白"
+              :title="t('tip-reset-pad')"
             >
               {{ t('reset-pad') }}
             </button>
@@ -472,7 +487,7 @@ const handleHaloColorPicker = (e: Event) => {
     <!-- 04. 规格与开关 -->
     <div class="tactical-section">
       <div class="section-divider">
-        <span class="section-tag">04 // 导出与开关 (OUTPUT)</span>
+        <span class="section-tag">{{ t('sec-output') }}</span>
       </div>
 
         <!-- 分辨率倍率 -->
