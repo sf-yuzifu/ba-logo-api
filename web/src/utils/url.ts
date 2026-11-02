@@ -1,94 +1,102 @@
 import type { LogoFormState } from '../types.ts';
 
+type LogoParameter = keyof Omit<LogoFormState, 'endpoint'>;
+type ParameterNames = Partial<Record<LogoParameter, string>>;
+
+const COMMON_NAMES: ParameterNames = {
+  left: 'left',
+  right: 'right',
+  subtitle: 'subtitle',
+  subtitleColor: 'subtitleColor',
+  subX: 'subX',
+  subY: 'subY',
+  accent: 'accent',
+  textColor: 'textColor',
+  crossColor: 'crossColor',
+  haloColor: 'haloColor',
+  behind: 'motifsBehindText',
+  x: 'offsetX',
+  y: 'offsetY',
+  wordGap: 'wordGap',
+  scale: 'scale',
+  format: 'format',
+  transparent: 'transparent',
+  dark: 'darkMode',
+  swap: 'swapColors',
+  padding: 'padding',
+  center: 'center',
+};
+
+const LEGACY_NAMES: ParameterNames = {
+  ...COMMON_NAMES,
+  left: 'l',
+  right: 'r',
+  subtitle: 'sub',
+  subtitleColor: 'subColor',
+  accent: 'accent',
+  crossColor: 'cross',
+  haloColor: 'halo',
+  behind: 'behind',
+  x: 'x',
+  y: 'y',
+  wordGap: 'gap',
+  scale: 'scale',
+  format: 'format',
+  transparent: 'tp',
+  dark: 'dark',
+  swap: 'swap',
+};
+
 function cleanHex(color: string): string {
   return color.replace(/^#/, '').trim();
 }
 
-/**
- * 统一构建前端请求或分享的 API 相对/绝对 URL
- * 支持 RESTful `/api/logo` 与旧版 `/balogo` 双重路由参数映射
- */
+function addParam(params: URLSearchParams, name: string, value: unknown): void {
+  params.set(name, String(value));
+}
+
+/** Build an API URL while keeping endpoint-specific names in one mapping. */
 export function buildLogoUrl(state: Readonly<LogoFormState>, origin = ''): string {
+  const legacy = state.endpoint === 'balogo';
+  const names = legacy ? LEGACY_NAMES : COMMON_NAMES;
   const params = new URLSearchParams();
-  const isLegacy = state.endpoint === 'balogo';
+  const set = (key: LogoParameter, value: unknown) => {
+    const name = names[key];
+    if (name) addParam(params, name, value);
+  };
 
-  const defaultTextColor = state.dark ? '#ffffff' : '#2b2b2b';
-  const hasCustomTextColor = state.textColor.trim().toLowerCase() !== defaultTextColor;
-  const hasCustomAccent = state.accent.trim().toLowerCase() !== '#128afa';
-
-  if (isLegacy) {
-    // 兼容旧版 /balogo
-    params.set('l', state.left);
-    params.set('r', state.right);
-
-    if (state.subtitle) {
-      params.set('sub', state.subtitle);
-      if (state.subtitleColor) params.set('subColor', cleanHex(state.subtitleColor));
-      if (state.subX !== 0) params.set('subX', String(state.subX));
-      if (state.subY !== 0) params.set('subY', String(state.subY));
-    }
-
-    if (hasCustomAccent) params.set('accent', cleanHex(state.accent));
-    if (hasCustomTextColor) params.set('textColor', cleanHex(state.textColor));
-    if (state.crossColor) params.set('cross', cleanHex(state.crossColor));
-    if (state.haloColor) params.set('halo', cleanHex(state.haloColor));
-    if (state.behind) params.set('behind', 'true');
-
-    if (state.x !== -15) params.set('x', String(state.x));
-    if (state.y !== 0) params.set('y', String(state.y));
-    if (state.wordGap !== 0) params.set('gap', String(state.wordGap));
-    if (state.scale !== 1) params.set('scale', String(state.scale));
-    if (state.format !== 'png') params.set('format', state.format);
-    if (state.transparent) params.set('tp', 'true');
-    if (state.dark) params.set('dark', 'true');
-    if (state.swap) params.set('swap', 'true');
-
-    const trimmedPadding = state.padding.trim();
-    if (trimmedPadding && trimmedPadding !== '2') {
-      params.set('padding', trimmedPadding);
-    }
-    if (state.center !== !state.transparent) {
-      params.set('center', String(state.center));
-    }
-
-    const query = params.toString();
-    return `${origin}/balogo${query ? `?${query}` : ''}`;
-  }
-
-  // 现代 RESTful /api/logo
-  params.set('left', state.left);
-  params.set('right', state.right);
+  set('left', state.left);
+  set('right', state.right);
 
   if (state.subtitle) {
-    params.set('subtitle', state.subtitle);
-    if (state.subtitleColor) params.set('subtitleColor', cleanHex(state.subtitleColor));
-    if (state.subX !== 0) params.set('subX', String(state.subX));
-    if (state.subY !== 0) params.set('subY', String(state.subY));
+    set('subtitle', state.subtitle);
+    if (state.subtitleColor) set('subtitleColor', cleanHex(state.subtitleColor));
+    if (state.subX !== 0) set('subX', state.subX);
+    if (state.subY !== 0) set('subY', state.subY);
   }
 
-  if (hasCustomAccent) params.set('accent', cleanHex(state.accent));
-  if (hasCustomTextColor) params.set('textColor', cleanHex(state.textColor));
-  if (state.crossColor) params.set('crossColor', cleanHex(state.crossColor));
-  if (state.haloColor) params.set('haloColor', cleanHex(state.haloColor));
-  if (state.behind) params.set('motifsBehindText', 'true');
-
-  if (state.x !== -15) params.set('offsetX', String(state.x));
-  if (state.y !== 0) params.set('offsetY', String(state.y));
-  if (state.wordGap !== 0) params.set('wordGap', String(state.wordGap));
-  if (state.scale !== 1) params.set('scale', String(state.scale));
-  if (state.format !== 'png') params.set('format', state.format);
-  if (state.transparent) params.set('transparent', 'true');
-  if (state.dark) params.set('darkMode', 'true');
-  if (state.swap) params.set('swapColors', 'true');
-
-  const trimmedPadding = state.padding.trim();
-  if (trimmedPadding && trimmedPadding !== '2') {
-    params.set('padding', trimmedPadding);
+  const defaultTextColor = state.dark ? '#ffffff' : '#2b2b2b';
+  if (state.accent.trim().toLowerCase() !== '#128afa') set('accent', cleanHex(state.accent));
+  if (state.textColor.trim().toLowerCase() !== defaultTextColor) {
+    set('textColor', cleanHex(state.textColor));
   }
-  if (state.center !== !state.transparent) {
-    params.set('center', String(state.center));
-  }
+  if (state.crossColor) set('crossColor', cleanHex(state.crossColor));
+  if (state.haloColor) set('haloColor', cleanHex(state.haloColor));
+  if (state.behind) set('behind', 'true');
+
+  if (state.x !== -15) set('x', state.x);
+  if (state.y !== 0) set('y', state.y);
+  if (state.wordGap !== 0) set('wordGap', state.wordGap);
+  if (state.scale !== 1) set('scale', state.scale);
+  if (state.format !== 'png') set('format', state.format);
+  if (state.transparent) set('transparent', 'true');
+  if (state.dark) set('dark', 'true');
+  if (state.swap) set('swap', 'true');
+
+  const padding = state.padding.trim();
+  if (padding && padding !== '2') set('padding', padding);
+  if (state.center !== !state.transparent) set('center', String(state.center));
 
   const query = params.toString();
-  return `${origin}/api/logo${query ? `?${query}` : ''}`;
+  return `${origin}${legacy ? '/balogo' : '/api/logo'}${query ? `?${query}` : ''}`;
 }

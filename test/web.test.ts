@@ -139,6 +139,19 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(parsed.searchParams.get('padding')).toBe('5');
   });
 
+  it('buildLogoUrl 应保留默认值省略、空副标题与相对/绝对 origin 行为', () => {
+    const url = buildLogoUrl(DEFAULT_STATE);
+    expect(url).toBe('/api/logo?left=%E8%94%9A%E8%93%9D&right=%E6%A1%A3%E6%A1%88&scale=2');
+
+    const absoluteLegacy = buildLogoUrl(
+      { ...DEFAULT_STATE, endpoint: 'balogo', subtitle: '', center: true },
+      'https://example.com',
+    );
+    expect(absoluteLegacy).toBe(
+      'https://example.com/balogo?l=%E8%94%9A%E8%93%9D&r=%E6%A1%A3%E6%A1%88&scale=2',
+    );
+  });
+
   it('i18n 词典应当在所有支持的语言中具备 100% 键覆盖率', () => {
     const zhKeys = Object.keys(LOCALES.zh).sort();
     expect(zhKeys.length).toBeGreaterThan(30);
