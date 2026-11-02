@@ -4,6 +4,7 @@ import { DEFAULT_STATE } from '../web/src/constants.ts';
 import { LOCALES } from '../web/src/locales/index.ts';
 import type { LogoFormState } from '../web/src/types.ts';
 import { buildLogoUrl } from '../web/src/utils/url.ts';
+import { createPreviewHarness } from './helpers/useLogoPreviewHarness.ts';
 
 describe('WebUI Frontend Architecture & Logic Tests', () => {
   it('默认标题随语言切换；用户编辑后不因语言切换而被覆盖', () => {
@@ -168,31 +169,126 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     }
   });
 
-  it('WebUI 异步预览应保证请求序号时序与参数快照隔离', async () => {
-    let currentRequestId = 0;
-    let activeData = '';
-
-    // 模拟两个异步请求：请求 1 耗时 50ms，请求 2 耗时 10ms
-    const sendRequest = async (id: number, text: string, delay: number) => {
-      currentRequestId = id;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      if (id === currentRequestId) {
-        activeData = text;
+  it('useLogoPreview 应通过取消与请求序号阻止旧响应覆盖最新预览', async () => {
+    const state = { ...DEFAULT_STATE };
+    const harness = createPreviewHarness(state);
+    const unmount = harness.mount();
+    const pending: Array<(response: Response) => void> = [];
+    const originalFetch = globalThis.fetch;
+    const originalImage = globalThis.Image;
+    globalThis.Image = class {
+      naturalWidth = 12;
+      naturalHeight = 8;
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_value: string) {
+        this.onload?.();
       }
-    };
+    } as unknown as typeof Image;
+    globalThis.fetch = ((_input: RequestInfo | URL, init?: RequestInit) =>
+      new Promise<Response>((resolve, reject) => {
+        pending.push(resolve);
+        init?.signal?.addEventListener('abort', () =>
+          reject(new DOMException('Aborted', 'AbortError')),
+        );
+      })) as typeof fetch;
 
-    const p1 = sendRequest(1, '慢响应文本', 50);
-    const p2 = sendRequest(2, '快响应文本', 10);
-    await Promise.all([p1, p2]);
+    try {
+      harness.api.triggerPreview();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      state.left = '最新';
+      harness.api.triggerPreview();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(pending.length).toBe(2);
 
-    // 较慢返回的请求 1 不得覆盖较新的请求 2
-    expect(activeData).toBe('快响应文本');
+      pending[1](new Response(new Blob([new Uint8Array([2])], { type: 'image/png' })));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      expect(harness.api.activePreview.value.snapshot.left).toBe('最新');
+      expect(harness.api.isLoading.value).toBe(false);
+    } finally {
+      unmount();
+      globalThis.fetch = originalFetch;
+      globalThis.Image = originalImage;
+    }
+  });
 
-    // 验证状态快照隔离：修改原状态不应污染已抓取的快照
-    const state: LogoFormState = { ...DEFAULT_STATE, left: '旧文本' };
-    const snapshot = { ...state };
-    state.left = '新文本';
-    expect(snapshot.left).toBe('旧文本');
+  it('useLogoPreview 应在替换与卸载时回收 Blob URL，并清除 toast 定时器', async () => {
+    const state = { ...DEFAULT_STATE };
+    const harness = createPreviewHarness(state);
+    const unmount = harness.mount();
+    const originalFetch = globalThis.fetch;
+    const originalCreate = URL.createObjectURL;
+    const originalRevoke = URL.revokeObjectURL;
+    const originalImage = globalThis.Image;
+    const created: string[] = [];
+    const revoked: string[] = [];
+    let imageSrc = '';
+    URL.createObjectURL = (() => {
+      const url = `blob:test-${created.length + 1}`;
+      created.push(url);
+      return url;
+    }) as typeof URL.createObjectURL;
+    URL.revokeObjectURL = ((url: string) => revoked.push(url)) as typeof URL.revokeObjectURL;
+    globalThis.Image = class {
+      naturalWidth = 10;
+      naturalHeight = 20;
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(value: string) {
+        imageSrc = value;
+      }
+    } as unknown as typeof Image;
+    globalThis.fetch = (async () =>
+      new Response(
+        new Blob([new Uint8Array([1])], { type: 'image/png' }),
+      )) as unknown as typeof fetch;
+
+    try {
+      harness.api.triggerPreview();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(harness.api.activePreview.value.blobUrl).toBe(imageSrc);
+
+      state.left = 'replaced';
+      harness.api.triggerPreview();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(revoked).toContain(created[0]);
+
+      harness.api.showToast('test');
+      unmount();
+      expect(revoked).toContain(created[1]);
+    } finally {
+      globalThis.fetch = originalFetch;
+      URL.createObjectURL = originalCreate;
+      URL.revokeObjectURL = originalRevoke;
+      globalThis.Image = originalImage;
+    }
+  });
+
+  it('useLogoPreview 卸载时应取消复制图片发起的辅助请求', async () => {
+    const state = { ...DEFAULT_STATE, format: 'svg' as const };
+    const harness = createPreviewHarness(state);
+    const unmount = harness.mount();
+    const originalFetch = globalThis.fetch;
+    let signal: AbortSignal | undefined;
+    globalThis.fetch = ((_input: RequestInfo | URL, init?: RequestInit) => {
+      signal = init?.signal ?? undefined;
+      return new Promise<Response>((_resolve, reject) => {
+        signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+      });
+    }) as typeof fetch;
+
+    try {
+      const copyPromise = harness.api.copyImage();
+      expect(signal?.aborted).toBe(false);
+      unmount();
+      expect(signal?.aborted).toBe(true);
+      await copyPromise;
+    } finally {
+      unmount();
+      globalThis.fetch = originalFetch;
+    }
   });
 
   it('useTheme 应当正确管理主题模式并支持 cycleTheme 轮转', async () => {

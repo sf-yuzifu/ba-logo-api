@@ -25,6 +25,7 @@ export function useLogoPreview(state: LogoFormState) {
 
   let currentRequestId = 0;
   let abortController: AbortController | null = null;
+  const auxiliaryControllers = new Set<AbortController>();
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   const showToast = (message: string) => {
@@ -67,6 +68,7 @@ export function useLogoPreview(state: LogoFormState) {
 
       if (!response.ok) {
         const errorJson = await response.json().catch(() => ({}));
+        if (requestId !== currentRequestId) return;
         const summary =
           (errorJson as Record<string, string>).summary ||
           (errorJson as Record<string, string>).message ||
@@ -87,10 +89,11 @@ export function useLogoPreview(state: LogoFormState) {
 
       if (snapshot.format === 'base64') {
         const json = await response.json();
+        if (requestId !== currentRequestId) return;
         const data = json.data;
 
         // 清理旧的 Blob URL
-        if (activePreview.value.blobUrl) {
+        if (activePreview.value.blobUrl && !activePreview.value.base64Data) {
           URL.revokeObjectURL(activePreview.value.blobUrl);
         }
 
@@ -215,7 +218,14 @@ export function useLogoPreview(state: LogoFormState) {
         pngBlob = preview.blob;
       } else {
         const pngUrl = buildLogoUrl({ ...preview.snapshot, format: 'png' });
-        const res = await fetch(pngUrl);
+        const controller = new AbortController();
+        auxiliaryControllers.add(controller);
+        let res: Response;
+        try {
+          res = await fetch(pngUrl, { signal: controller.signal });
+        } finally {
+          auxiliaryControllers.delete(controller);
+        }
         pngBlob = await res.blob();
       }
 
@@ -228,7 +238,11 @@ export function useLogoPreview(state: LogoFormState) {
 
   onUnmounted(() => {
     if (debounceTimer) clearTimeout(debounceTimer);
+    if (toastTimer) clearTimeout(toastTimer);
+    currentRequestId++;
     if (abortController) abortController.abort();
+    for (const controller of auxiliaryControllers) controller.abort();
+    auxiliaryControllers.clear();
     if (activePreview.value.blobUrl && !activePreview.value.base64Data) {
       URL.revokeObjectURL(activePreview.value.blobUrl);
     }
