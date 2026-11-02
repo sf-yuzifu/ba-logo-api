@@ -113,6 +113,25 @@ describe('Renderer Core Unit Tests', () => {
     }
   });
 
+  it('官方层级 SVG 应同时将中心多边形遮罩应用于光环与右侧文字，且光环遮罩应包含文字描边镂空', async () => {
+    const { svg, buffer, width, height } = renderLogoToBuffer({
+      textL: '蔚蓝',
+      textR: '档案',
+      scale: 2,
+      format: 'svg',
+    });
+    expect(svg).toContain('<mask id="ba-halo-mask"');
+    expect(svg).toContain('<mask id="ba-text-cutout"');
+    expect(svg).toContain('<g mask="url(#ba-halo-mask)">');
+    expect(svg).toContain('<g mask="url(#ba-text-cutout)">');
+    expect(svg).toContain('stroke-width="24"');
+
+    // 验证光栅化后 SVG 渲染有效且尺寸完全一致
+    const image = await loadImage(buffer);
+    expect(image.width).toBe(width);
+    expect(image.height).toBe(height);
+  });
+
   it('应当支持分辨率等比例缩放 (scale)', () => {
     // 紧凑裁切模式下，各倍率尺寸应当严格保持成倍放大
     const logo1x = renderLogo({ scale: 1 });

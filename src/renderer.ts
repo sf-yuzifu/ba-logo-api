@@ -438,18 +438,26 @@ export function renderLogoSvg(options: RenderOptions = {}): SvgRenderResult {
     svg += `    <mask id="ba-halo-mask" maskUnits="userSpaceOnUse" x="-5000" y="-5000" width="10000" height="10000">\n`;
     svg += `      <rect x="-5000" y="-5000" width="10000" height="10000" fill="white"/>\n`;
     svg += `      <polygon points="${hollowPoints}" fill="black"/>\n`;
-    svg += `      <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="black" stroke="black" stroke-width="${strokeWidth}" stroke-linejoin="round" stroke-linecap="round">\n`;
+    svg += `      <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="black" stroke="black" stroke-width="${strokeWidth}" stroke-linejoin="miter" stroke-linecap="butt">\n`;
     svg += `        ${vectorR}\n`;
     svg += `      </g>\n`;
     svg += `    </mask>\n`;
+    svg += `    <mask id="ba-text-cutout" maskUnits="userSpaceOnUse" x="-5000" y="-5000" width="10000" height="10000">\n`;
+    svg += `      <rect x="-5000" y="-5000" width="10000" height="10000" fill="white"/>\n`;
+    svg += `      <polygon points="${hollowPoints}" fill="black"/>\n`;
+    svg += `    </mask>\n`;
     svg += `  </defs>\n`;
 
-    svg += `  <g transform="translate(${graphX} ${graphY}) scale(${haloScale})" mask="url(#ba-halo-mask)">\n`;
-    svg += `    <path fill="${haloColor}" d="${HALO_PATH_DATA}"/>\n`;
+    svg += `  <g mask="url(#ba-halo-mask)">\n`;
+    svg += `    <g transform="translate(${graphX} ${graphY}) scale(${haloScale})">\n`;
+    svg += `      <path fill="${haloColor}" d="${HALO_PATH_DATA}"/>\n`;
+    svg += `    </g>\n`;
     svg += `  </g>\n`;
 
-    svg += `  <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="${secondaryColor}">\n`;
-    svg += `    ${vectorR}\n`;
+    svg += `  <g mask="url(#ba-text-cutout)">\n`;
+    svg += `    <g transform="matrix(1 0 ${HORIZONTAL_TILT} 1 ${transX_R} ${baseL.toFixed(2)})" fill="${secondaryColor}">\n`;
+    svg += `      ${vectorR}\n`;
+    svg += `    </g>\n`;
     svg += `  </g>\n`;
 
     svg += `  <g transform="translate(${graphX} ${graphY}) scale(${haloScale})">\n`;
