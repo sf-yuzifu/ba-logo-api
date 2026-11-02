@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { getDefaultTextPair, getTextPairOnLanguageChange } from '../web/src/constants/textPairs.ts';
 import { DEFAULT_STATE } from '../web/src/constants.ts';
 import { LOCALES } from '../web/src/locales/index.ts';
@@ -167,6 +168,36 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
         expect(value.trim().length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('主题样式应同时定义明暗主题变量，并让组件通过变量引用主题色', () => {
+    const css = readFileSync(new URL('../web/src/styles/main.css', import.meta.url), 'utf8');
+    const darkTheme = css.slice(
+      css.indexOf("html[data-theme='dark'] {"),
+      css.indexOf('\n}', css.indexOf("html[data-theme='dark'] {")),
+    );
+
+    for (const variable of [
+      '--surface-hover',
+      '--surface-raised',
+      '--input-focus-bg',
+      '--primary-focus-ring',
+      '--control-focus-ring',
+      '--surface-control',
+      '--surface-popover',
+      '--surface-loading',
+      '--switch-track',
+      '--tag-neutral-bg',
+      '--tag-neutral-border',
+      '--tag-neutral-text',
+      '--shadow-card',
+      '--header-bg',
+    ]) {
+      expect(css).toContain(`${variable}:`);
+      expect(darkTheme).toContain(`${variable}:`);
+    }
+    expect(css).toContain('background: var(--surface-hover)');
+    expect(css).toContain('background: var(--input-focus-bg)');
   });
 
   it('useLogoPreview 应通过取消与请求序号阻止旧响应覆盖最新预览', async () => {
