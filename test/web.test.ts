@@ -212,6 +212,25 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(headerContent).not.toContain('subrecovery.top');
   });
 
+  it('移动端应具备完整的视口配置、置顶吸顶预览、紧凑导航与底部浮动操作栏', () => {
+    const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
+    expect(html).toContain('viewport-fit=cover');
+
+    const appVue = readFileSync(new URL('../web/src/App.vue', import.meta.url), 'utf8');
+    expect(appVue).toContain('class="mobile-floating-bar"');
+    expect(appVue).toContain('@click="downloadImage"');
+    expect(appVue).toContain('@click="copyImage"');
+
+    const css = readFileSync(new URL('../web/src/styles/main.css', import.meta.url), 'utf8');
+    expect(css).toContain('@media (max-width: 1200px)');
+    expect(css).toContain('@media (max-width: 768px)');
+    expect(css).toContain('@media (max-width: 480px)');
+    expect(css).toContain('.mobile-floating-bar');
+    expect(css).toContain('order: -1');
+    expect(css).toContain('position: sticky');
+    expect(css).toContain('env(safe-area-inset-bottom');
+  });
+
   it('主题样式应同时定义明暗主题变量，并让组件通过变量引用主题色', () => {
     const css = readFileSync(new URL('../web/src/styles/main.css', import.meta.url), 'utf8');
     const darkTheme = css.slice(

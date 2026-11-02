@@ -27,6 +27,17 @@ const themeLabel = computed(() => {
   return 'DARK';
 });
 
+const langShortCode = computed(() => {
+  const map: Record<SupportedLang, string> = {
+    zh: 'ZH',
+    'zh-tw': 'TW',
+    en: 'EN',
+    ja: 'JA',
+    ko: 'KO',
+  };
+  return map[lang.value] || lang.value.toUpperCase();
+});
+
 const handleSelectLang = (newLang: SupportedLang) => {
   setLang(newLang);
   isDropdownOpen.value = false;
@@ -72,7 +83,7 @@ onUnmounted(() => {
       </div>
       <div class="brand-text-group">
         <div class="brand-title">
-          Blue Archive <span>Logo Generator</span>
+          Blue Archive <span class="brand-title-sub">Logo Generator</span>
         </div>
         <div class="brand-sub">TACTICAL LOGISTICS // KIVOTOS D1</div>
       </div>
@@ -126,7 +137,8 @@ onUnmounted(() => {
             <line x1="2" y1="12" x2="22" y2="12"></line>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
           </svg>
-          <span class="lang-trigger-label">{{ currentLangOption.label }}</span>
+          <span class="lang-trigger-label lang-label-full">{{ currentLangOption.label }}</span>
+          <span class="lang-trigger-label lang-label-short">{{ langShortCode }}</span>
           <svg class="lang-chevron" :class="{ rotate: isDropdownOpen }" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -157,7 +169,7 @@ onUnmounted(() => {
         </transition>
       </div>
 
-      <a href="/swagger" class="nav-btn nav-btn-primary" target="_blank">
+      <a href="/swagger" class="nav-btn nav-btn-primary" target="_blank" :title="t('nav-swagger')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
@@ -165,16 +177,16 @@ onUnmounted(() => {
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        <span>{{ t('nav-swagger') }}</span>
+        <span class="nav-btn-text">{{ t('nav-swagger') }}</span>
       </a>
 
-      <a href="https://lab.nulla.top/ba-logo/" class="nav-btn nav-btn-default" target="_blank" rel="noopener noreferrer">
+      <a href="https://lab.nulla.top/ba-logo/" class="nav-btn nav-btn-default" target="_blank" rel="noopener noreferrer" :title="t('nav-upstream')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
           <polyline points="15 3 21 3 21 9"></polyline>
           <line x1="10" y1="14" x2="21" y2="3"></line>
         </svg>
-        <span>{{ t('nav-upstream') }}</span>
+        <span class="nav-btn-text">{{ t('nav-upstream') }}</span>
       </a>
     </div>
   </header>

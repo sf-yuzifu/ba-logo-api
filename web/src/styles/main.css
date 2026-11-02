@@ -282,9 +282,13 @@ header {
   gap: 6px;
 }
 
-.brand-title span {
+.brand-title .brand-title-sub {
   color: var(--primary);
   font-weight: 700;
+}
+
+.lang-label-short {
+  display: none;
 }
 
 .brand-sub {
@@ -602,6 +606,10 @@ main {
     width: 96%;
     padding: 1rem;
     gap: 1.5rem;
+  }
+
+  .preview-card {
+    order: -1;
   }
 }
 
@@ -1674,4 +1682,395 @@ html[data-theme='dark'] .copy-url-btn {
 
 html[data-theme='dark'] .copy-url-btn:hover {
   background: var(--primary-hover);
+}
+
+/* ========================================================
+   移动端与响应式适配 (Mobile & Responsive HUD Adaptation)
+   ======================================================== */
+
+/* 移动端底部悬浮吸底操作栏 (默认在桌面端隐藏) */
+.mobile-floating-bar {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  main {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: 720px;
+    padding: 0 1rem;
+    margin: 1.25rem auto;
+    gap: 1.25rem;
+  }
+
+  .preview-card {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 顶部导航栏极简图标模式 */
+  header {
+    height: 52px;
+    padding: 0 10px;
+  }
+
+  .brand {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .brand-badge {
+    padding: 2px 7px;
+    font-size: 0.74rem;
+    letter-spacing: 0.05em;
+  }
+
+  .brand-badge-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .brand-title {
+    font-size: 0.96rem;
+    white-space: nowrap;
+  }
+
+  .brand-title-sub {
+    display: none;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .nav-links {
+    gap: 5px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .theme-label {
+    display: none;
+  }
+
+  .lang-dropdown-trigger {
+    height: 32px;
+    padding: 0 7px;
+    gap: 4px;
+  }
+
+  .lang-label-full {
+    display: none;
+  }
+
+  .lang-label-short {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 800;
+    font-family: var(--font-hud);
+  }
+
+  .lang-dropdown-trigger .lang-chevron {
+    display: none;
+  }
+
+  .nav-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .nav-btn .nav-btn-text {
+    display: none;
+  }
+
+  /* 主体卡片与吸顶视口 */
+  main {
+    padding: 0 0.65rem;
+    margin: 0.65rem auto;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 12px));
+    gap: 0.75rem;
+  }
+
+  .card {
+    border-top-width: 3px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* 核心：移动端置顶吸顶视口 */
+  .preview-card {
+    position: sticky;
+    top: 52px;
+    z-index: 50;
+    padding: 8px 10px;
+    gap: 6px;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 1px 4px var(--shadow-card);
+  }
+
+  .preview-card .card-header {
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .preview-card .card-sec-tag {
+    display: none;
+  }
+
+  .preview-card .card-title {
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  .preview-card .card-title-slashes {
+    display: none;
+  }
+
+  .preview-card .meta-bar {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .preview-card .meta-badge {
+    padding: 2px 5px;
+    font-size: 0.7rem;
+    gap: 3px;
+  }
+
+  .preview-canvas-box {
+    min-height: 130px;
+    max-height: 155px;
+    padding: 6px;
+    border-radius: var(--radius-xs);
+  }
+
+  .preview-canvas-box .hud-reticle {
+    font-size: 12px;
+  }
+  .preview-canvas-box .hud-reticle.top-left { top: 4px; left: 6px; }
+  .preview-canvas-box .hud-reticle.top-right { top: 4px; right: 6px; }
+  .preview-canvas-box .hud-reticle.bottom-left { bottom: 4px; left: 6px; }
+  .preview-canvas-box .hud-reticle.bottom-right { bottom: 4px; right: 6px; }
+
+  .preview-img {
+    max-height: 140px;
+    object-fit: contain;
+  }
+
+  .preview-card .url-box-container {
+    height: 30px;
+    padding: 0 6px 0 8px;
+    font-size: 0.74rem;
+    gap: 6px;
+  }
+
+  .preview-card .url-prefix {
+    font-size: 0.62rem;
+    padding: 1px 4px;
+  }
+
+  .preview-card .url-text {
+    font-size: 0.74rem;
+  }
+
+  .preview-card .copy-url-btn {
+    height: 22px;
+    padding: 0 6px;
+    font-size: 0.7rem;
+    gap: 4px;
+  }
+
+  .preview-card .copy-url-btn svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* 移动端卡片内隐藏重复按钮，由底部吸底工具条接管 */
+  .preview-card .actions-grid {
+    display: none;
+  }
+
+  /* 表单控件优化 */
+  .controls-card {
+    padding: 12px 14px;
+    margin-bottom: 0.5rem;
+  }
+
+  .controls-card .card-header {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .controls-card .card-title {
+    font-size: 0.95rem;
+  }
+
+  .controls-card .card-sec-tag {
+    font-size: 0.68rem;
+  }
+
+  .tactical-section {
+    margin-bottom: 1rem;
+  }
+
+  /* 防止移动端聚焦输入框时 iOS Safari 自动强制缩放放大视口 */
+  input[type='text'],
+  input[type='number'] {
+    font-size: 16px;
+  }
+
+  /* 移动端底部悬浮吸底操作栏 */
+  .mobile-floating-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 95;
+    background: var(--header-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1.5px solid var(--card-border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 10px));
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .floating-btn {
+    height: 42px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-hud);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: transform var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .floating-btn:active {
+    transform: scale(0.96);
+  }
+
+  .floating-btn-primary {
+    flex: 1.35;
+    background: linear-gradient(180deg, #1C93FD 0%, #0E7ADB 100%);
+    color: var(--on-primary);
+    box-shadow: 0 3px 10px var(--primary-glow);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .floating-btn-secondary {
+    flex: 1;
+    background: var(--surface-control);
+    border: 1.5px solid var(--card-border);
+    color: var(--text-main);
+  }
+
+  .floating-btn-icon {
+    width: 42px;
+    flex: 0 0 42px;
+    background: var(--surface-control);
+    border: 1.5px solid var(--card-border);
+    color: var(--text-muted);
+    padding: 0;
+  }
+
+  .floating-btn-icon:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  /* 移动端 Toast 提示居中定位在浮动条上方 */
+  #toast {
+    left: 50%;
+    right: auto;
+    bottom: calc(68px + env(safe-area-inset-bottom, 12px));
+    transform: translate(-50%, 12px) scale(0.96);
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 8px 16px;
+    font-size: 0.88rem;
+  }
+
+  #toast.show {
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* 超窄小屏适配 (<= 480px, 如 iPhone SE) */
+@media (max-width: 480px) {
+  .card {
+    padding: 0.95rem;
+  }
+
+  .preview-canvas-box {
+    min-height: 140px;
+    max-height: 175px;
+    padding: 0.5rem;
+  }
+
+  .form-row {
+    gap: 8px;
+  }
+
+  .color-picker-box {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .color-presets {
+    gap: 6px;
+  }
+
+  .color-dot {
+    width: 26px;
+    height: 26px;
+  }
+
+  .floating-btn-secondary span {
+    font-size: 0.82rem;
+  }
+}
+
+/* 暗色主题下浮动操作栏适配 */
+html[data-theme='dark'] .floating-btn-primary {
+  background: linear-gradient(180deg, #A78BFA 0%, #8B5CF6 100%);
+  border: 1px solid #8B5CF6;
+  box-shadow: 0 3px 10px rgba(139, 92, 246, 0.4);
+}
+
+html[data-theme='dark'] .floating-btn-secondary,
+html[data-theme='dark'] .floating-btn-icon {
+  background: var(--surface-control);
+  border-color: var(--card-border);
+  color: var(--text-main);
 }
