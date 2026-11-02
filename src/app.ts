@@ -4,7 +4,7 @@ import { swagger } from '@elysiajs/swagger';
 import { type Context, Elysia } from 'elysia';
 import pkg from '../package.json' with { type: 'json' };
 import { type OutputFormat, type RenderOptions, renderLogoToBuffer } from './renderer.ts';
-import { type LogoQuery, LogoQuerySchema } from './schema.ts';
+import { type LogoQuery, LogoQuerySchema, resolveQueryAlias } from './schema.ts';
 
 const APP_NAME = pkg.name;
 const APP_VERSION = pkg.version;
@@ -44,36 +44,35 @@ function createCacheHeaders(
  * 将 Query 查询参数解析并标准化为 RenderOptions
  */
 export function parseLogoQuery(query: LogoQuery): RenderOptions {
-  const textL = query.left ?? query.l ?? '蔚蓝';
-  const textR = query.right ?? query.r ?? '档案';
-  const subtitle = query.subtitle ?? query.sub;
-  const subtitleColor = query.subtitleColor ?? query.subColor;
+  const value = (key: keyof LogoQuery) => resolveQueryAlias(query, key as string);
+  const textL = (value('left') as string | undefined) ?? '蔚蓝';
+  const textR = (value('right') as string | undefined) ?? '档案';
+  const subtitle = value('subtitle') as string | undefined;
+  const subtitleColor = value('subtitleColor') as string | undefined;
 
-  const offsetX = parseOptionalNumber(query.offsetX ?? query.x);
-  const offsetY = parseOptionalNumber(query.offsetY ?? query.y);
-  const subtitleOffsetX = parseOptionalNumber(query.subtitleOffsetX ?? query.subX);
-  const subtitleOffsetY = parseOptionalNumber(query.subtitleOffsetY ?? query.subY);
-  const scale = parseOptionalNumber(query.scale ?? query.s);
-  const wordGap = parseOptionalNumber(query.wordGap ?? query.gap);
+  const offsetX = parseOptionalNumber(value('offsetX'));
+  const offsetY = parseOptionalNumber(value('offsetY'));
+  const subtitleOffsetX = parseOptionalNumber(value('subtitleOffsetX'));
+  const subtitleOffsetY = parseOptionalNumber(value('subtitleOffsetY'));
+  const scale = parseOptionalNumber(value('scale'));
+  const wordGap = parseOptionalNumber(value('wordGap'));
 
-  const transparent = parseOptionalBoolean(query.transparent ?? query.tp);
-  const darkMode = parseOptionalBoolean(query.darkMode ?? query.dark);
-  const swapColors = parseOptionalBoolean(query.swapColors ?? query.swap);
-  const motifsBehindText = parseOptionalBoolean(
-    query.motifsBehindText ?? query.underText ?? query.behind,
-  );
-  const center = parseOptionalBoolean(query.center ?? query.vcenter);
+  const transparent = parseOptionalBoolean(value('transparent'));
+  const darkMode = parseOptionalBoolean(value('darkMode'));
+  const swapColors = parseOptionalBoolean(value('swapColors'));
+  const motifsBehindText = parseOptionalBoolean(value('motifsBehindText'));
+  const center = parseOptionalBoolean(value('center'));
 
-  const accentColor = query.accentColor ?? query.accent;
-  const textColor = query.textColor ?? query.color ?? query.tc;
-  const crossColor = query.crossColor ?? query.cross;
-  const haloColor = query.haloColor ?? query.halo;
+  const accentColor = value('accentColor') as string | undefined;
+  const textColor = value('textColor') as string | undefined;
+  const crossColor = value('crossColor') as string | undefined;
+  const haloColor = value('haloColor') as string | undefined;
 
-  const padding = query.padding ?? query.pad;
-  const paddingTop = parseOptionalNumber(query.paddingTop ?? query.pt);
-  const paddingRight = parseOptionalNumber(query.paddingRight ?? query.pr);
-  const paddingBottom = parseOptionalNumber(query.paddingBottom ?? query.pb);
-  const paddingLeft = parseOptionalNumber(query.paddingLeft ?? query.pl);
+  const padding = value('padding') as RenderOptions['padding'];
+  const paddingTop = parseOptionalNumber(value('paddingTop'));
+  const paddingRight = parseOptionalNumber(value('paddingRight'));
+  const paddingBottom = parseOptionalNumber(value('paddingBottom'));
+  const paddingLeft = parseOptionalNumber(value('paddingLeft'));
 
   const format = (query.format ?? 'png').toLowerCase() as OutputFormat;
 

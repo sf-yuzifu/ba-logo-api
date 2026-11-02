@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { createApp } from '../src/app.ts';
+import { getRegisteredQueryAliases, LogoQuerySchema } from '../src/schema.ts';
 
 describe('HTTP Route & Compatibility Tests', () => {
   const app = createApp();
@@ -173,6 +174,20 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(bufPadLong.equals(bufPadShort)).toBe(true);
   });
 
+  it('长参数与别名同时提供时应优先采用长参数', async () => {
+    const canonical = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&scale=1'),
+    );
+    const conflictingAlias = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&l=Other&right=Archive&r=Other&scale=1&s=2'),
+    );
+    expect(
+      Buffer.from(await conflictingAlias.arrayBuffer()).equals(
+        Buffer.from(await canonical.arrayBuffer()),
+      ),
+    ).toBe(true);
+  });
+
   it('GET /api/logo?format=svg 应当返回纯矢量 SVG 文件', async () => {
     const res = await app.handle(
       new Request('http://localhost/api/logo?left=Blue&right=Archive&format=svg'),
@@ -225,6 +240,20 @@ describe('HTTP Route & Compatibility Tests', () => {
         '/balogo': expect.any(Object),
       },
     });
+
+    expect(Object.keys(LogoQuerySchema.properties)).toContain('left');
+    expect(Object.keys(LogoQuerySchema.properties)).toContain('l');
+    expect(getRegisteredQueryAliases()).toContain('behind');
+    for (const name of ['left', 'l', 'motifsBehindText', 'behind']) {
+      expect(JSON.stringify(LogoQuerySchema)).toContain(name);
+    }
+  });
+
+  it('参数别名登记应与 LogoQuerySchema 字段保持同步', () => {
+    const schemaFields = Object.keys(LogoQuerySchema.properties);
+    for (const name of getRegisteredQueryAliases()) {
+      expect(schemaFields).toContain(name);
+    }
   });
 
   it('应当正确输出 Cache-Control 与 ETag 并在命中缓存时响应 304 Not Modified', async () => {

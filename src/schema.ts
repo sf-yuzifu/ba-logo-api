@@ -1,5 +1,27 @@
 import { t } from 'elysia';
 
+const queryAliases: Record<string, string[]> = {};
+const registeredAliases: string[] = [];
+
+function alias<T>(canonical: string, name: string, schema: T): T {
+  if (!queryAliases[canonical]) queryAliases[canonical] = [];
+  queryAliases[canonical].push(name);
+  registeredAliases.push(name);
+  return schema;
+}
+
+export function getRegisteredQueryAliases(): readonly string[] {
+  return registeredAliases;
+}
+
+export function resolveQueryAlias(query: object, canonical: string): unknown {
+  const values = query as Record<string, unknown>;
+  for (const name of [canonical, ...(queryAliases[canonical] ?? [])]) {
+    if (values[name] !== undefined) return values[name];
+  }
+  return undefined;
+}
+
 /**
  * 宽松布尔值转换转换器（兼容 'true', 'false', '1', '0', boolean）
  */
@@ -22,7 +44,7 @@ export const LogoQuerySchema = t.Object({
       examples: ['Blue', '蔚蓝'],
     }),
   ),
-  l: t.Optional(t.String({ description: 'left 别名' })),
+  l: alias('left', 'l', t.Optional(t.String({ description: 'left 别名' }))),
 
   right: t.Optional(
     t.String({
@@ -30,7 +52,7 @@ export const LogoQuerySchema = t.Object({
       examples: ['Archive', '档案'],
     }),
   ),
-  r: t.Optional(t.String({ description: 'right 别名' })),
+  r: alias('right', 'r', t.Optional(t.String({ description: 'right 别名' }))),
 
   // 可选副标题（PR #12）
   subtitle: t.Optional(
@@ -39,7 +61,7 @@ export const LogoQuerySchema = t.Object({
       examples: ['ブルーアーカイブ', 'Blue Archive'],
     }),
   ),
-  sub: t.Optional(t.String({ description: 'subtitle 别名' })),
+  sub: alias('subtitle', 'sub', t.Optional(t.String({ description: 'subtitle 别名' }))),
 
   subtitleColor: t.Optional(
     t.String({
@@ -47,7 +69,11 @@ export const LogoQuerySchema = t.Object({
       examples: ['#2B2B2B', '#FFFFFF'],
     }),
   ),
-  subColor: t.Optional(t.String({ description: 'subtitleColor 别名' })),
+  subColor: alias(
+    'subtitleColor',
+    'subColor',
+    t.Optional(t.String({ description: 'subtitleColor 别名' })),
+  ),
 
   subtitleOffsetX: t.Optional(
     t.Numeric({
@@ -55,7 +81,11 @@ export const LogoQuerySchema = t.Object({
       examples: [0, 20, -20],
     }),
   ),
-  subX: t.Optional(t.Numeric({ description: 'subtitleOffsetX 别名' })),
+  subX: alias(
+    'subtitleOffsetX',
+    'subX',
+    t.Optional(t.Numeric({ description: 'subtitleOffsetX 别名' })),
+  ),
 
   subtitleOffsetY: t.Optional(
     t.Numeric({
@@ -63,7 +93,11 @@ export const LogoQuerySchema = t.Object({
       examples: [0, 10, -10],
     }),
   ),
-  subY: t.Optional(t.Numeric({ description: 'subtitleOffsetY 别名' })),
+  subY: alias(
+    'subtitleOffsetY',
+    'subY',
+    t.Optional(t.Numeric({ description: 'subtitleOffsetY 别名' })),
+  ),
 
   // 坐标偏移
   offsetX: t.Optional(
@@ -72,7 +106,7 @@ export const LogoQuerySchema = t.Object({
       examples: [-15, 0, 20],
     }),
   ),
-  x: t.Optional(t.Numeric({ description: 'offsetX 别名' })),
+  x: alias('offsetX', 'x', t.Optional(t.Numeric({ description: 'offsetX 别名' }))),
 
   offsetY: t.Optional(
     t.Numeric({
@@ -80,7 +114,7 @@ export const LogoQuerySchema = t.Object({
       examples: [0, -10, 10],
     }),
   ),
-  y: t.Optional(t.Numeric({ description: 'offsetY 别名' })),
+  y: alias('offsetY', 'y', t.Optional(t.Numeric({ description: 'offsetY 别名' }))),
 
   // 词间距（左右两词间距微调）
   wordGap: t.Optional(
@@ -91,17 +125,21 @@ export const LogoQuerySchema = t.Object({
       examples: [0, 20, -10],
     }),
   ),
-  gap: t.Optional(
-    t.Numeric({
-      description: 'wordGap 别名',
-      minimum: -100,
-      maximum: 300,
-    }),
+  gap: alias(
+    'wordGap',
+    'gap',
+    t.Optional(
+      t.Numeric({
+        description: 'wordGap 别名',
+        minimum: -100,
+        maximum: 300,
+      }),
+    ),
   ),
 
   // 背景与样式
   transparent: t.Optional(FlexibleBoolean),
-  tp: t.Optional(FlexibleBoolean),
+  tp: alias('transparent', 'tp', t.Optional(FlexibleBoolean)),
 
   // 分辨率缩放（PR #9）
   scale: t.Optional(
@@ -112,20 +150,24 @@ export const LogoQuerySchema = t.Object({
       examples: [1, 2, 4],
     }),
   ),
-  s: t.Optional(
-    t.Numeric({
-      description: 'scale 别名',
-      minimum: 0.1,
-      maximum: 8.0,
-    }),
+  s: alias(
+    'scale',
+    's',
+    t.Optional(
+      t.Numeric({
+        description: 'scale 别名',
+        minimum: 0.1,
+        maximum: 8.0,
+      }),
+    ),
   ),
 
   // 配色方案（PR #6）
   darkMode: t.Optional(FlexibleBoolean),
-  dark: t.Optional(FlexibleBoolean),
+  dark: alias('darkMode', 'dark', t.Optional(FlexibleBoolean)),
 
   swapColors: t.Optional(FlexibleBoolean),
-  swap: t.Optional(FlexibleBoolean),
+  swap: alias('swapColors', 'swap', t.Optional(FlexibleBoolean)),
 
   accentColor: t.Optional(
     t.String({
@@ -133,7 +175,7 @@ export const LogoQuerySchema = t.Object({
       examples: ['#128AFA', '#FF5722', '#00E5FF'],
     }),
   ),
-  accent: t.Optional(t.String({ description: 'accentColor 别名' })),
+  accent: alias('accentColor', 'accent', t.Optional(t.String({ description: 'accentColor 别名' }))),
 
   textColor: t.Optional(
     t.String({
@@ -141,8 +183,8 @@ export const LogoQuerySchema = t.Object({
       examples: ['#2B2B2B', '#000000', '#FFFFFF'],
     }),
   ),
-  color: t.Optional(t.String({ description: 'textColor 别名' })),
-  tc: t.Optional(t.String({ description: 'textColor 别名' })),
+  color: alias('textColor', 'color', t.Optional(t.String({ description: 'textColor 别名' }))),
+  tc: alias('textColor', 'tc', t.Optional(t.String({ description: 'textColor 别名' }))),
 
   // 独立图元色彩与层级控制
   crossColor: t.Optional(
@@ -151,7 +193,7 @@ export const LogoQuerySchema = t.Object({
       examples: ['#FFD700', '#FF5722', '#128AFA'],
     }),
   ),
-  cross: t.Optional(t.String({ description: 'crossColor 别名' })),
+  cross: alias('crossColor', 'cross', t.Optional(t.String({ description: 'crossColor 别名' }))),
 
   haloColor: t.Optional(
     t.String({
@@ -159,11 +201,11 @@ export const LogoQuerySchema = t.Object({
       examples: ['#9C27B0', '#2B2B2B', '#FFFFFF'],
     }),
   ),
-  halo: t.Optional(t.String({ description: 'haloColor 别名' })),
+  halo: alias('haloColor', 'halo', t.Optional(t.String({ description: 'haloColor 别名' }))),
 
   motifsBehindText: t.Optional(FlexibleBoolean),
-  underText: t.Optional(FlexibleBoolean),
-  behind: t.Optional(FlexibleBoolean),
+  underText: alias('motifsBehindText', 'underText', t.Optional(FlexibleBoolean)),
+  behind: alias('motifsBehindText', 'behind', t.Optional(FlexibleBoolean)),
 
   // 留白边距（支持纯数字如 10，或 CSS 语法字符串如 "10 20", "10,20,30,40"）
   padding: t.Optional(
@@ -175,17 +217,21 @@ export const LogoQuerySchema = t.Object({
       }),
     ]),
   ),
-  pad: t.Optional(t.Union([t.Numeric(), t.String({ description: 'padding 别名' })])),
+  pad: alias(
+    'padding',
+    'pad',
+    t.Optional(t.Union([t.Numeric(), t.String({ description: 'padding 别名' })])),
+  ),
   paddingTop: t.Optional(t.Numeric({ description: '独立上留白边距（像素）' })),
-  pt: t.Optional(t.Numeric({ description: 'paddingTop 别名' })),
+  pt: alias('paddingTop', 'pt', t.Optional(t.Numeric({ description: 'paddingTop 别名' }))),
   paddingRight: t.Optional(t.Numeric({ description: '独立右留白边距（像素）' })),
-  pr: t.Optional(t.Numeric({ description: 'paddingRight 别名' })),
+  pr: alias('paddingRight', 'pr', t.Optional(t.Numeric({ description: 'paddingRight 别名' }))),
   paddingBottom: t.Optional(t.Numeric({ description: '独立下留白边距（像素）' })),
-  pb: t.Optional(t.Numeric({ description: 'paddingBottom 别名' })),
+  pb: alias('paddingBottom', 'pb', t.Optional(t.Numeric({ description: 'paddingBottom 别名' }))),
   paddingLeft: t.Optional(t.Numeric({ description: '独立左留白边距（像素）' })),
-  pl: t.Optional(t.Numeric({ description: 'paddingLeft 别名' })),
+  pl: alias('paddingLeft', 'pl', t.Optional(t.Numeric({ description: 'paddingLeft 别名' }))),
   center: t.Optional(FlexibleBoolean),
-  vcenter: t.Optional(FlexibleBoolean),
+  vcenter: alias('center', 'vcenter', t.Optional(FlexibleBoolean)),
 
   format: t.Optional(
     t.Union(
