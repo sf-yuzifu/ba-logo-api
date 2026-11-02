@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit && vue-tsc -p web/tsconfig.json --noEmit",
     "lint": "biome check --error-on-warnings .",
     "format": "biome format --write .",
-    "check": "bun run typecheck && bun run lint && bun test",
+    "check": "bun run typecheck && bun run lint && bun run build:web && bun test",
     "samples": "bun run scripts/generate-samples.ts",
     "bench": "bun run scripts/benchmark.ts"
   },

@@ -25,5 +25,7 @@ jobs:
         run: bun run typecheck
       - name: Lint and formatting
         run: bun run lint
+      - name: Build WebUI
+        run: bun run build:web
       - name: Test
         run: bun test

@@ -5,7 +5,6 @@ import { type Context, Elysia } from 'elysia';
 import pkg from '../package.json' with { type: 'json' };
 import { type OutputFormat, type RenderOptions, renderLogoToBuffer } from './renderer.ts';
 import { type LogoQuery, LogoQuerySchema } from './schema.ts';
-import { getWebUIHtml } from './webui.ts';
 
 const APP_NAME = pkg.name;
 const APP_VERSION = pkg.version;
@@ -240,8 +239,9 @@ export function createApp() {
           set.headers['content-type'] = 'text/html; charset=utf-8';
           return distFile;
         }
+        set.status = 503;
         set.headers['content-type'] = 'text/html; charset=utf-8';
-        return getWebUIHtml();
+        return '<!DOCTYPE html><html><body><h1>WebUI Not Built</h1><p>Please run <code>bun run build:web</code> to build the Vue 3 frontend.</p></body></html>';
       },
       {
         detail: {
