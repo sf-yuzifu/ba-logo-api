@@ -286,6 +286,29 @@ describe('Renderer Core Unit Tests', () => {
     expect(spaceLogo.height).toBeGreaterThan(0);
   });
 
+  it('应当原生支持韩语（Hangul）文本位图与纯矢量 SVG 轮廓化渲染', () => {
+    // 验证韩文字符 "블루" / "아카이브" 在位图和矢量导出下均可正常渲染
+    const pngRes = renderLogoToBuffer({
+      textL: '블루',
+      textR: '아카이브',
+      subtitle: '로고 생성기',
+      format: 'png',
+    });
+    expect(pngRes.buffer.length).toBeGreaterThan(0);
+    expect(pngRes.width).toBeGreaterThan(300);
+    expect(pngRes.height).toBeGreaterThan(100);
+
+    const svgRes = renderLogoToBuffer({
+      textL: '블루',
+      textR: '아카이브',
+      subtitle: 'Blue Archive',
+      format: 'svg',
+    });
+    expect(svgRes.svg).toBeDefined();
+    expect(svgRes.svg).toContain('<path');
+    expect(svgRes.buffer.length).toBeGreaterThan(0);
+  });
+
   it('渲染性能基准多采样测试应当中位数小于 50ms', () => {
     // 预热 1 次
     renderLogoToBuffer({ textL: '蔚蓝', textR: '档案', scale: 1 });
