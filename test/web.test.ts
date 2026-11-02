@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { getDefaultTextPair, getTextPairOnLanguageChange } from '../web/src/constants/textPairs.ts';
 import { DEFAULT_STATE } from '../web/src/constants.ts';
 import { LOCALES } from '../web/src/locales/index.ts';
@@ -152,7 +152,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     );
   });
 
-  it('i18n 词典应当在所有支持的语言中具备 100% 键覆盖率', () => {
+  it('i18n 词典应当在所有支持的语言中具备 100% 键覆盖率，且覆盖代码中所有引用的翻译键', () => {
     const zhKeys = Object.keys(LOCALES.zh).sort();
     expect(zhKeys.length).toBeGreaterThan(30);
 
@@ -166,6 +166,40 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
         expect(value).toBeDefined();
         expect(typeof value).toBe('string');
         expect(value.trim().length).toBeGreaterThan(0);
+      }
+    }
+
+    // 扫描 web/src 源码中所有实际引用的 t('...') 键
+    const srcDir = new URL('../web/src', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+    const collectFiles = (dir: string): string[] => {
+      const list: string[] = [];
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = `${dir}/${entry.name}`;
+        if (entry.isDirectory()) {
+          list.push(...collectFiles(fullPath));
+        } else if (/\.(vue|ts|js)$/.test(entry.name) && !fullPath.includes('/locales/')) {
+          list.push(fullPath);
+        }
+      }
+      return list;
+    };
+
+    const usedKeys = new Set<string>();
+    for (const file of collectFiles(srcDir)) {
+      const content = readFileSync(file, 'utf8');
+      const matches = content.matchAll(/\bt\(['"]([^'"]+)['"]\)/g);
+      for (const match of matches) {
+        usedKeys.add(match[1]);
+      }
+    }
+
+    const allLangs = ['zh', ...targetLangs] as const;
+    for (const lang of allLangs) {
+      const dict = LOCALES[lang];
+      for (const key of usedKeys) {
+        expect(dict[key]).toBeDefined();
+        expect(typeof dict[key]).toBe('string');
+        expect(dict[key].trim().length).toBeGreaterThan(0);
       }
     }
   });

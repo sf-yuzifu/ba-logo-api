@@ -65,6 +65,7 @@ export default {
   // プレビューカード
   'preview-title': 'リアルタイム表示',
   'preview-loading': 'レンダリング中...',
+  'load-failed': '読込失敗',
   'meta-size': '解像度',
   'meta-time': '描画時間',
   'copy-api': 'APIリンクをコピー',
@@ -78,6 +79,9 @@ export default {
   'toast-img-copied': '画像をクリップボードにコピーしました！',
   'toast-reset': 'すべての設定を初期値に戻しました！',
   'toast-copy-failed': 'コピーに失敗しました。手動でコピーしてください',
+  'toast-download': '画像の保存を開始しました！',
+  'toast-validation-failed': 'パラメータ検証に失敗しました',
+  'toast-network-error': '通信に失敗しました。時間をおいて再試行してください',
 
   // ツールチップ Tooltips
   'tip-reset-text': 'テキストをリセット',

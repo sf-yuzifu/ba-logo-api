@@ -65,6 +65,7 @@ export default {
   // Preview card
   'preview-title': 'Live Viewport',
   'preview-loading': 'Rendering...',
+  'load-failed': 'Load failed',
   'meta-size': 'Resolution',
   'meta-time': 'Render Time',
   'copy-api': 'Copy API URL',
@@ -78,6 +79,9 @@ export default {
   'toast-img-copied': 'Image copied to clipboard!',
   'toast-reset': 'All settings reset to defaults!',
   'toast-copy-failed': 'Copy failed, please copy manually',
+  'toast-download': 'Image download started!',
+  'toast-validation-failed': 'Parameter validation failed',
+  'toast-network-error': 'Network request failed, please try again later',
 
   // Tooltips
   'tip-reset-text': 'Reset text',

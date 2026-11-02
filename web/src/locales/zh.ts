@@ -65,6 +65,7 @@ export default {
   // 预览卡片
   'preview-title': '实时视口预览',
   'preview-loading': '正在渲染...',
+  'load-failed': '加载失败',
   'meta-size': '分辨率',
   'meta-time': '渲染耗时',
   'copy-api': '复制 API 链接',
@@ -78,6 +79,9 @@ export default {
   'toast-img-copied': '图片已写入系统剪贴板！',
   'toast-reset': '已重置所有参数为初始值！',
   'toast-copy-failed': '复制失败，请手动长按或选中复制',
+  'toast-download': '图片已开始下载！',
+  'toast-validation-failed': '参数校验失败',
+  'toast-network-error': '网络请求失败，请稍后重试',
 
   // 悬浮提示 Tooltips
   'tip-reset-text': '重置文字',

@@ -65,6 +65,7 @@ export default {
   // 프리뷰 카드
   'preview-title': '실시간 뷰포트 프리뷰',
   'preview-loading': '렌더링 중...',
+  'load-failed': '로드 실패',
   'meta-size': '해상도',
   'meta-time': '렌더링 소요시간',
   'copy-api': 'API 링크 복사',
@@ -78,6 +79,9 @@ export default {
   'toast-img-copied': '이미지가 클립보드에 복사되었습니다!',
   'toast-reset': '모든 설정이 초기값으로 재설정되었습니다!',
   'toast-copy-failed': '복사에 실패했습니다. 수동으로 복사해주세요',
+  'toast-download': '이미지 다운로드를 시작했습니다!',
+  'toast-validation-failed': '파라미터 검증에 실패했습니다',
+  'toast-network-error': '네트워크 요청에 실패했습니다. 잠시 후 다시 시도해주세요',
 
   // 툴팁 Tooltips
   'tip-reset-text': '텍스트 초기화',
