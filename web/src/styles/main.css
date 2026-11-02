@@ -37,10 +37,10 @@
   --scrollbar-thumb: #B4DCF8;
   --scrollbar-thumb-hover: #128AFA;
 
-  /* 字体族系 */
-  --font-main: 'Plus Jakarta Sans', 'Noto Sans SC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-hud: 'Rajdhani', 'Chakra Petch', 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', Consolas, Monaco, monospace;
+  /* 全站统一纯净字体体系 - 100% 专一使用 HarmonyOS Sans (华为鸿蒙高清屏幕字体) */
+  --font-main: 'HarmonyOS Sans SC', 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-hud: 'HarmonyOS Sans SC', 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'JetBrains Mono', Consolas, Monaco, monospace;
 
   /* Emil Kowalski 动效标准 */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -108,6 +108,11 @@ html[data-theme='dark'] {
 html {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none; /* 彻底禁止浏览器对字重使用算法描边伪粗体，根治中文字体边缘发虚与锯齿毛刺 */
+  -webkit-text-size-adjust: 100%;
 }
 
 ::-webkit-scrollbar {
@@ -142,8 +147,10 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
   transition: background-color var(--duration-normal) var(--ease-out),
               color var(--duration-normal) var(--ease-out);
 }
@@ -289,11 +296,25 @@ header {
   }
 }
 
+.theme-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.theme-icon-moon {
+  margin-left: 0.5px;
+}
+
 .theme-label {
-  font-family: var(--font-hud);
+  font-family: var(--font-main);
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-btn {
@@ -377,15 +398,24 @@ header {
 }
 
 .lang-globe-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
   color: var(--primary);
   flex-shrink: 0;
 }
 
 .lang-trigger-label {
   letter-spacing: 0.02em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .lang-chevron {
+  width: 13px;
+  height: 13px;
+  display: block;
   color: var(--text-muted);
   transition: transform var(--duration-normal) var(--ease-out);
   flex-shrink: 0;

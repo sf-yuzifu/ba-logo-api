@@ -88,12 +88,12 @@ onUnmounted(() => {
         aria-label="Toggle Color Theme"
       >
         <!-- 自动 (Auto) -->
-        <svg v-if="themeMode === 'auto'" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <svg v-if="themeMode === 'auto'" class="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M12 2a10 10 0 0 1 0 20V2z" fill="currentColor"></path>
         </svg>
         <!-- 浅色 (Light) -->
-        <svg v-else-if="themeMode === 'light'" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <svg v-else-if="themeMode === 'light'" class="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
           <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -105,7 +105,7 @@ onUnmounted(() => {
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
         </svg>
         <!-- 暗色 (Dark) -->
-        <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <svg v-else class="theme-icon theme-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
         <span class="theme-label">{{ themeLabel }}</span>
