@@ -204,7 +204,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     const state = { ...DEFAULT_STATE };
     const harness = createPreviewHarness(state);
     const unmount = harness.mount();
-    const pending: Array<(response: Response) => void> = [];
+    const pending: Array<{ resolve: (response: Response) => void; signal?: AbortSignal }> = [];
     const originalFetch = globalThis.fetch;
     const originalImage = globalThis.Image;
     globalThis.Image = class {
@@ -217,11 +217,8 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
       }
     } as unknown as typeof Image;
     globalThis.fetch = ((_input: RequestInfo | URL, init?: RequestInit) =>
-      new Promise<Response>((resolve, reject) => {
-        pending.push(resolve);
-        init?.signal?.addEventListener('abort', () =>
-          reject(new DOMException('Aborted', 'AbortError')),
-        );
+      new Promise<Response>((resolve) => {
+        pending.push({ resolve, signal: init?.signal ?? undefined });
       })) as typeof fetch;
 
     try {
@@ -231,8 +228,16 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
       harness.api.triggerPreview();
       await new Promise((resolve) => setTimeout(resolve, 100));
       expect(pending.length).toBe(2);
+      expect(pending[0].signal?.aborted).toBe(true);
+      expect(harness.api.isLoading.value).toBe(true);
 
-      pending[1](new Response(new Blob([new Uint8Array([2])], { type: 'image/png' })));
+      pending[1].resolve(new Response(new Blob([new Uint8Array([2])], { type: 'image/png' })));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      expect(harness.api.activePreview.value.snapshot.left).toBe('最新');
+      expect(harness.api.isLoading.value).toBe(false);
+
+      // 模拟不遵守 AbortSignal 的传输层：旧请求晚到也不得覆盖新预览。
+      pending[0].resolve(new Response(new Blob([new Uint8Array([1])], { type: 'image/png' })));
       await new Promise((resolve) => setTimeout(resolve, 20));
       expect(harness.api.activePreview.value.snapshot.left).toBe('最新');
       expect(harness.api.isLoading.value).toBe(false);
@@ -240,6 +245,71 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
       unmount();
       globalThis.fetch = originalFetch;
       globalThis.Image = originalImage;
+    }
+  });
+
+  it('useLogoPreview 应拒绝过期的 Base64 JSON 响应', async () => {
+    const state: LogoFormState = { ...DEFAULT_STATE, format: 'base64' };
+    const harness = createPreviewHarness(state);
+    const unmount = harness.mount();
+    const jsonResponses: Array<(value: unknown) => void> = [];
+    const originalFetch = globalThis.fetch;
+    const originalImage = globalThis.Image;
+    const originalCreate = URL.createObjectURL;
+    const originalRevoke = URL.revokeObjectURL;
+    let fetchCount = 0;
+    globalThis.Image = class {
+      naturalWidth = 14;
+      naturalHeight = 9;
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_value: string) {
+        this.onload?.();
+      }
+    } as unknown as typeof Image;
+    URL.createObjectURL = (() => 'blob:png-latest') as typeof URL.createObjectURL;
+    URL.revokeObjectURL = (() => {}) as typeof URL.revokeObjectURL;
+    globalThis.fetch = (() =>
+      fetchCount++ === 0
+        ? Promise.resolve({
+            ok: true,
+            json: () => new Promise((resolve) => jsonResponses.push(resolve)),
+          })
+        : Promise.resolve(
+            new Response(new Blob([new Uint8Array([1])], { type: 'image/png' })),
+          )) as unknown as typeof fetch;
+
+    try {
+      harness.api.triggerPreview();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(jsonResponses).toHaveLength(1);
+
+      state.format = 'png';
+      state.left = 'new PNG';
+      harness.api.triggerPreview();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(jsonResponses).toHaveLength(1);
+
+      // 完成最新 PNG 请求，再让旧 Base64 响应晚到。
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      jsonResponses[0]({
+        data: {
+          base64: 'old',
+          dataUrl: 'data:image/png;base64,old',
+          width: 1,
+          height: 1,
+          mimeType: 'image/png',
+        },
+      });
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(harness.api.activePreview.value.snapshot.format).toBe('png');
+      expect(harness.api.activePreview.value.snapshot.left).toBe('new PNG');
+    } finally {
+      unmount();
+      globalThis.fetch = originalFetch;
+      globalThis.Image = originalImage;
+      URL.createObjectURL = originalCreate;
+      URL.revokeObjectURL = originalRevoke;
     }
   });
 
