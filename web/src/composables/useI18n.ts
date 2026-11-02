@@ -20,7 +20,23 @@ const getInitialLang = (): SupportedLang => {
   return 'zh';
 };
 
-const currentLang = ref<SupportedLang>(getInitialLang());
+const applyLangToDOM = (lang: SupportedLang) => {
+  if (typeof document === 'undefined') return;
+  const langMap: Record<SupportedLang, string> = {
+    zh: 'zh-CN',
+    'zh-tw': 'zh-TW',
+    en: 'en',
+    ja: 'ja',
+    ko: 'ko',
+  };
+  document.documentElement.setAttribute('lang', langMap[lang] || lang);
+};
+
+const initialLang = getInitialLang();
+const currentLang = ref<SupportedLang>(initialLang);
+if (typeof document !== 'undefined') {
+  applyLangToDOM(initialLang);
+}
 
 export function useI18n() {
   const t = (key: string): string => {
@@ -30,6 +46,7 @@ export function useI18n() {
 
   const setLang = (lang: SupportedLang) => {
     currentLang.value = lang;
+    applyLangToDOM(lang);
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(STORAGE_KEY, lang);
