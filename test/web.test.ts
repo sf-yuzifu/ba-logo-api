@@ -222,8 +222,9 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(appVue).toContain('@click="copyImage"');
 
     const css = readFileSync(new URL('../web/src/styles/main.css', import.meta.url), 'utf8');
-    expect(css).toContain('@media (max-width: 1200px)');
-    expect(css).toContain('@media (max-width: 768px)');
+    expect(css).toContain('@media (max-width: 1240px)');
+    expect(css).toContain('@media (max-width: 960px)');
+    expect(css).toContain('@media (max-width: 720px)');
     expect(css).toContain('@media (max-width: 480px)');
     expect(css).toContain('.mobile-floating-bar');
     expect(css).toContain('order: -1');

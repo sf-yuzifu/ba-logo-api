@@ -600,16 +600,56 @@ main {
   min-width: 0;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1240px) and (min-width: 961px) {
   main {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 420px minmax(0, 1fr);
     width: 96%;
-    padding: 1rem;
-    gap: 1.5rem;
+    padding: 0;
+    gap: 1.25rem;
+    margin: 1.25rem auto;
   }
 
-  .preview-card {
-    order: -1;
+  .card {
+    padding: 1.25rem;
+  }
+
+  .preview-canvas-box {
+    min-height: 280px;
+    max-height: 380px;
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 960px) and (min-width: 721px) {
+  main {
+    grid-template-columns: 360px minmax(0, 1fr);
+    width: 96%;
+    padding: 0;
+    gap: 1rem;
+    margin: 1rem auto;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+  }
+
+  .preview-canvas-box {
+    min-height: 220px;
+    max-height: 300px;
+    padding: 1rem;
+  }
+
+  .actions-grid {
+    gap: 8px;
+  }
+
+  .action-btn {
+    padding: 10px 8px;
+    font-size: 0.92rem;
   }
 }
 
@@ -1097,6 +1137,26 @@ input:checked + .slider:before {
   gap: 1.25rem;
 }
 
+@media (min-width: 721px) {
+  .preview-card {
+    position: sticky;
+    top: calc(64px + 1.75rem);
+    align-self: start;
+  }
+}
+
+@media (max-width: 1240px) and (min-width: 961px) {
+  .preview-card {
+    top: calc(52px + 1.25rem);
+  }
+}
+
+@media (max-width: 960px) and (min-width: 721px) {
+  .preview-card {
+    top: calc(52px + 1rem);
+  }
+}
+
 /* 元数据战术徽章 */
 .meta-bar {
   display: flex;
@@ -1202,7 +1262,7 @@ input:checked + .slider:before {
 
 .preview-img {
   max-width: 100%;
-  max-height: 520px;
+  max-height: 100%;
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.1));
@@ -1693,26 +1753,11 @@ html[data-theme='dark'] .copy-url-btn:hover {
   display: none;
 }
 
-@media (max-width: 1024px) {
-  main {
-    grid-template-columns: minmax(0, 1fr);
-    width: 100%;
-    max-width: 720px;
-    padding: 0 1rem;
-    margin: 1.25rem auto;
-    gap: 1.25rem;
-  }
-
-  .preview-card {
-    order: -1;
-  }
-}
-
-@media (max-width: 768px) {
-  /* 顶部导航栏极简图标模式 */
+/* 顶部导航栏在中等屏幕与移动端（<= 1240px）提前进入精炼图标模式，杜绝文字挤爆折行 */
+@media (max-width: 1240px) {
   header {
     height: 52px;
-    padding: 0 10px;
+    padding: 0 12px;
   }
 
   .brand {
@@ -1732,7 +1777,7 @@ html[data-theme='dark'] .copy-url-btn:hover {
   }
 
   .brand-title {
-    font-size: 0.96rem;
+    font-size: 0.98rem;
     white-space: nowrap;
   }
 
@@ -1745,15 +1790,15 @@ html[data-theme='dark'] .copy-url-btn:hover {
   }
 
   .nav-links {
-    gap: 5px;
+    gap: 6px;
     flex-shrink: 0;
     align-items: center;
   }
 
   .theme-toggle-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
     padding: 0;
     justify-content: center;
   }
@@ -1763,8 +1808,8 @@ html[data-theme='dark'] .copy-url-btn:hover {
   }
 
   .lang-dropdown-trigger {
-    height: 32px;
-    padding: 0 7px;
+    height: 34px;
+    padding: 0 8px;
     gap: 4px;
   }
 
@@ -1774,7 +1819,7 @@ html[data-theme='dark'] .copy-url-btn:hover {
 
   .lang-label-short {
     display: inline-block;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     font-weight: 800;
     font-family: var(--font-hud);
   }
@@ -1784,9 +1829,9 @@ html[data-theme='dark'] .copy-url-btn:hover {
   }
 
   .nav-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
     padding: 0;
     justify-content: center;
   }
@@ -1794,13 +1839,23 @@ html[data-theme='dark'] .copy-url-btn:hover {
   .nav-btn .nav-btn-text {
     display: none;
   }
+}
 
-  /* 主体卡片与吸顶视口 */
+/* 手机移动端（<= 720px），轻量置顶吸顶视口与底部常驻操作栏 */
+@media (max-width: 720px) {
   main {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    max-width: 520px;
     padding: 0 0.65rem;
     margin: 0.65rem auto;
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 12px));
     gap: 0.75rem;
+  }
+
+  header {
+    height: 50px;
+    padding: 0 10px;
   }
 
   .card {
@@ -1809,10 +1864,11 @@ html[data-theme='dark'] .copy-url-btn:hover {
     border-radius: var(--radius-sm);
   }
 
-  /* 核心：移动端置顶吸顶视口 */
+  /* 核心：移动端轻量置顶吸顶视口 */
   .preview-card {
+    order: -1;
     position: sticky;
-    top: 52px;
+    top: 50px;
     z-index: 50;
     padding: 8px 10px;
     gap: 6px;
@@ -2028,6 +2084,59 @@ html[data-theme='dark'] .copy-url-btn:hover {
 
 /* 超窄小屏适配 (<= 480px, 如 iPhone SE) */
 @media (max-width: 480px) {
+  header {
+    height: 48px;
+    padding: 0 8px;
+  }
+
+  .brand {
+    gap: 5px;
+  }
+
+  .brand-badge {
+    padding: 2px 5px;
+    font-size: 0.68rem;
+  }
+
+  .brand-title {
+    font-size: 0.88rem;
+  }
+
+  .nav-links {
+    gap: 4px;
+  }
+
+  /* 在超小屏幕（<= 480px）下隐藏外链文档小按钮，仅保留主题模式与多语言切换，确保极致清爽不溢出 */
+  .nav-btn {
+    display: none;
+  }
+
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+
+  .theme-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  .lang-dropdown-trigger {
+    height: 32px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .lang-globe-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .lang-label-short {
+    font-size: 0.76rem;
+  }
+
   .card {
     padding: 0.95rem;
   }
