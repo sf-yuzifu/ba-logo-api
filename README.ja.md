@@ -28,8 +28,8 @@
 | 公式英日サブタイトル風 (2x) | ダークモード (2x) |
 | :---: | :---: |
 | ![Official Style](samples/02-official-en-jp-2x.png) | ![Dark Mode](samples/03-dark-mode-2x.png) |
-| **カスタムアクセント＆配色反転 (2x)** | **透過背景くり抜き (2x)** |
-| ![Custom Swap](samples/04-custom-color-swap-2x.png) | ![Transparent](samples/05-transparent-2x.png) |
+| **カスタムアクセント＆配色反転 (2x)** | **透過背景くり抜き (明暗自動切替, 2x)** |
+| ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="透過背景くり抜き" src="samples/05-transparent-2x.png"></picture> |
 | **標準中国語 (1x、余白最適化)** | **4K 印刷級超高解像度 (4x)** |
 | ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
 

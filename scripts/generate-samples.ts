@@ -55,7 +55,19 @@ const samples = [
       scale: 2,
       center: false,
     },
-    desc: '透明背景镂空裁切（2x）',
+    desc: '透明背景镂空裁切（亮色模式，2x）',
+  },
+  {
+    filename: '05-transparent-dark-2x.png',
+    options: {
+      textL: '透明',
+      textR: '背景',
+      transparent: true,
+      darkMode: true,
+      scale: 2,
+      center: false,
+    },
+    desc: '透明背景镂空裁切（暗色模式自适应，2x）',
   },
   {
     filename: '06-hires-4x.png',

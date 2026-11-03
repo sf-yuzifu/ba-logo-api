@@ -28,8 +28,8 @@ A high-performance, pixel-perfect Blue Archive style logo generation service pow
 | Official Style (EN + JA Subtitle, 2x) | Dark Mode (2x) |
 | :---: | :---: |
 | ![Official Style](samples/02-official-en-jp-2x.png) | ![Dark Mode](samples/03-dark-mode-2x.png) |
-| **Custom Color Swap (2x)** | **Transparent Cutout (2x)** |
-| ![Custom Swap](samples/04-custom-color-swap-2x.png) | ![Transparent](samples/05-transparent-2x.png) |
+| **Custom Color Swap (2x)** | **Transparent Cutout (Auto Theme, 2x)** |
+| ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="Transparent Cutout" src="samples/05-transparent-2x.png"></picture> |
 | **Standard Chinese (1x, Balanced Margins)** | **Ultra HD Print-Ready (4x)** |
 | ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
 
