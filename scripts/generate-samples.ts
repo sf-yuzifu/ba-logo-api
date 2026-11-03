@@ -10,7 +10,7 @@ console.log('🚀 开始生成离线样例图...\n');
 const samples = [
   {
     filename: '01-default-1x.png',
-    options: { textL: '蔚蓝', textR: '档案', scale: 1 },
+    options: { textL: '蔚蓝', textR: '档案', scale: 1, center: false },
     desc: '标准中文（1x）',
   },
   {
@@ -42,6 +42,7 @@ const samples = [
       accentColor: '#FF5722',
       swapColors: true,
       scale: 2,
+      center: false,
     },
     desc: '自定义橙色强调色 + 左右颜色互换（2x）',
   },
@@ -52,6 +53,7 @@ const samples = [
       textR: '背景',
       transparent: true,
       scale: 2,
+      center: false,
     },
     desc: '透明背景镂空裁切（2x）',
   },
@@ -61,6 +63,7 @@ const samples = [
       textL: '超高',
       textR: '清4K',
       scale: 4,
+      center: false,
     },
     desc: '4x 超高分辨率印刷级大图',
   },
