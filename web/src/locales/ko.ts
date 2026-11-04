@@ -42,7 +42,7 @@ export default {
   'label-y-offset': '헤일로 Y 오프셋',
   'label-word-gap': '단어 간격 (Gap)',
   'label-padding': '여백 마진 (Padding)',
-  'reset-pad': '기본 2 ↺',
+  'reset-pad': '2 ↺',
   'ph-padding': '기본 2px, CSS 구문 (예: 10 20) 지원',
 
   // 배율 및 포맷
@@ -53,8 +53,12 @@ export default {
   'format-svg': 'SVG (순수 벡터)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
-  'format-gif': 'GIF (애니)',
-  'format-apng': 'APNG (고화질 애니)',
+  'format-group-static': '정적 이미지',
+  'format-group-animated': '애니메이션 이미지',
+  'format-gif': 'GIF',
+  'format-apng': 'APNG (고화질)',
+  'format-svg-animated': 'SVG (벡터)',
+  'format-webp-animated': 'WebP (고효율)',
 
   // 토글 스위치
   'toggle-tp': '투명 배경',

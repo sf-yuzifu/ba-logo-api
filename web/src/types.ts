@@ -1,4 +1,13 @@
-export type OutputFormat = 'png' | 'webp' | 'svg' | 'jpeg' | 'base64' | 'gif' | 'apng';
+export type OutputFormat =
+  | 'png'
+  | 'webp'
+  | 'svg'
+  | 'jpeg'
+  | 'base64'
+  | 'gif'
+  | 'apng'
+  | 'svg-animated'
+  | 'webp-animated';
 
 export type SupportedLang = 'zh' | 'zh-tw' | 'en' | 'ja' | 'ko';
 

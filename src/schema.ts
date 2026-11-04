@@ -258,16 +258,19 @@ export const LogoQuerySchema = t.Object({
         t.Literal('svg'),
         t.Literal('gif'),
         t.Literal('apng'),
+        t.Literal('svg-animated'),
+        t.Literal('webp-animated'),
       ],
       {
-        description: '输出格式（png / webp / jpeg / svg / base64 / gif / apng）',
+        description:
+          '输出格式（png / webp / jpeg / svg / base64 / gif / apng / svg-animated / webp-animated）',
         default: 'png',
       },
     ),
   ),
   fps: t.Optional(
     t.Numeric({
-      description: '动图帧率（针对 gif / apng，默认 24，范围 10~30）',
+      description: '动图帧率（针对 gif / apng / webp-animated，默认 24，范围 10~30）',
       minimum: 10,
       maximum: 30,
       default: 24,
@@ -275,7 +278,7 @@ export const LogoQuerySchema = t.Object({
   ),
   duration: t.Optional(
     t.Numeric({
-      description: '动图入场时长秒数（针对 gif / apng，默认 1.1，范围 0.4~3.0）',
+      description: '动图入场时长秒数（针对动态格式，默认 1.1，范围 0.4~3.0）',
       minimum: 0.4,
       maximum: 3.0,
       default: 1.1,

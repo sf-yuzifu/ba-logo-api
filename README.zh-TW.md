@@ -40,11 +40,11 @@
 ## ✨ 核心特性
 
 - ⚡ **極致效能躍升**：底層由 C++/Rust 編譯的 Google Skia 原生 2D 圖形內核驅動，單圖生成延遲低至 **8~15ms**，相較傳統無頭瀏覽器方案提速逾 **150 倍**。
-- 🎬 **入場動畫生成 (GIF & APNG)**：左右文字水平靠攏，左側由上往下著色、右側由下往上著色；十字從中心向外延伸，光環與副標題由左往右展開，支援 GIF 與無損 APNG 匯出。
+- 🎬 **入場動畫生成 (GIF / APNG / SVG / WebP)**：左右文字水平靠攏，左側由上往下著色、右側由下往上著色；十字從中心向外延伸，光環與副標題由左往右展開，支援點陣動圖與純向量 SMIL SVG 匯出。
 - 🪶 **極低記憶體佔用**：常駐記憶體僅約 **30~50 MB RSS**，JS 堆疊記憶體維持在 **20 MB** 以內，無沙箱包袱，1C1G 入門型伺服器亦能流暢運行。
 - 🎨 **像素級向量精度**：光環（Halo）與十字架（Cross）採用高精度 SVG `Path2D` 向量鏤空演算法，支援 `scale=0.1~8x` 任意縮放，4K 印刷級圖檔依然細膩清晰。
 - 🌐 **全量 CJK 字形庫**：內建高品質整合字庫（逾 **30,000 個字形**），完整支援拉丁字母、日文假名、繁體中文、簡體中文與韓文諺文。
-- 📦 **多種格式輸出**：原生支援 `png`、`webp`、`jpeg`，免字型依賴的純向量輪廓 `svg`（可直接匯入 Figma / Illustrator），JSON `base64`，以及 `gif`、`apng` 動圖。
+- 📦 **多種格式輸出**：原生支援 `png`、`webp`、`jpeg`，免字型依賴的純向量輪廓 `svg`（可直接匯入 Figma / Illustrator），JSON `base64`，以及 `gif`、`apng`、`svg-animated`、`webp-animated` 動圖。
 - 🎛️ **Kivotos HUD 主控台**：專為同人創作打造的戰術儀表板前端，具備即時防手震預覽、響應式雙欄/行動裝置置頂吸頂佈局與一鍵分享功能。
 - 🔄 **平滑向下相容**：支援標準 RESTful 規範，原有 `/balogo` 端點自動進行 HTTP 308 永久重新導向並完整透傳參數。
 
@@ -116,7 +116,7 @@ docker run -d -p 3000:3000 ba-logo-api
 | `swapColors` | `swap` | boolean | `false` | 是否對調左右文字主題色彩 |
 | `transparent`| `tp` | boolean | `false` | 是否啟用透明背景（透明模式將鏤空圖層） |
 | `scale` | `s` | number | `1` | 解析度縮放倍率（範圍 `0.1` ~ `8.0`） |
-| `format` | - | string | `"png"` | 匯出格式：`png`, `webp`, `jpeg`, `svg`, `base64` |
+| `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `svg`, `base64`, `gif`, `apng`, `svg-animated`, `webp-animated` |
 | `center` | `vcenter`| boolean | *自適應* | 縱向視覺置中（有副標題預設置中，無副標題預設貼邊） |
 
 *如需查閱完整參數規格與線上除錯，請前往 `/swagger` 頁面。*

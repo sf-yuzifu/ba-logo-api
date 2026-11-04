@@ -48,12 +48,27 @@ export const SCALE_OPTIONS = [
   { value: 4, label: '4x (1000p)' },
 ] as const;
 
-export const FORMAT_OPTIONS: { format: OutputFormat; i18nKey: string }[] = [
-  { format: 'png', i18nKey: 'format-png' },
-  { format: 'webp', i18nKey: 'format-webp' },
-  { format: 'svg', i18nKey: 'format-svg' },
-  { format: 'jpeg', i18nKey: 'format-jpeg' },
-  { format: 'base64', i18nKey: 'format-base64' },
-  { format: 'gif', i18nKey: 'format-gif' },
-  { format: 'apng', i18nKey: 'format-apng' },
+export const FORMAT_GROUPS: {
+  i18nKey: string;
+  items: { format: OutputFormat; i18nKey: string }[];
+}[] = [
+  {
+    i18nKey: 'format-group-static',
+    items: [
+      { format: 'png', i18nKey: 'format-png' },
+      { format: 'webp', i18nKey: 'format-webp' },
+      { format: 'svg', i18nKey: 'format-svg' },
+      { format: 'jpeg', i18nKey: 'format-jpeg' },
+      { format: 'base64', i18nKey: 'format-base64' },
+    ],
+  },
+  {
+    i18nKey: 'format-group-animated',
+    items: [
+      { format: 'gif', i18nKey: 'format-gif' },
+      { format: 'apng', i18nKey: 'format-apng' },
+      { format: 'svg-animated', i18nKey: 'format-svg-animated' },
+      { format: 'webp-animated', i18nKey: 'format-webp-animated' },
+    ],
+  },
 ];

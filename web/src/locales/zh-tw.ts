@@ -42,7 +42,7 @@ export default {
   'label-y-offset': '光環 Y 偏移',
   'label-word-gap': '兩詞間距',
   'label-padding': '留白邊距 (Padding)',
-  'reset-pad': '預設 2 ↺',
+  'reset-pad': '2 ↺',
   'ph-padding': '預設 2px，支援 CSS 語法如 10 20',
 
   // 縮放與格式
@@ -53,8 +53,12 @@ export default {
   'format-svg': 'SVG (純向量)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
-  'format-gif': 'GIF (動圖)',
-  'format-apng': 'APNG (高畫質動圖)',
+  'format-group-static': '靜態圖片',
+  'format-group-animated': '動態圖片',
+  'format-gif': 'GIF',
+  'format-apng': 'APNG (高畫質)',
+  'format-svg-animated': 'SVG (向量)',
+  'format-webp-animated': 'WebP (高效)',
 
   // 開關
   'toggle-tp': '透明背景',

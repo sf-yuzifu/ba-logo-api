@@ -42,7 +42,7 @@ export default {
   'label-y-offset': '光环 Y 偏移',
   'label-word-gap': '两词间距',
   'label-padding': '留白边距 (Padding)',
-  'reset-pad': '默认 2 ↺',
+  'reset-pad': '2 ↺',
   'ph-padding': '默认 2px，支持 CSS 语法如 10 20',
 
   // 缩放与格式
@@ -53,8 +53,12 @@ export default {
   'format-svg': 'SVG (纯矢量)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
-  'format-gif': 'GIF (动图)',
-  'format-apng': 'APNG (高清动图)',
+  'format-group-static': '静态图片',
+  'format-group-animated': '动态图片',
+  'format-gif': 'GIF',
+  'format-apng': 'APNG (高清)',
+  'format-svg-animated': 'SVG (矢量)',
+  'format-webp-animated': 'WebP (高效)',
 
   // 开关
   'toggle-tp': '透明背景',

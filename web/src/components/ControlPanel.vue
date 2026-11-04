@@ -5,7 +5,7 @@ import { getDefaultTextPair } from '../constants/textPairs.ts';
 import {
   ACCENT_PRESETS,
   DEFAULT_STATE,
-  FORMAT_OPTIONS,
+  FORMAT_GROUPS,
   SCALE_OPTIONS,
   TEXT_COLOR_PRESETS,
 } from '../constants.ts';
@@ -525,17 +525,22 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
           <label class="form-label">
             <span class="label-text">{{ t('label-format') }}</span>
           </label>
-          <div class="format-pills" id="formatPills">
-            <button
-              v-for="item in FORMAT_OPTIONS"
-              :key="item.format"
-              type="button"
-              class="pill-btn format-pill-btn"
-              :class="{ active: state.format === item.format }"
-              @click="handleFormatSelect(item.format)"
-            >
-              {{ t(item.i18nKey) }}
-            </button>
+          <div class="format-groups" id="formatPills">
+            <div class="format-group" v-for="group in FORMAT_GROUPS" :key="group.i18nKey">
+              <div class="format-group-label">{{ t(group.i18nKey) }}</div>
+              <div class="format-pills">
+                <button
+                  v-for="item in group.items"
+                  :key="item.format"
+                  type="button"
+                  class="pill-btn format-pill-btn"
+                  :class="{ active: state.format === item.format }"
+                  @click="handleFormatSelect(item.format)"
+                >
+                  {{ t(item.i18nKey) }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

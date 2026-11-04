@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test';
-import type { Canvas } from '@napi-rs/canvas';
+import { type Canvas, loadImage } from '@napi-rs/canvas';
 import { createApp } from '../src/app.ts';
 import { BASE_FONT_SIZE } from '../src/constants.ts';
 import { loadFonts } from '../src/font.ts';
 import { drawAnimatedLogoCanvas, renderLogoAnimatedToBuffer } from '../src/render/animated.ts';
 import { computeLogoLayout } from '../src/render/layout.ts';
 import { normalizeRenderOptions } from '../src/render/options.ts';
+import { renderLogoToBuffer } from '../src/renderer.ts';
 
 function pixelBounds(canvas: Canvas, color?: readonly number[], alphaThreshold = 64) {
   const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
@@ -324,6 +325,53 @@ describe('动画 Logo 生成与编码 (GIF & APNG)', () => {
     expect(hex.includes('fcTL')).toBe(true);
   });
 
+  it('应当生成纯矢量 SMIL Animated SVG，并保持动画时间轴', async () => {
+    const res = renderLogoToBuffer({
+      textL: 'Blue',
+      textR: 'Archive',
+      subtitle: 'BlueArchive',
+      format: 'svg-animated',
+    });
+
+    expect(res.mimeType).toBe('image/svg+xml; charset=utf-8');
+    const svg = res.buffer.toString('utf8');
+    expect(svg).toContain('<animate');
+    expect(svg).toContain('<animateTransform');
+    expect(svg).toContain('cross-reveal');
+    expect(svg).toContain('subtitle-reveal');
+    expect(svg).not.toContain('<image');
+    expect(svg).not.toContain('<text');
+    expect(svg).not.toContain('data:image/');
+    const image = await loadImage(res.buffer);
+    expect(image.width).toBe(res.width);
+    expect(image.height).toBe(res.height);
+  });
+
+  it('应当生成包含 VP8X / ANIM / ANMF 的合法 Animated WebP', async () => {
+    const res = renderLogoAnimatedToBuffer(
+      {
+        textL: 'Blue',
+        textR: 'Archive',
+        subtitle: 'BlueArchive',
+        fps: 12,
+        duration: 0.5,
+        holdDuration: 0.5,
+      },
+      'webp-animated',
+    );
+
+    expect(res.mimeType).toBe('image/webp');
+    expect(res.buffer.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(res.buffer.toString('ascii', 8, 12)).toBe('WEBP');
+    const content = res.buffer.toString('latin1');
+    expect(content).toContain('VP8X');
+    expect(content).toContain('ANIM');
+    expect(content).toContain('ANMF');
+    const image = await loadImage(res.buffer);
+    expect(image.width).toBe(res.width);
+    expect(image.height).toBe(res.height);
+  });
+
   it('API GET /api/logo 应支持 format=gif 并返回正确的 MIME 类型与内容', async () => {
     const req = new Request(
       'http://localhost/api/logo?left=蔚蓝&right=档案&format=gif&fps=12&duration=0.5',
@@ -349,6 +397,26 @@ describe('动画 Logo 生成与编码 (GIF & APNG)', () => {
     const buf = Buffer.from(await resp.arrayBuffer());
     expect(buf[0]).toBe(0x89);
     expect(buf.toString('latin1').includes('acTL')).toBe(true);
+  });
+
+  it('API 应支持 format=svg-animated 与 format=webp-animated', async () => {
+    const svgResponse = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&format=svg-animated'),
+    );
+    expect(svgResponse.status).toBe(200);
+    expect(svgResponse.headers.get('content-type')).toContain('image/svg+xml');
+    const svg = await svgResponse.text();
+    expect(svg).toContain('<animate');
+    expect(svg).not.toContain('<image');
+
+    const webpResponse = await app.handle(
+      new Request('http://localhost/api/logo?left=Blue&right=Archive&format=webp-animated&fps=12'),
+    );
+    expect(webpResponse.status).toBe(200);
+    expect(webpResponse.headers.get('content-type')).toContain('image/webp');
+    const webp = Buffer.from(await webpResponse.arrayBuffer());
+    expect(webp.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(webp.toString('latin1')).toContain('ANMF');
   });
 
   it('支持透明通道与暗黑模式下的动效生成', () => {

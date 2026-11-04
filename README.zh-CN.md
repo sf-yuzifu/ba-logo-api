@@ -40,11 +40,11 @@
 ## ✨ 核心特性
 
 - ⚡ **极致性能跃迁**：基于底层 C++/Rust 编译的 Google Skia 原生 2D 图形内核，单图生成延迟低至 **8~15ms**，较传统无头浏览器渲染方案提速超 **150 倍**。
-- 🎬 **入场动图生成 (GIF & APNG)**：左右文字水平靠拢，左侧自上而下着色、右侧自下而上着色；十字从中心向外延伸，光环与副标题从左向右展开，支持 GIF 与无损 APNG 导出。
+- 🎬 **入场动图生成 (GIF / APNG / SVG / WebP)**：左右文字水平靠拢，左侧自上而下着色、右侧自下而上着色；十字从中心向外延伸，光环与副标题从左向右展开，支持位图动图与纯矢量 SMIL SVG 导出。
 - 🪶 **极低内存占用**：常驻内存仅 **30~50 MB RSS**，JS 堆内存维持在 **20 MB** 以内，无沙箱负担，1C1G 入门级服务器也能丝滑运行。
 - 🎨 **像素级矢量精度**：光环（Halo）与十字架（Cross）采用高精度 SVG `Path2D` 矢量切除算法，支持 `scale=0.1~8x` 任意缩放，4K 印刷级大图依然清晰锐利。
 - 🌐 **全量 CJK 字形库**：内置合并字库（超过 **30,000 个字形**），完整覆盖拉丁字母、日文假名、简体中文、繁体中文及韩文谚文。
-- 📦 **现代多格式输出**：原生支持 `png`、`webp`、`jpeg`，免字体的纯矢量轮廓 `svg`（可直接导入 Figma / Illustrator），JSON `base64`，以及 `gif`、`apng` 动图。
+- 📦 **现代多格式输出**：原生支持 `png`、`webp`、`jpeg`，免字体的纯矢量轮廓 `svg`（可直接导入 Figma / Illustrator），JSON `base64`，以及 `gif`、`apng`、`svg-animated`、`webp-animated` 动图。
 - 🎛️ **Kivotos HUD 控制台**：专为同人创作定制的战术仪表盘前端，支持实时防抖预览、响应式双栏/移动端吸顶布局及一键分享链接。
 - 🔄 **平滑向下兼容**：支持标准 RESTful 规范，原有 `/balogo` 端点自动发起 HTTP 308 永久重定向并完整透传参数。
 
@@ -116,7 +116,7 @@ docker run -d -p 3000:3000 ba-logo-api
 | `swapColors` | `swap` | boolean | `false` | 是否对调左右文字主题颜色 |
 | `transparent`| `tp` | boolean | `false` | 是否启用透明背景（透明模式将镂空切除图层） |
 | `scale` | `s` | number | `1` | 分辨率放大倍率（范围 `0.1` ~ `8.0`） |
-| `format` | - | string | `"png"` | 导出格式：`png`, `webp`, `jpeg`, `svg`, `base64` |
+| `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `svg`, `base64`, `gif`, `apng`, `svg-animated`, `webp-animated` |
 | `center` | `vcenter`| boolean | *自适应* | 纵向视觉居中（有副标题时默认居中，无副标题默认贴合） |
 
 *如需查看完整参数与在线调试，请访问 `/swagger` 页面。*

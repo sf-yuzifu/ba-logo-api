@@ -42,7 +42,7 @@ export default {
   'label-y-offset': '光輪 Y オフセット',
   'label-word-gap': '単語間スペース',
   'label-padding': '余白マージン (Padding)',
-  'reset-pad': '既定 2 ↺',
+  'reset-pad': '2 ↺',
   'ph-padding': '既定 2px、CSS構文（例：10 20）対応',
 
   // スケールとフォーマット
@@ -53,8 +53,12 @@ export default {
   'format-svg': 'SVG (ベクター)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
-  'format-gif': 'GIF (アニメ)',
-  'format-apng': 'APNG (高画質アニメ)',
+  'format-group-static': '静止画像',
+  'format-group-animated': 'アニメーション画像',
+  'format-gif': 'GIF',
+  'format-apng': 'APNG (高画質)',
+  'format-svg-animated': 'SVG (ベクター)',
+  'format-webp-animated': 'WebP (高効率)',
 
   // トグル
   'toggle-tp': '背景透過',

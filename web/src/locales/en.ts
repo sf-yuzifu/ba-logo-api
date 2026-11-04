@@ -42,7 +42,7 @@ export default {
   'label-y-offset': 'Halo Y Offset',
   'label-word-gap': 'Word Gap',
   'label-padding': 'Canvas Padding',
-  'reset-pad': 'Default 2 ↺',
+  'reset-pad': '2 ↺',
   'ph-padding': 'Default 2px, or CSS like 10 20',
 
   // Scale and formats
@@ -53,8 +53,12 @@ export default {
   'format-svg': 'SVG (Vector)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
-  'format-gif': 'GIF (Animated)',
-  'format-apng': 'APNG (HD Animated)',
+  'format-group-static': 'Static Images',
+  'format-group-animated': 'Animated Images',
+  'format-gif': 'GIF',
+  'format-apng': 'APNG (HD)',
+  'format-svg-animated': 'SVG (Vector)',
+  'format-webp-animated': 'WebP (Optimized)',
 
   // Toggles
   'toggle-tp': 'Transparent BG',

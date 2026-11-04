@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { getDefaultTextPair, getTextPairOnLanguageChange } from '../web/src/constants/textPairs.ts';
-import { DEFAULT_STATE } from '../web/src/constants.ts';
+import { DEFAULT_STATE, FORMAT_GROUPS } from '../web/src/constants.ts';
 import { LOCALES } from '../web/src/locales/index.ts';
 import type { LogoFormState } from '../web/src/types.ts';
 import { buildLogoUrl } from '../web/src/utils/url.ts';
@@ -35,6 +35,29 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(DEFAULT_STATE.behind).toBe(false);
 
     expect(Object.isFrozen(DEFAULT_STATE)).toBe(true);
+  });
+
+  it('导出格式应按静态与动态分类，并包含动态 SVG 和动态 WebP', () => {
+    expect(FORMAT_GROUPS.map((group) => group.i18nKey)).toEqual([
+      'format-group-static',
+      'format-group-animated',
+    ]);
+    expect(FORMAT_GROUPS[0].items.map((item) => item.format)).toEqual([
+      'png',
+      'webp',
+      'svg',
+      'jpeg',
+      'base64',
+    ]);
+    expect(FORMAT_GROUPS[1].items.map((item) => item.format)).toEqual([
+      'gif',
+      'apng',
+      'svg-animated',
+      'webp-animated',
+    ]);
+    for (const locale of Object.values(LOCALES)) {
+      expect(locale['reset-pad']).toBe('2 ↺');
+    }
   });
 
   it('buildLogoUrl 应当正确序列化 RESTful /api/logo 查询参数', () => {

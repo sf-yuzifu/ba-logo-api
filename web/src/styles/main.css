@@ -944,6 +944,19 @@ main {
   gap: 8px;
 }
 
+.format-group + .format-group {
+  margin-top: 12px;
+}
+
+.format-group-label {
+  margin-bottom: 7px;
+  color: var(--text-muted);
+  font-family: var(--font-hud);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 .format-pills {
   display: flex;
   flex-wrap: wrap;

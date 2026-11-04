@@ -40,11 +40,11 @@ A high-performance, pixel-perfect Blue Archive style logo generation service pow
 ## ✨ Features
 
 - ⚡ **Blazing Fast**: Native C++/Rust Google Skia graphics engine. Sub-15ms cold/warm generation latency — over **150x faster** than legacy headless browser rendering.
-- 🎬 **Animated GIF & APNG Generation**: Text slides inward horizontally, with color filling top-to-bottom on the left and bottom-to-top on the right. The cross extends from its center; the halo and subtitle reveal from left to right. Export as GIF or lossless APNG.
+- 🎬 **Animated GIF, APNG, SVG & WebP**: Text slides inward horizontally, with color filling top-to-bottom on the left and bottom-to-top on the right. The cross extends from its center; the halo and subtitle reveal from left to right. Export raster animations or pure-vector SMIL SVG.
 - 🪶 **Ultra Lightweight**: Resident memory stays around **30–50 MB RSS** with JS heap under **20 MB**. Runs smoothly on entry-level 1-vCPU/1-GB servers without sandbox overhead.
 - 🎨 **Pixel-Perfect Vector Graphics**: Mathematical SVG `Path2D` vector outlines for the iconic Halo and Cross. Supports dynamic scaling (`scale=0.1~8x`) up to 4K+ print resolution without pixelation.
 - 🌐 **Comprehensive CJK Typography**: Merged high-quality TrueType font asset containing **30,000+ glyphs**, supporting Latin, Japanese Kana, Simplified Chinese, Traditional Chinese, and Korean Hangul.
-- 📦 **Multi-Format Exports**: Native raster exports for `png`, `webp`, and `jpeg`, plus pure vector `svg` (fully outlined paths for direct import into Figma / Illustrator), JSON `base64`, `gif`, and `apng`.
+- 📦 **Multi-Format Exports**: Native raster exports for `png`, `webp`, and `jpeg`, plus pure vector `svg` (fully outlined paths for direct import into Figma / Illustrator), JSON `base64`, plus `gif`, `apng`, `svg-animated`, and `webp-animated`.
 - 🎛️ **Kivotos HUD WebUI**: Built-in responsive frontend inspired by Blue Archive's tactical HUD, featuring real-time preview, debounced rendering, sticky mobile layout, and one-click URL sharing.
 - 🔄 **Drop-in Compatibility**: Full backward compatibility with legacy `/balogo` endpoints via automatic HTTP 308 permanent redirect.
 
@@ -116,7 +116,7 @@ Modern RESTful endpoint: `GET /api/logo` *(Legacy `GET /balogo` automatically re
 | `swapColors` | `swap` | boolean | `false` | Swap left and right text color themes |
 | `transparent`| `tp` | boolean | `false` | Transparent background with cutout motifs |
 | `scale` | `s` | number | `1` | Resolution scaling multiplier (`0.1` to `8.0`) |
-| `format` | - | string | `"png"` | Output format: `png`, `webp`, `jpeg`, `svg`, `base64` |
+| `format` | - | string | `"png"` | `png`, `webp`, `jpeg`, `svg`, `base64`, `gif`, `apng`, `svg-animated`, `webp-animated` |
 | `center` | `vcenter`| boolean | *auto* | Vertically center content (defaults to `true` with subtitle, `false` without) |
 
 *For complete parameter schemas and interactive testing, please visit the interactive `/swagger` page.*

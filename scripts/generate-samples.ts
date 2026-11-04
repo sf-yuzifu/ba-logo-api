@@ -105,6 +105,31 @@ const samples: { filename: string; options: RenderOptions; desc: string }[] = [
     },
     desc: '官方英日副标题 APNG 高清动图 (24fps 全彩)',
   },
+  {
+    filename: '09-animated-entrance.svg',
+    options: {
+      textL: 'Blue',
+      textR: 'Archive',
+      subtitle: 'ブルーアーカイブ',
+      format: 'svg-animated',
+      scale: 1,
+      duration: 1.1,
+    },
+    desc: '官方英日副标题 Animated SVG 纯矢量动图',
+  },
+  {
+    filename: '10-animated-entrance.webp',
+    options: {
+      textL: 'Blue',
+      textR: 'Archive',
+      subtitle: 'ブルーアーカイブ',
+      format: 'webp-animated',
+      scale: 1,
+      fps: 24,
+      duration: 1.1,
+    },
+    desc: '官方英日副标题 Animated WebP 高清动图',
+  },
 ];
 
 for (const s of samples) {

@@ -15,6 +15,7 @@ import { drawLogoCanvas, type RenderOptions } from '../renderer.ts';
 import { findAlphaBounds } from './bounds.ts';
 import { computeLogoLayout, type LogoLayout } from './layout.ts';
 import { type NormalizedRenderOptions, normalizeRenderOptions } from './options.ts';
+import { encodeAnimatedWebP } from './webp.ts';
 
 function easeOutCubic(x: number): number {
   return 1 - (1 - x) ** 3;
@@ -458,11 +459,11 @@ export function drawAnimatedLogoCanvas(
 }
 
 /**
- * 渲染逐帧动效并导出为 GIF 或 APNG 格式二进制包
+ * 渲染逐帧动效并导出为 GIF、APNG 或 Animated WebP 二进制包
  */
 export function renderLogoAnimatedToBuffer(
   options: AnimatedOptions = {},
-  targetFormat: 'gif' | 'apng' = 'gif',
+  targetFormat: 'gif' | 'apng' | 'webp-animated' = 'gif',
 ): AnimatedRenderResult {
   loadFonts();
   const normalized = normalizeRenderOptions(options);
@@ -523,6 +524,7 @@ export function renderLogoAnimatedToBuffer(
   const outH = Math.max(cropH + padding.top + padding.bottom, 1);
 
   const rgbaBuffers: ArrayBuffer[] = [];
+  const webpFrames: Buffer[] = [];
   const delays: number[] = [];
 
   const gif = targetFormat === 'gif' ? GIFEncoder() : null;
@@ -551,14 +553,19 @@ export function renderLogoAnimatedToBuffer(
       sourceHeight,
     );
 
-    const imgData = crCtx.getImageData(0, 0, outW, outH).data;
-    rgbaBuffers.push(imgData.buffer as ArrayBuffer);
+    if (targetFormat === 'apng') {
+      const imgData = crCtx.getImageData(0, 0, outW, outH).data;
+      rgbaBuffers.push(imgData.buffer as ArrayBuffer);
+    } else if (targetFormat === 'webp-animated') {
+      webpFrames.push(croppedCanvas.toBuffer('image/webp', 90));
+    }
 
     const isLast = i === totalFrames - 1;
     const delay = isLast ? holdDelayMs : stepDelayMs;
     delays.push(delay);
 
     if (gif) {
+      const imgData = crCtx.getImageData(0, 0, outW, outH).data;
       const palette = quantize(imgData, 256);
       const index = applyPalette(imgData, palette);
       gif.writeFrame(index, outW, outH, {
@@ -577,6 +584,9 @@ export function renderLogoAnimatedToBuffer(
     gif.finish();
     buffer = Buffer.from(gif.bytes());
     mimeType = 'image/gif';
+  } else if (targetFormat === 'webp-animated') {
+    buffer = encodeAnimatedWebP(webpFrames, outW, outH, delays);
+    mimeType = 'image/webp';
   } else {
     // APNG 格式：无损编码 (cnum: 0 保留 24位真彩与 8位透明通道)
     const apngArrayBuffer = UPNG.encode(rgbaBuffers, outW, outH, 0, delays);
