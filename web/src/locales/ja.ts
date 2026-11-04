@@ -1,4 +1,6 @@
 export default {
+  'app-title': 'ブルーアーカイブ ロゴジェネレーター | Schale タクティカルコンソール',
+
   // ナビゲーション
   'nav-swagger': 'Swagger API',
   'nav-upstream': '元フロントエンド',

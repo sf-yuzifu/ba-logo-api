@@ -1,4 +1,6 @@
 export default {
+  'app-title': '蔚蓝档案 Logo 生成器 | Schale 战术控制台',
+
   // 顶部导航
   'nav-swagger': 'Swagger API',
   'nav-upstream': '原版前端',

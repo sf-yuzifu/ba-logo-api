@@ -257,7 +257,18 @@ export function createApp() {
       },
     )
 
-    // 4. WebUI 静态前端资源分发
+    // 4. WebUI favicon 与静态前端资源分发
+    .get('/favicon.svg', async ({ set }) => {
+      const file = Bun.file(path.join(WEB_DIST_DIR, 'favicon.svg'));
+      if (!(await file.exists())) {
+        set.status = 404;
+        return 'Asset Not Found';
+      }
+      set.headers['content-type'] = 'image/svg+xml; charset=utf-8';
+      set.headers['cache-control'] = CACHE_CONTROL_HEADER;
+      return file;
+    })
+
     .get(
       '/assets/*',
       async ({ params, set }) => {

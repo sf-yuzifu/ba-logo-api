@@ -1,4 +1,6 @@
 export default {
+  'app-title': 'Blue Archive Logo Generator | Schale Tactical Console',
+
   // Navigation
   'nav-swagger': 'Swagger API',
   'nav-upstream': 'Original Web',

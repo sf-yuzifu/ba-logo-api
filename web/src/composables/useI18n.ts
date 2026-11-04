@@ -30,6 +30,7 @@ const applyLangToDOM = (lang: SupportedLang) => {
     ko: 'ko',
   };
   document.documentElement.setAttribute('lang', langMap[lang] || lang);
+  document.title = LOCALES[lang]['app-title'] ?? LOCALES.zh['app-title'];
 };
 
 const initialLang = getInitialLang();

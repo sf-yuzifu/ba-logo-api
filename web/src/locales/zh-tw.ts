@@ -1,4 +1,6 @@
 export default {
+  'app-title': '蔚藍檔案 Logo 產生器 | Schale 戰術控制台',
+
   // 頂部導航
   'nav-swagger': 'Swagger API',
   'nav-upstream': '原版前端',

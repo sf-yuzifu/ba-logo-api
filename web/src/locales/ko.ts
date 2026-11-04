@@ -1,4 +1,6 @@
 export default {
+  'app-title': '블루 아카이브 로고 생성기 | Schale 전술 콘솔',
+
   // 상단 네비게이션
   'nav-swagger': 'Swagger API',
   'nav-upstream': '원작 웹사이트',

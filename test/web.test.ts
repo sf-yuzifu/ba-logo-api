@@ -186,6 +186,24 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(zeroSubtitleYUrl.searchParams.get('subY')).toBe('0');
   });
 
+  it('页面标题应完整本地化，并提供光环与十字 favicon', () => {
+    expect(LOCALES.zh['app-title']).toBe('蔚蓝档案 Logo 生成器 | Schale 战术控制台');
+    expect(LOCALES['zh-tw']['app-title']).toBe('蔚藍檔案 Logo 產生器 | Schale 戰術控制台');
+    expect(LOCALES.en['app-title']).toBe('Blue Archive Logo Generator | Schale Tactical Console');
+    expect(LOCALES.ja['app-title']).toBe(
+      'ブルーアーカイブ ロゴジェネレーター | Schale タクティカルコンソール',
+    );
+    expect(LOCALES.ko['app-title']).toBe('블루 아카이브 로고 생성기 | Schale 전술 콘솔');
+
+    const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
+    expect(html).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">');
+    const favicon = readFileSync(new URL('../web/public/favicon.svg', import.meta.url), 'utf8');
+    expect(favicon).toContain('Blue Archive Halo and Cross');
+    expect(favicon).toContain('<polygon');
+    expect(favicon).toContain('fill="#128AFA"');
+    expect(favicon).toContain('fill="#FFFFFF"');
+  });
+
   it('i18n 词典应当在所有支持的语言中具备 100% 键覆盖率，且覆盖代码中所有引用的翻译键', () => {
     const zhKeys = Object.keys(LOCALES.zh).sort();
     expect(zhKeys.length).toBeGreaterThan(30);

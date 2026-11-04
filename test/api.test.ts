@@ -10,8 +10,20 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toContain('text/html');
     const html = await res.text();
-    expect(html).toContain('Blue Archive Logo Generator');
+    expect(html).toContain('蔚蓝档案 Logo 生成器 | Schale 战术控制台');
     expect(html).toContain('id="app"');
+    expect(html).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">');
+  });
+
+  it('GET /favicon.svg 应当返回光环与十字矢量图标', async () => {
+    const res = await app.handle(new Request('http://localhost/favicon.svg'));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('image/svg+xml');
+    const svg = await res.text();
+    expect(svg).toContain('<svg');
+    expect(svg).toContain('Blue Archive Halo and Cross');
+    expect(svg).toContain('fill="#128AFA"');
+    expect(svg).toContain('fill="#FFFFFF"');
   });
 
   it('GET / 携带 Accept: application/json 或访问 /health 应当返回 JSON 状态及动态版本信息', async () => {
