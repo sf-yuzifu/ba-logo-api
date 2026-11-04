@@ -22,6 +22,7 @@ export default {
   'ph-sub': '例如：ブルーアーカイブ / Blue Archive',
   'label-sub-x': '副標題 X 偏移',
   'label-sub-y': '副標題 Y 偏移',
+  'label-sub-size': '副標題字級',
   'reset-0': '0 ↺',
 
   // 色彩配置

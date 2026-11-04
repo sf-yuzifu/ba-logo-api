@@ -3,7 +3,6 @@ import {
   BASE_CANVAS_HEIGHT,
   BASE_CANVAS_WIDTH,
   BASE_FONT_SIZE,
-  BASE_SUBTITLE_FONT_SIZE,
   HORIZONTAL_TILT,
   PADDING_X,
   TEXT_BASELINE,
@@ -60,7 +59,7 @@ export function computeLogoLayout(options: NormalizedRenderOptions): LogoLayout 
   const canvasHeight = Math.round(BASE_CANVAS_HEIGHT * scale);
   const initialWidth = Math.round(BASE_CANVAS_WIDTH * scale);
   const fontSize = Math.round(BASE_FONT_SIZE * scale);
-  const subtitleFontSize = Math.round(BASE_SUBTITLE_FONT_SIZE * scale);
+  const subtitleFontSize = Math.round(options.subtitleFontSize * scale);
   const strokeWidth = 12 * scale;
   const font = `${fontSize}px "${FONT_FAMILY}"`;
   const subtitleFont = `${subtitleFontSize}px "${FONT_FAMILY}"`;

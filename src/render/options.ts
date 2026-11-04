@@ -1,4 +1,4 @@
-import { COLORS, DEFAULT_GRAPH_OFFSET } from '../constants.ts';
+import { BASE_SUBTITLE_FONT_SIZE, COLORS, DEFAULT_GRAPH_OFFSET } from '../constants.ts';
 import type { PaddingBox, PaddingValue, RenderOptions } from '../renderer.ts';
 
 export interface NormalizedRenderOptions
@@ -13,6 +13,7 @@ export interface NormalizedRenderOptions
   offsetY: number;
   subtitleOffsetX: number;
   subtitleOffsetY: number;
+  subtitleFontSize: number;
   wordGap: number;
   scale: number;
   transparent: boolean;
@@ -77,6 +78,10 @@ export function normalizeRenderOptions(options: RenderOptions = {}): NormalizedR
     offsetY: finite(options.offsetY, DEFAULT_GRAPH_OFFSET.y),
     subtitleOffsetX: finite(options.subtitleOffsetX, 0),
     subtitleOffsetY: finite(options.subtitleOffsetY, 0),
+    subtitleFontSize: Math.min(
+      Math.max(finite(options.subtitleFontSize, BASE_SUBTITLE_FONT_SIZE), 12),
+      96,
+    ),
     wordGap: Math.min(Math.max(finite(options.wordGap, 0), -100), 300),
     scale,
     accentColor,

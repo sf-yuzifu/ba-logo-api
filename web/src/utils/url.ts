@@ -10,6 +10,7 @@ const PARAM_NAMES: ParameterNames = {
   subtitleColor: 'subtitleColor',
   subX: 'subX',
   subY: 'subY',
+  subtitleFontSize: 'subtitleFontSize',
   accent: 'accent',
   textColor: 'textColor',
   crossColor: 'crossColor',
@@ -51,6 +52,7 @@ export function buildLogoUrl(state: Readonly<LogoFormState>, origin = ''): strin
     if (state.subtitleColor) set('subtitleColor', cleanHex(state.subtitleColor));
     if (state.subX !== 0) set('subX', state.subX);
     if (state.subY !== 0) set('subY', state.subY);
+    if (state.subtitleFontSize !== 30) set('subtitleFontSize', state.subtitleFontSize);
   }
 
   const defaultTextColor = state.dark ? '#ffffff' : '#2b2b2b';

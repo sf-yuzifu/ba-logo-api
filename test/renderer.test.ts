@@ -144,6 +144,23 @@ describe('Renderer Core Unit Tests', () => {
     expect(Math.abs(logo3x.height - logo1x.height * 3)).toBeLessThan(15);
   });
 
+  it('副标题字号参数应同时影响位图与 SVG，并保持导出尺寸一致', async () => {
+    const small = renderLogo({ subtitle: 'BlueArchive', subtitleFontSize: 24 });
+    const large = renderLogo({ subtitle: 'BlueArchive', subtitleFontSize: 48 });
+    expect(large.width).toBeGreaterThan(small.width);
+
+    const svg = renderLogoToBuffer({
+      subtitle: 'BlueArchive',
+      subtitleFontSize: 48,
+      format: 'svg',
+    });
+    expect(svg.width).toBe(large.width);
+    expect(svg.height).toBe(large.height);
+    const image = await loadImage(svg.buffer);
+    expect(image.width).toBe(large.width);
+    expect(image.height).toBe(large.height);
+  });
+
   it('应当支持色彩自定义、暗黑模式与颜色互换', () => {
     const normal = renderLogoToBuffer({ accentColor: '#00E5FF' });
     expect(normal.buffer.length).toBeGreaterThan(0);
@@ -196,6 +213,7 @@ describe('Renderer Core Unit Tests', () => {
       textL: '蔚蓝',
       textR: '档案',
       subtitle: '1145141313484848484111',
+      subtitleFontSize: 36,
       scale: 2,
     });
     expect(longSub.width).toBeGreaterThan(1200);

@@ -102,6 +102,55 @@ describe('文字水平入场与反向着色', () => {
   }
 });
 
+describe('副标题横向揭示与十字同步', () => {
+  it('应仅以最终颜色从左向右揭示，并与十字在同一帧完成', () => {
+    loadFonts();
+    const options = normalizeRenderOptions({
+      textL: '',
+      textR: '',
+      subtitle: 'HHHH',
+      subtitleColor: '#2B2B2B',
+      haloColor: '#00000000',
+      crossColor: '#00000000',
+      transparent: true,
+    });
+    const layout = computeLogoLayout(options);
+    const actionDuration = 1.1;
+    const frameAt = (elapsed: number) =>
+      drawAnimatedLogoCanvas(options, layout, elapsed / actionDuration, actionDuration);
+    const pixels = (canvas: Canvas) =>
+      Buffer.from(canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data);
+
+    const early = pixelBounds(frameAt(0.6));
+    const laterFrame = frameAt(0.7);
+    const later = pixelBounds(laterFrame);
+    const laterPixels = pixels(laterFrame);
+    let cyanPixelCount = 0;
+    for (let i = 0; i < laterPixels.length; i += 4) {
+      if (
+        laterPixels[i + 3] >= 64 &&
+        laterPixels[i + 2] > laterPixels[i] + 10 &&
+        laterPixels[i + 1] > laterPixels[i] + 5
+      ) {
+        cyanPixelCount++;
+      }
+    }
+
+    // 只扩大右侧横向揭示窗口，不进行纵向或斜向颜色扫描。
+    expect(later.minX).toBe(early.minX);
+    expect(later.maxX).toBeGreaterThan(early.maxX);
+    expect(later.minY).toBe(early.minY);
+    expect(later.maxY).toBe(early.maxY);
+    expect(cyanPixelCount).toBe(0);
+
+    const beforeCompletion = frameAt(0.8);
+    const crossCompleted = frameAt(1.006);
+    const finalFrame = frameAt(actionDuration);
+    expect(pixels(beforeCompletion).equals(pixels(crossCompleted))).toBe(false);
+    expect(pixels(crossCompleted).equals(pixels(finalFrame))).toBe(true);
+  });
+});
+
 describe('动画 Logo 生成与编码 (GIF & APNG)', () => {
   const app = createApp();
   it('应当能成功生成合法的 GIF 动图且包含 GIF89a 标志', () => {

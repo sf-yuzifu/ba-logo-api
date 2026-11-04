@@ -44,6 +44,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
       subtitleColor: '#4A90E2',
       subX: 10,
       subY: -5,
+      subtitleFontSize: 42,
       accent: '#FF5722',
       textColor: '#333333',
       crossColor: '#FFD700',
@@ -71,6 +72,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(parsed.searchParams.get('subtitleColor')).toBe('4A90E2');
     expect(parsed.searchParams.get('subX')).toBe('10');
     expect(parsed.searchParams.get('subY')).toBe('-5');
+    expect(parsed.searchParams.get('subtitleFontSize')).toBe('42');
     expect(parsed.searchParams.get('accent')).toBe('FF5722');
     expect(parsed.searchParams.get('textColor')).toBe('333333');
     expect(parsed.searchParams.get('crossColor')).toBe('FFD700');

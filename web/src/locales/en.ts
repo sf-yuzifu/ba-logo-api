@@ -22,6 +22,7 @@ export default {
   'ph-sub': 'e.g. Blue Archive / ブルーアーカイブ',
   'label-sub-x': 'Subtitle X Offset',
   'label-sub-y': 'Subtitle Y Offset',
+  'label-sub-size': 'Subtitle Font Size',
   'reset-0': '0 ↺',
 
   // Colors

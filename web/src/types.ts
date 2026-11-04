@@ -9,6 +9,7 @@ export interface LogoFormState {
   subtitleColor: string;
   subX: number;
   subY: number;
+  subtitleFontSize: number;
   accent: string;
   textColor: string;
   crossColor: string;

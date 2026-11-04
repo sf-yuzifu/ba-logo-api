@@ -8,7 +8,6 @@ import {
 import {
   BASE_CANVAS_HEIGHT,
   BASE_FONT_SIZE,
-  BASE_SUBTITLE_FONT_SIZE,
   CROSS_PATH_DATA,
   HALO_PATH_DATA,
   HOLLOW_POLYGON,
@@ -51,6 +50,7 @@ export interface RenderOptions {
   subtitleColor?: string; // 可选副标题颜色（默认跟随右侧次要文字颜色）
   subtitleOffsetX?: number; // 副标题 X 轴偏移量微调（像素，默认 0）
   subtitleOffsetY?: number; // 副标题 Y 轴偏移量微调（像素，默认 0）
+  subtitleFontSize?: number; // 副标题基础字号（默认 30，范围 12~96，随 scale 缩放）
   offsetX?: number;
   offsetY?: number;
   transparent?: boolean;
@@ -165,7 +165,7 @@ export function drawLogoCanvas(normalized: NormalizedRenderOptions, layout: Logo
   // PR #12 副标题配置
   const subtitle = normalized.subtitle;
   const subtitleColor = normalized.subtitleColor;
-  const subtitleFontSize = Math.round(BASE_SUBTITLE_FONT_SIZE * scale);
+  const subtitleFontSize = layout.subtitleFontSize;
   const subtitleFont = `${subtitleFontSize}px "${FONT_FAMILY}"`;
 
   // 1. 获取全局单例测量上下文（避免每次请求重复开辟无谓画布）

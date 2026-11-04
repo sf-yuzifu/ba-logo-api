@@ -22,6 +22,7 @@ export default {
   'ph-sub': '例：ブルーアーカイブ / Blue Archive',
   'label-sub-x': 'サブタイトル X オフセット',
   'label-sub-y': 'サブタイトル Y オフセット',
+  'label-sub-size': 'サブタイトルのフォントサイズ',
   'reset-0': '0 ↺',
 
   // カラー設定

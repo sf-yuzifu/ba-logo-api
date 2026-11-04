@@ -3,7 +3,6 @@ import { applyPalette, GIFEncoder, quantize } from 'gifenc';
 import UPNG from 'upng-js';
 import {
   BASE_FONT_SIZE,
-  BASE_SUBTITLE_FONT_SIZE,
   CROSS_PATH_DATA,
   HALO_PATH_DATA,
   HOLLOW_POLYGON,
@@ -116,14 +115,12 @@ const crossPath = new Path2D(CROSS_PATH_DATA);
  */
 function drawCrossRevealArm(
   ctx: ReturnType<Canvas['getContext']>,
-  graphX: number,
-  graphY: number,
   canvasHeight: number,
   centerX: number,
   centerY: number,
   angle: number,
   reveal: number,
-  color: string,
+  drawContent: () => void,
 ): void {
   const fullLength = canvasHeight * 2;
   const visibleLength = Math.max(fullLength * reveal, 0.001);
@@ -136,11 +133,7 @@ function drawCrossRevealArm(
   ctx.clip();
   ctx.rotate(-angle);
   ctx.translate(-centerX, -centerY);
-  ctx.translate(graphX, graphY);
-  const s = canvasHeight / SVG_VIEWBOX_SIZE;
-  ctx.scale(s, s);
-  ctx.fillStyle = color;
-  ctx.fill(crossPath);
+  drawContent();
   ctx.restore();
 }
 
@@ -169,20 +162,21 @@ function getMeasureContext() {
 
 /**
  * 绘制特定进度 p (0.0 ~ 1.0) 下的动画帧画布
- * 物理运动学设计（严格对齐原版视频时间线）：
- * Phase 1 (0.0-0.30): 文字在初始位置，先完成颜色注入（左↓右↑，带渐变平滑过渡）
- * Phase 2 (0.30-0.50): 着色完成后，文字水平靠拢归位
- * Phase 3 (0.50-0.80): 十字架中心延伸、光环左→右展开、副标题左→右擦入
+ * 物理运动学设计（按实际秒数驱动）：
+ * Phase 1 (0.00s-0.33s): 文字在初始位置，先完成颜色注入（左↓右↑，带渐变平滑过渡）
+ * Phase 2 (0.33s-0.55s): 着色完成后，文字水平靠拢归位
+ * Phase 3 (0.506s 起): 十字架以 0.5 秒展开，白色镂空同步延伸；副标题与十字同步左→右展开，光环随后左→右展开
  */
 export function drawAnimatedLogoCanvas(
   normalized: NormalizedRenderOptions,
   layout: LogoLayout,
   progress: number,
+  actionDuration = 1.1,
 ): Canvas {
   const scale = normalized.scale;
   const canvasHeight = Math.round(250 * scale);
   const font = `${Math.round(BASE_FONT_SIZE * scale)}px "${FONT_FAMILY}"`;
-  const subtitleFont = `${Math.round(BASE_SUBTITLE_FONT_SIZE * scale)}px "${FONT_FAMILY}"`;
+  const subtitleFont = `${layout.subtitleFontSize}px "${FONT_FAMILY}"`;
   const strokeWidth = 12 * scale;
 
   const {
@@ -209,11 +203,13 @@ export function drawAnimatedLogoCanvas(
   const crossColor = normalized.crossColor;
   const haloColor = normalized.haloColor;
 
-  // === Phase 1: 颜色注入（初始位置先着色） (0.0 -> 0.30) ===
-  const scanProgress = Math.min(Math.max(progress / 0.3, 0), 1);
+  const elapsed = progress * actionDuration;
 
-  // === Phase 2: 文字水平靠拢（着色完成后） (0.30 -> 0.50) ===
-  const textMoveP = Math.min(Math.max((progress - 0.3) / 0.2, 0), 1);
+  // === Phase 1: 颜色注入（初始位置先着色，0.00s -> 0.33s） ===
+  const scanProgress = Math.min(Math.max(elapsed / 0.33, 0), 1);
+
+  // === Phase 2: 文字水平靠拢（着色完成后，0.33s -> 0.55s） ===
+  const textMoveP = Math.min(Math.max((elapsed - 0.33) / 0.22, 0), 1);
   const textMoveEase = easeOutCubic(textMoveP);
   const textMoveRemain = 1 - textMoveEase;
 
@@ -223,24 +219,52 @@ export function drawAnimatedLogoCanvas(
   // 文字 alpha：原视频文字直接以纯白实色出现，无需淡入
   const textIntroAlpha = 1;
 
-  // === Phase 3: 十字架延伸（文字即将归位时提前启动） (0.46 -> 0.66) ===
-  const crossP = Math.min(Math.max((progress - 0.46) / 0.2, 0), 1);
+  // === Phase 3: 十字架延伸，完整展开耗时 0.5 秒 ===
+  const crossDuration = Math.min(0.5, Math.max(0.1, actionDuration - 0.55));
+  const crossP = Math.min(Math.max((elapsed - 0.506) / crossDuration, 0), 1);
   const crossEase = easeOutCubic(crossP);
   const crossAlpha = Math.min(crossP / 0.12, 1);
   const crossReveal = crossEase;
 
-  // === Phase 3: 光环左→右展开 (0.54 -> 0.74) ===
-  const haloP = Math.min(Math.max((progress - 0.54) / 0.2, 0), 1);
+  // === Phase 3: 光环左→右展开 (0.594s -> 0.814s) ===
+  const haloP = Math.min(Math.max((elapsed - 0.594) / 0.22, 0), 1);
   const haloEase = easeOutCubic(haloP);
   const haloAlpha = Math.min(haloP / 0.12, 1);
 
-  // === Phase 3: 副标题左→右擦入 (0.52 -> 0.72) ===
-  const subP = Math.min(Math.max((progress - 0.52) / 0.2, 0), 1);
-  const subEase = easeOutCubic(subP);
-  const subAlpha = Math.min(subP / 0.12, 1);
+  // === Phase 3: 副标题与十字同步，左→右擦入并在同一帧完成 ===
+  const subEase = crossEase;
+  const subAlpha = crossAlpha;
 
-  // === Phase 3: 白色镂空描边跟随十字延伸逐渐生效 ===
-  const cutoutAlpha = Math.min(crossP / 0.7, 1);
+  const crossCenterX = graphX + (307 / SVG_VIEWBOX_SIZE) * canvasHeight;
+  const crossCenterY = graphY + (151.5 / SVG_VIEWBOX_SIZE) * canvasHeight;
+  const diagonalAngle = Math.atan2(28.5 - 385.5, 366.5 - 166);
+  const transverseAngle = Math.atan2(220 - 50, 483.5 - 86.5);
+
+  // 十字和白色镂空共用相同延伸窗口，延伸到哪里就立即绘制/裁切到哪里。
+  const revealWithCross = (drawContent: () => void) => {
+    if (crossReveal >= 1) {
+      drawContent();
+      return;
+    }
+    drawCrossRevealArm(
+      ctx,
+      canvasHeight,
+      crossCenterX,
+      crossCenterY,
+      diagonalAngle,
+      crossReveal,
+      drawContent,
+    );
+    drawCrossRevealArm(
+      ctx,
+      canvasHeight,
+      crossCenterX,
+      crossCenterY,
+      transverseAngle,
+      crossReveal,
+      drawContent,
+    );
+  };
 
   const textBaselineY = canvasHeight * TEXT_BASELINE;
   ctx.font = font;
@@ -313,18 +337,19 @@ export function drawAnimatedLogoCanvas(
     ctx.restore();
   }
 
-  // --- Step 3: 绘制右文字描边镂空，随十字延伸提前显露 ---
-  if (cutoutAlpha > 0) {
-    ctx.save();
-    ctx.globalAlpha = cutoutAlpha;
-    ctx.font = font;
-    ctx.textAlign = 'start';
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = strokeWidth;
-    ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, rightDx, 0);
-    ctx.strokeText(textR, rightTextX, textBaselineY);
-    ctx.restore();
+  // --- Step 3: 右文字白色描边随十字延伸同步裁切 ---
+  if (crossP > 0) {
+    revealWithCross(() => {
+      ctx.save();
+      ctx.font = font;
+      ctx.textAlign = 'start';
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = strokeWidth;
+      ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, rightDx, 0);
+      ctx.strokeText(textR, rightTextX, textBaselineY);
+      ctx.restore();
+    });
   }
 
   // --- Step 4: 右侧文字自右滑入，次要文字色自下而上注入 ---
@@ -363,95 +388,65 @@ export function drawAnimatedLogoCanvas(
     ctx.restore();
   }
 
-  // --- Step 5: 十字镂空多边形遮罩 ---
-  if (crossAlpha > 0 && cutoutAlpha > 0) {
-    ctx.save();
-    ctx.globalAlpha = cutoutAlpha;
-    ctx.beginPath();
-    ctx.moveTo(
-      graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-      graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
-    );
-    for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
-      ctx.lineTo(
-        graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
-        graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
+  // --- Step 5: 十字镂空多边形随延伸区域同步裁切 ---
+  if (crossP > 0) {
+    revealWithCross(() => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(
+        graphX + (HOLLOW_POLYGON[0][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
+        graphY + (HOLLOW_POLYGON[0][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
       );
-    }
-    ctx.closePath();
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = '#000000';
-    ctx.fill();
-    ctx.restore();
+      for (let i = 1; i < HOLLOW_POLYGON.length; i++) {
+        ctx.lineTo(
+          graphX + (HOLLOW_POLYGON[i][0] / SVG_VIEWBOX_SIZE) * canvasHeight,
+          graphY + (HOLLOW_POLYGON[i][1] / SVG_VIEWBOX_SIZE) * canvasHeight,
+        );
+      }
+      ctx.closePath();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = '#000000';
+      ctx.fill();
+      ctx.restore();
+    });
   }
 
   // --- Step 6: 绘制十字架（尺寸不变，从交点沿两组方向向外延伸） ---
   if (crossAlpha > 0 && crossReveal > 0.001) {
     ctx.save();
     ctx.globalAlpha = crossAlpha;
-
-    const crossCenterX = graphX + (307 / SVG_VIEWBOX_SIZE) * canvasHeight;
-    const crossCenterY = graphY + (151.5 / SVG_VIEWBOX_SIZE) * canvasHeight;
-    const diagonalAngle = Math.atan2(28.5 - 385.5, 366.5 - 166);
-    const transverseAngle = Math.atan2(220 - 50, 483.5 - 86.5);
-
-    if (crossReveal >= 1) {
+    revealWithCross(() => {
+      ctx.save();
       ctx.translate(graphX, graphY);
       const s = canvasHeight / SVG_VIEWBOX_SIZE;
       ctx.scale(s, s);
       ctx.fillStyle = crossColor;
       ctx.fill(crossPath);
-    } else {
-      drawCrossRevealArm(
-        ctx,
-        graphX,
-        graphY,
-        canvasHeight,
-        crossCenterX,
-        crossCenterY,
-        diagonalAngle,
-        crossReveal,
-        crossColor,
-      );
-      drawCrossRevealArm(
-        ctx,
-        graphX,
-        graphY,
-        canvasHeight,
-        crossCenterX,
-        crossCenterY,
-        transverseAngle,
-        crossReveal,
-        crossColor,
-      );
-    }
-
+      ctx.restore();
+    });
     ctx.restore();
   }
 
-  // --- Step 7: 绘制副标题（自左向右横向擦除展开） ---
+  // --- Step 7: 副标题仅以最终颜色左→右显现，与十字同步完成 ---
   if (subtitle && subAlpha > 0) {
-    ctx.save();
-    ctx.globalAlpha = subAlpha;
-    ctx.font = subtitleFont;
-    ctx.fillStyle = subtitleColor;
-    ctx.textAlign = 'end';
-
-    // 测量副标题实际宽度进行动态从左到右 clip 揭开
     const mCtx = getMeasureContext();
     mCtx.font = subtitleFont;
     const subWidth = mCtx.measureText(subtitle).width;
     const subLeftX = subtitleX - subWidth;
     const subVisibleW = subWidth * subEase;
+    const subClipY = subY - layout.subtitleFontSize - 12 * scale;
+    const subClipH = layout.subtitleFontSize + 24 * scale;
 
     ctx.save();
+    ctx.globalAlpha = subAlpha;
+    ctx.font = subtitleFont;
+    ctx.textAlign = 'end';
+    ctx.fillStyle = subtitleColor;
     ctx.setTransform(1, 0, HORIZONTAL_TILT, 1, 0, 0);
     ctx.beginPath();
-    ctx.rect(subLeftX - 10 * scale, subY - 45 * scale, subVisibleW + 15 * scale, 65 * scale);
+    ctx.rect(subLeftX - 10 * scale, subClipY, subVisibleW + 15 * scale, subClipH);
     ctx.clip();
     ctx.fillText(subtitle, subtitleX, subY);
-    ctx.restore();
-
     ctx.restore();
   }
 
@@ -522,7 +517,7 @@ export function renderLogoAnimatedToBuffer(
 
   for (let i = 0; i < totalFrames; i++) {
     const p = i / (totalFrames - 1);
-    const frameCanvas = drawAnimatedLogoCanvas(normalized, layout, p);
+    const frameCanvas = drawAnimatedLogoCanvas(normalized, layout, p, actionDuration);
 
     const croppedCanvas = createCanvas(outW, outH);
     const crCtx = croppedCanvas.getContext('2d');

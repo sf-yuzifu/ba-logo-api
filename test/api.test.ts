@@ -136,12 +136,12 @@ describe('HTTP Route & Compatibility Tests', () => {
     // 1. /api/logo 全称长参数 vs /api/logo 短别名
     const resLong = await app.handle(
       new Request(
-        'http://localhost/api/logo?left=Blue&right=Archive&subtitle=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subtitleColor=4A90E2&subtitleOffsetX=15&subtitleOffsetY=-8&scale=2&wordGap=20&offsetX=10&offsetY=-5&transparent=true&accentColor=FF5722&textColor=333333&crossColor=FFD700&haloColor=9C27B0&motifsBehindText=true&padding=10',
+        'http://localhost/api/logo?left=Blue&right=Archive&subtitle=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subtitleColor=4A90E2&subtitleFontSize=34&subtitleOffsetX=15&subtitleOffsetY=-8&scale=2&wordGap=20&offsetX=10&offsetY=-5&transparent=true&accentColor=FF5722&textColor=333333&crossColor=FFD700&haloColor=9C27B0&motifsBehindText=true&padding=10',
       ),
     );
     const resShort = await app.handle(
       new Request(
-        'http://localhost/api/logo?l=Blue&r=Archive&sub=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subColor=4A90E2&subX=15&subY=-8&s=2&gap=20&x=10&y=-5&tp=true&accent=FF5722&tc=333333&cross=FFD700&halo=9C27B0&behind=true&pad=10',
+        'http://localhost/api/logo?l=Blue&r=Archive&sub=%E3%83%96%E3%83%AB%E3%83%BC%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%96&subColor=4A90E2&subSize=34&subX=15&subY=-8&s=2&gap=20&x=10&y=-5&tp=true&accent=FF5722&tc=333333&cross=FFD700&halo=9C27B0&behind=true&pad=10',
       ),
     );
 

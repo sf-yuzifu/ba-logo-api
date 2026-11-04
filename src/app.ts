@@ -54,6 +54,7 @@ export function parseLogoQuery(query: LogoQuery): RenderOptions {
   const offsetY = parseOptionalNumber(value('offsetY'));
   const subtitleOffsetX = parseOptionalNumber(value('subtitleOffsetX'));
   const subtitleOffsetY = parseOptionalNumber(value('subtitleOffsetY'));
+  const subtitleFontSize = parseOptionalNumber(value('subtitleFontSize'));
   const scale = parseOptionalNumber(value('scale'));
   const wordGap = parseOptionalNumber(value('wordGap'));
 
@@ -85,6 +86,7 @@ export function parseLogoQuery(query: LogoQuery): RenderOptions {
     subtitleColor,
     subtitleOffsetX,
     subtitleOffsetY,
+    subtitleFontSize,
     offsetX,
     offsetY,
     wordGap,

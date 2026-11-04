@@ -252,6 +252,32 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
           >
         </div>
       </div>
+
+      <!-- 副标题字号 -->
+      <div class="form-group">
+        <label class="form-label" for="inputSubSize">
+          <span class="label-text">{{ t('label-sub-size') }}</span>
+          <button
+            type="button"
+            class="reset-badge"
+            @click="resetField('subtitleFontSize')"
+            :title="t('label-sub-size')"
+          >
+            30 ↺
+          </button>
+        </label>
+        <input
+          type="number"
+          id="inputSubSize"
+          v-model.number="state.subtitleFontSize"
+          class="input-text input-mono"
+          min="12"
+          max="96"
+          step="1"
+          placeholder="30"
+          @input="handleInput"
+        >
+      </div>
     </div>
 
     <!-- 02. 色彩配置 -->

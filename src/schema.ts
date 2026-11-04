@@ -75,6 +75,20 @@ export const LogoQuerySchema = t.Object({
     t.Optional(t.String({ description: 'subtitleColor 别名' })),
   ),
 
+  subtitleFontSize: t.Optional(
+    t.Numeric({
+      description: '副标题基础字号（默认 30，范围 12~96，随 scale 缩放）',
+      minimum: 12,
+      maximum: 96,
+      examples: [30, 36, 48],
+    }),
+  ),
+  subSize: alias(
+    'subtitleFontSize',
+    'subSize',
+    t.Optional(t.Numeric({ description: 'subtitleFontSize 别名', minimum: 12, maximum: 96 })),
+  ),
+
   subtitleOffsetX: t.Optional(
     t.Numeric({
       description: '副标题 X 轴偏移量（像素，默认 0）',

@@ -22,6 +22,7 @@ export default {
   'ph-sub': '예: 블루아카이브 / Blue Archive',
   'label-sub-x': '서브타이틀 X 오프셋',
   'label-sub-y': '서브타이틀 Y 오프셋',
+  'label-sub-size': '부제목 글자 크기',
   'reset-0': '0 ↺',
 
   // 색상 설정
