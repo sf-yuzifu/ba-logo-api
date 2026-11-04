@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Blue Archive Logo Preview](samples/ja/01-official-2x.png)
+![Blue Archive Animated Logo Preview](samples/ja/05-animated-entrance.gif)
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | 日本語 | [한국어](README.ko.md)
 
