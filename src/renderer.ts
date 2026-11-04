@@ -49,7 +49,7 @@ export interface RenderOptions {
   subtitle?: string; // 可选副标题（PR #12，如 "ブルーアーカイブ"，右下方对齐绘制）
   subtitleColor?: string; // 可选副标题颜色（默认跟随右侧次要文字颜色）
   subtitleOffsetX?: number; // 副标题 X 轴偏移量微调（像素，默认 0）
-  subtitleOffsetY?: number; // 副标题 Y 轴偏移量微调（像素，默认 0）
+  subtitleOffsetY?: number; // 副标题 Y 轴偏移量微调（像素，默认 4）
   subtitleFontSize?: number; // 副标题基础字号（默认 24，范围 12~96，随 scale 缩放）
   offsetX?: number;
   offsetY?: number;

@@ -103,8 +103,8 @@ export const LogoQuerySchema = t.Object({
 
   subtitleOffsetY: t.Optional(
     t.Numeric({
-      description: '副标题 Y 轴偏移量（像素，默认 0）',
-      examples: [0, 10, -10],
+      description: '副标题 Y 轴偏移量（像素，默认 4）',
+      examples: [4, 10, -10],
     }),
   ),
   subY: alias(

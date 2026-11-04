@@ -26,6 +26,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(DEFAULT_STATE.textColor).toBe('#2B2B2B');
     expect(DEFAULT_STATE.scale).toBe(2);
     expect(DEFAULT_STATE.subtitleFontSize).toBe(24);
+    expect(DEFAULT_STATE.subY).toBe(4);
     expect(DEFAULT_STATE.padding).toBe('2');
     expect(DEFAULT_STATE.format).toBe('png');
     expect(DEFAULT_STATE.transparent).toBe(false);
@@ -151,6 +152,15 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(absoluteUrl).toBe(
       'https://example.com/api/logo?left=%E8%94%9A%E8%93%9D&right=%E6%A1%A3%E6%A1%88&scale=2',
     );
+
+    const defaultSubtitleUrl = new URL(
+      `http://localhost${buildLogoUrl({ ...DEFAULT_STATE, subtitle: 'BlueArchive' })}`,
+    );
+    expect(defaultSubtitleUrl.searchParams.get('subY')).toBeNull();
+    const zeroSubtitleYUrl = new URL(
+      `http://localhost${buildLogoUrl({ ...DEFAULT_STATE, subtitle: 'BlueArchive', subY: 0 })}`,
+    );
+    expect(zeroSubtitleYUrl.searchParams.get('subY')).toBe('0');
   });
 
   it('i18n 词典应当在所有支持的语言中具备 100% 键覆盖率，且覆盖代码中所有引用的翻译键', () => {

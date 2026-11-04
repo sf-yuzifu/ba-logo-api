@@ -239,7 +239,7 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
               @click="resetField('subY')"
               :title="t('tip-reset-y')"
             >
-              {{ t('reset-0') }}
+              4 ↺
             </button>
           </label>
           <input
@@ -247,7 +247,7 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
             id="inputSubY"
             v-model.number="state.subY"
             class="input-text input-mono"
-            placeholder="0"
+            placeholder="4"
             @input="handleInput"
           >
         </div>

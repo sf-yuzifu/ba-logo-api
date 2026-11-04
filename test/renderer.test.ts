@@ -264,6 +264,8 @@ describe('Renderer Core Unit Tests', () => {
   });
 
   it('应当支持副标题排版与渲染', () => {
+    expect(normalizeRenderOptions().subtitleOffsetY).toBe(4);
+    expect(normalizeRenderOptions({ subtitleOffsetY: 0 }).subtitleOffsetY).toBe(0);
     const withoutSub = renderLogo({ textL: 'Blue', textR: 'Archive' });
     const withSub = renderLogo({
       textL: 'Blue',

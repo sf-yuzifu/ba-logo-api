@@ -51,7 +51,7 @@ export function buildLogoUrl(state: Readonly<LogoFormState>, origin = ''): strin
     set('subtitle', state.subtitle);
     if (state.subtitleColor) set('subtitleColor', cleanHex(state.subtitleColor));
     if (state.subX !== 0) set('subX', state.subX);
-    if (state.subY !== 0) set('subY', state.subY);
+    if (state.subY !== 4) set('subY', state.subY);
     if (state.subtitleFontSize !== 24) set('subtitleFontSize', state.subtitleFontSize);
   }
 

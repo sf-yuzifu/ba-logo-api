@@ -6,7 +6,7 @@ export const DEFAULT_STATE: Readonly<LogoFormState> = Object.freeze({
   subtitle: '',
   subtitleColor: '',
   subX: 0,
-  subY: 0,
+  subY: 4,
   subtitleFontSize: 24,
   accent: '#128AFA',
   textColor: '#2B2B2B',

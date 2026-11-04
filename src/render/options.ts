@@ -77,7 +77,7 @@ export function normalizeRenderOptions(options: RenderOptions = {}): NormalizedR
     offsetX: finite(options.offsetX, DEFAULT_GRAPH_OFFSET.x),
     offsetY: finite(options.offsetY, DEFAULT_GRAPH_OFFSET.y),
     subtitleOffsetX: finite(options.subtitleOffsetX, 0),
-    subtitleOffsetY: finite(options.subtitleOffsetY, 0),
+    subtitleOffsetY: finite(options.subtitleOffsetY, 4),
     subtitleFontSize: Math.min(
       Math.max(finite(options.subtitleFontSize, BASE_SUBTITLE_FONT_SIZE), 12),
       96,
