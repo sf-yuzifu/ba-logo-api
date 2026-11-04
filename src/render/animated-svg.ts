@@ -124,6 +124,7 @@ export function renderLogoAnimatedSvg(options: AnimatedOptions = {}): SvgRenderR
   const crossDuration = Math.min(0.5, Math.max(0.1, actionDuration - 0.55));
   const crossStart = 0.506;
   const crossEnd = crossStart + crossDuration;
+  const subtitleEnd = crossStart + Math.max(0.01, crossDuration - 0.2);
   const crossCenterX = graphX + (307 / SVG_VIEWBOX_SIZE) * canvasHeight;
   const crossCenterY = graphY + (151.5 / SVG_VIEWBOX_SIZE) * canvasHeight;
   const diagonalAngle = (Math.atan2(28.5 - 385.5, 366.5 - 166) * 180) / Math.PI;
@@ -156,7 +157,7 @@ export function renderLogoAnimatedSvg(options: AnimatedOptions = {}): SvgRenderR
   svg += `<defs>${scanClip('scan-left', totalCanvasWidth, leftTop, leftBottom, 'down', totalDuration)}${scanClip('scan-right', totalCanvasWidth, rightTop, rightBottom, 'up', totalDuration)}`;
   svg += `<clipPath id="cross-reveal" clipPathUnits="userSpaceOnUse">${crossClipRect('cross-diagonal', diagonalAngle)}${crossClipRect('cross-transverse', transverseAngle)}</clipPath>`;
   svg += `<clipPath id="halo-reveal" clipPathUnits="userSpaceOnUse"><rect x="${n(graphX - 10 * scale)}" y="0" width="0" height="${totalCanvasHeight}">${animate('width', 0, canvasHeight + 20 * scale, 0.594, 0.814, totalDuration)}</rect></clipPath>`;
-  svg += `<clipPath id="subtitle-reveal" clipPathUnits="userSpaceOnUse"><rect x="${n(subtitleLeft - 10 * scale)}" y="${n(subtitleClipY)}" width="0" height="${n(subtitleClipHeight)}">${animate('width', 0, subtitleWidth + 15 * scale, crossStart, crossEnd, totalDuration)}</rect></clipPath>`;
+  svg += `<clipPath id="subtitle-reveal" clipPathUnits="userSpaceOnUse"><rect x="${n(subtitleLeft - 10 * scale)}" y="${n(subtitleClipY)}" width="0" height="${n(subtitleClipHeight)}">${animate('width', 0, subtitleWidth + 15 * scale, crossStart, subtitleEnd, totalDuration)}</rect></clipPath>`;
   svg += `<mask id="halo-cutout" maskUnits="userSpaceOnUse" x="-5000" y="-5000" width="10000" height="10000"><rect x="-5000" y="-5000" width="10000" height="10000" fill="white"/><g clip-path="url(#cross-reveal)"><polygon points="${hollowPoints}" fill="black"/><g transform="${transformR}" fill="black" stroke="black" stroke-width="${layout.strokeWidth}">${vectorR}</g></g></mask>`;
   svg += `<mask id="text-cutout" maskUnits="userSpaceOnUse" x="-5000" y="-5000" width="10000" height="10000"><rect x="-5000" y="-5000" width="10000" height="10000" fill="white"/><g clip-path="url(#cross-reveal)"><polygon points="${hollowPoints}" fill="black"/></g></mask></defs>\n`;
 

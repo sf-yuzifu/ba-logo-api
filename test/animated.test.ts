@@ -186,8 +186,8 @@ describe('文字扫描高光边界', () => {
   }
 });
 
-describe('副标题横向揭示与十字同步', () => {
-  it('应仅以最终颜色从左向右揭示，并与十字在同一帧完成', () => {
+describe('副标题横向揭示时序', () => {
+  it('应仅以最终颜色从左向右揭示，并比十字提前 0.2 秒完成', () => {
     loadFonts();
     const options = normalizeRenderOptions({
       textL: '',
@@ -227,11 +227,10 @@ describe('副标题横向揭示与十字同步', () => {
     expect(later.maxY).toBe(early.maxY);
     expect(cyanPixelCount).toBe(0);
 
-    const beforeCompletion = frameAt(0.8);
-    const crossCompleted = frameAt(1.006);
+    const subtitleCompleted = frameAt(0.806);
     const finalFrame = frameAt(actionDuration);
-    expect(pixels(beforeCompletion).equals(pixels(crossCompleted))).toBe(false);
-    expect(pixels(crossCompleted).equals(pixels(finalFrame))).toBe(true);
+    expect(pixels(laterFrame).equals(pixels(subtitleCompleted))).toBe(false);
+    expect(pixels(subtitleCompleted).equals(pixels(finalFrame))).toBe(true);
   });
 });
 
@@ -339,6 +338,13 @@ describe('动画 Logo 生成与编码 (GIF & APNG)', () => {
     expect(svg).toContain('<animateTransform');
     expect(svg).toContain('cross-reveal');
     expect(svg).toContain('subtitle-reveal');
+    // 默认总时长 2.3s：副标题在 0.806s 完成，十字仍在 1.006s 完成。
+    expect(svg).toMatch(
+      /<clipPath id="subtitle-reveal"[^>]*><rect[^>]*><animate attributeName="width"[^>]*keyTimes="0;0\.22;0\.35;1"/,
+    );
+    expect(svg).toMatch(
+      /<rect id="cross-diagonal"[^>]*><animate attributeName="x"[^>]*keyTimes="0;0\.22;0\.437;1"/,
+    );
     expect(svg).not.toContain('<image');
     expect(svg).not.toContain('<text');
     expect(svg).not.toContain('data:image/');

@@ -169,7 +169,7 @@ function getMeasureContext() {
  * 物理运动学设计（按实际秒数驱动）：
  * Phase 1 (0.00s-0.33s): 文字在初始位置，先完成颜色注入（左↓右↑，带渐变平滑过渡）
  * Phase 2 (0.33s-0.55s): 着色完成后，文字水平靠拢归位
- * Phase 3 (0.506s 起): 十字架以 0.5 秒展开，白色镂空同步延伸；副标题与十字同步左→右展开，光环随后左→右展开
+ * Phase 3 (0.506s 起): 十字架以 0.5 秒展开，白色镂空同步延伸；副标题左→右展开并提前 0.2 秒完成，光环随后左→右展开
  */
 export function drawAnimatedLogoCanvas(
   normalized: NormalizedRenderOptions,
@@ -236,9 +236,11 @@ export function drawAnimatedLogoCanvas(
   const haloEase = easeOutCubic(haloP);
   const haloAlpha = Math.min(haloP / 0.12, 1);
 
-  // === Phase 3: 副标题与十字同步，左→右擦入并在同一帧完成 ===
-  const subEase = crossEase;
-  const subAlpha = crossAlpha;
+  // === Phase 3: 副标题左→右擦入，比十字提前 0.2 秒完成 ===
+  const subtitleDuration = Math.max(0.01, crossDuration - 0.2);
+  const subP = Math.min(Math.max((elapsed - 0.506) / subtitleDuration, 0), 1);
+  const subEase = easeOutCubic(subP);
+  const subAlpha = Math.min(subP / 0.12, 1);
 
   const crossCenterX = graphX + (307 / SVG_VIEWBOX_SIZE) * canvasHeight;
   const crossCenterY = graphY + (151.5 / SVG_VIEWBOX_SIZE) * canvasHeight;
@@ -432,7 +434,7 @@ export function drawAnimatedLogoCanvas(
     ctx.restore();
   }
 
-  // --- Step 7: 副标题仅以最终颜色左→右显现，与十字同步完成 ---
+  // --- Step 7: 副标题仅以最终颜色左→右显现，比十字提前 0.2 秒完成 ---
   if (subtitle && subAlpha > 0) {
     const mCtx = getMeasureContext();
     mCtx.font = subtitleFont;
