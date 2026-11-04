@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Blue Archive Logo Preview](samples/02-official-en-jp-2x.png)
+![Blue Archive Logo Preview](samples/en/01-official-2x.png)
 
 English | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
@@ -25,15 +25,13 @@ A high-performance, pixel-perfect Blue Archive style logo generation service pow
 
 ## 📸 Showcase
 
-| Official Style (EN + JA Subtitle, 2x) | Dark Mode (2x) |
+| Official Style (2x, No Subtitle) | Dark Mode (2x) |
 | :---: | :---: |
-| ![Official Style](samples/02-official-en-jp-2x.png) | ![Dark Mode](samples/03-dark-mode-2x.png) |
-| **Custom Color Swap (2x)** | **Transparent Cutout (Auto Theme, 2x)** |
-| ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="Transparent Cutout" src="samples/05-transparent-2x.png"></picture> |
-| **Standard Chinese (1x, Balanced Margins)** | **Ultra HD Print-Ready (4x)** |
-| ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
-| **Animated Entrance (GIF, 24fps)** | **Official Anime Entrance (APNG HD)** |
-| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
+| ![Official Style](samples/en/01-official-2x.png) | ![Dark Mode](samples/en/02-dark-mode-2x.png) |
+| **RedArchive Custom Color Swap (2x)** | **Transparent Cutout (Auto Theme, 2x)** |
+| ![RedArchive Custom Color Swap](samples/en/03-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/en/04-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/en/04-transparent-2x.png#gh-light-mode-only"><img alt="Transparent Cutout" src="samples/en/04-transparent-2x.png"></picture> |
+| **Animated Entrance (GIF, 24fps)** | **Additional Animated Formats** |
+| ![Animated GIF](samples/en/05-animated-entrance.gif) | [Animated SVG](samples/en/06-animated-entrance.svg) · [Animated WebP](samples/en/07-animated-entrance.webp) |
 
 ---
 

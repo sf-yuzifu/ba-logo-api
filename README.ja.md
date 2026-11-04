@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Blue Archive Logo Preview](samples/02-official-en-jp-2x.png)
+![Blue Archive Logo Preview](samples/ja/01-official-2x.png)
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | 日本語 | [한국어](README.ko.md)
 
@@ -25,15 +25,13 @@
 
 ## 📸 サンプルギャラリー
 
-| 公式英日サブタイトル風 (2x) | ダークモード (2x) |
+| 公式ローカライズスタイル (2x、英字サブタイトル) | ダークモード (2x) |
 | :---: | :---: |
-| ![Official Style](samples/02-official-en-jp-2x.png) | ![Dark Mode](samples/03-dark-mode-2x.png) |
-| **カスタムアクセント＆配色反転 (2x)** | **透過背景くり抜き (明暗自動切替, 2x)** |
-| ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="透過背景くり抜き" src="samples/05-transparent-2x.png"></picture> |
-| **標準中国語 (1x、余白最適化)** | **4K 印刷級超高解像度 (4x)** |
-| ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
-| **入場アニメーション (GIF, 24fps)** | **公式英日サブタイトルアニメ (APNG 高画質)** |
-| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
+| ![公式ローカライズスタイル](samples/ja/01-official-2x.png) | ![ダークモード](samples/ja/02-dark-mode-2x.png) |
+| **レッドアーカイブ・赤色アクセント＆配色反転 (2x)** | **透過背景くり抜き (明暗自動切替, 2x)** |
+| ![レッドアーカイブ・赤色アクセント＆配色反転](samples/ja/03-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/ja/04-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/ja/04-transparent-2x.png#gh-light-mode-only"><img alt="透過背景くり抜き" src="samples/ja/04-transparent-2x.png"></picture> |
+| **入場アニメーション (GIF, 24fps)** | **その他のアニメーション形式** |
+| ![入場アニメーション GIF](samples/ja/05-animated-entrance.gif) | [Animated SVG](samples/ja/06-animated-entrance.svg) · [Animated WebP](samples/ja/07-animated-entrance.webp) |
 
 ---
 

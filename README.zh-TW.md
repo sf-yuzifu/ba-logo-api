@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Blue Archive Logo Preview](samples/02-official-en-jp-2x.png)
+![Blue Archive Logo Preview](samples/zh-TW/01-official-2x.png)
 
 [English](README.md) | [简体中文](README.zh-CN.md) | 繁體中文 | [日本語](README.ja.md) | [한국어](README.ko.md)
 
@@ -25,15 +25,13 @@
 
 ## 📸 範例展示
 
-| 官方英日副標題風格 (2x) | 暗黑模式 (2x) |
+| 官方在地化樣式 (2x，英文副標題) | 暗黑模式 (2x) |
 | :---: | :---: |
-| ![Official Style](samples/02-official-en-jp-2x.png) | ![Dark Mode](samples/03-dark-mode-2x.png) |
-| **自訂強調色與對調 (2x)** | **透明背景鏤空裁切 (明暗自適應, 2x)** |
-| ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="透明背景鏤空裁切" src="samples/05-transparent-2x.png"></picture> |
-| **標準中文 (1x，關閉置中對齊)** | **4K 印刷級超高解析度 (4x)** |
-| ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
-| **入場動效 (GIF 動圖, 24fps)** | **官方英日副標題動效 (APNG 高畫質)** |
-| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
+| ![官方在地化樣式](samples/zh-TW/01-official-2x.png) | ![暗黑模式](samples/zh-TW/02-dark-mode-2x.png) |
+| **赤紅檔案 · 自訂紅色與對調 (2x)** | **透明背景鏤空裁切 (明暗自適應, 2x)** |
+| ![赤紅檔案 · 自訂紅色與對調](samples/zh-TW/03-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/zh-TW/04-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/zh-TW/04-transparent-2x.png#gh-light-mode-only"><img alt="透明背景鏤空裁切" src="samples/zh-TW/04-transparent-2x.png"></picture> |
+| **入場動效 (GIF, 24fps)** | **其他動態格式** |
+| ![入場動效 GIF](samples/zh-TW/05-animated-entrance.gif) | [動態 SVG](samples/zh-TW/06-animated-entrance.svg) · [動態 WebP](samples/zh-TW/07-animated-entrance.webp) |
 
 ---
 

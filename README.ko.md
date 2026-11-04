@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Blue Archive Logo Preview](samples/02-official-en-jp-2x.png)
+![Blue Archive Logo Preview](samples/ko/01-official-2x.png)
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | 한국어
 
@@ -25,15 +25,13 @@
 
 ## 📸 샘플 갤러리
 
-| 공식 영문+일본어 부제 스타일 (2x) | 다크 모드 (2x) |
+| 공식 현지화 스타일 (2x, 영문 부제) | 다크 모드 (2x) |
 | :---: | :---: |
-| ![Official Style](samples/02-official-en-jp-2x.png) | ![Dark Mode](samples/03-dark-mode-2x.png) |
-| **커스텀 포인트 컬러 및 반전 (2x)** | **투명 배경 컷아웃 (다크/라이트 자동 전환, 2x)** |
-| ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="투명 배경 컷아웃" src="samples/05-transparent-2x.png"></picture> |
-| **표준 한자 (1x, 여백 최적화)** | **4K 인쇄급 초고해상도 (4x)** |
-| ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
-| **등장 애니메이션 (GIF, 24fps)** | **공식 영문+일문 부제 애니메이션 (APNG 고화질)** |
-| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
+| ![공식 현지화 스타일](samples/ko/01-official-2x.png) | ![다크 모드](samples/ko/02-dark-mode-2x.png) |
+| **레드 아카이브 · 커스텀 빨간색 및 반전 (2x)** | **투명 배경 컷아웃 (다크/라이트 자동 전환, 2x)** |
+| ![레드 아카이브 · 커스텀 빨간색 및 반전](samples/ko/03-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/ko/04-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/ko/04-transparent-2x.png#gh-light-mode-only"><img alt="투명 배경 컷아웃" src="samples/ko/04-transparent-2x.png"></picture> |
+| **등장 애니메이션 (GIF, 24fps)** | **기타 애니메이션 형식** |
+| ![등장 애니메이션 GIF](samples/ko/05-animated-entrance.gif) | [Animated SVG](samples/ko/06-animated-entrance.svg) · [Animated WebP](samples/ko/07-animated-entrance.webp) |
 
 ---
 
