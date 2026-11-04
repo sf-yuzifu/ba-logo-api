@@ -472,13 +472,35 @@ export function renderLogoAnimatedToBuffer(
   const finalCanvas = drawLogoCanvas(normalized, layout);
   const ctx = finalCanvas.getContext('2d');
   const finalPixels = ctx.getImageData(0, 0, finalCanvas.width, finalCanvas.height).data;
-  const bounds = findAlphaBounds(
+  const finalBounds = findAlphaBounds(
     finalPixels,
     finalCanvas.width,
     finalCanvas.height,
     normalized.center,
     layout.textCenterY,
   );
+  const initialCanvas = drawAnimatedLogoCanvas(normalized, layout, 0);
+  const initialPixels = initialCanvas
+    .getContext('2d')
+    .getImageData(0, 0, initialCanvas.width, initialCanvas.height).data;
+  const initialBounds = findAlphaBounds(initialPixels, initialCanvas.width, initialCanvas.height);
+  const bounds =
+    finalBounds && initialBounds
+      ? {
+          minX: Math.min(finalBounds.minX, initialBounds.minX),
+          minY: Math.min(finalBounds.minY, initialBounds.minY),
+          maxX: Math.max(finalBounds.maxX, initialBounds.maxX),
+          maxY: Math.max(finalBounds.maxY, initialBounds.maxY),
+          width:
+            Math.max(finalBounds.maxX, initialBounds.maxX) -
+            Math.min(finalBounds.minX, initialBounds.minX) +
+            1,
+          height:
+            Math.max(finalBounds.maxY, initialBounds.maxY) -
+            Math.min(finalBounds.minY, initialBounds.minY) +
+            1,
+        }
+      : (finalBounds ?? initialBounds);
 
   const fps = Math.min(Math.max(options.fps ?? 24, 10), 30);
   const actionDuration = Math.min(Math.max(options.duration ?? 1.1, 0.4), 3.0);
@@ -488,28 +510,14 @@ export function renderLogoAnimatedToBuffer(
   const stepDelayMs = Math.round(1000 / fps);
   const holdDelayMs = Math.round(holdDuration * 1000);
 
-  const scale = normalized.scale;
   const padding = normalized.padding;
 
-  // 为文字水平入场的 70px 位移与抗锯齿边缘留出空间
-  const extraLeft = Math.ceil(72 * scale);
-  const extraRight = Math.ceil(72 * scale);
-  const extraTop = Math.round(40 * scale);
-  const extraBottom = Math.round(40 * scale);
-
-  const cropMinX = Math.max(0, (bounds ? bounds.minX : 0) - extraLeft);
-  const cropMinY = Math.max(0, (bounds ? bounds.minY : 0) - extraTop);
-  const cropMaxX = Math.min(
-    finalCanvas.width,
-    (bounds ? bounds.maxX : finalCanvas.width) + extraRight,
-  );
-  const cropMaxY = Math.min(
-    finalCanvas.height,
-    (bounds ? bounds.maxY : finalCanvas.height) + extraBottom,
-  );
-
-  const cropW = Math.max(1, cropMaxX - cropMinX + 1);
-  const cropH = Math.max(1, cropMaxY - cropMinY + 1);
+  // 使用动画内容的实际联合包围盒，仅添加与静态图相同的 padding，不强制总尺寸一致。
+  const cropMinX = bounds?.minX ?? 0;
+  const cropMinY = bounds?.minY ?? 0;
+  const cropW = bounds?.width ?? finalCanvas.width;
+  const cropH = bounds?.height ?? finalCanvas.height;
+  const sourceHeight = Math.min(finalCanvas.height - cropMinY, cropH);
 
   const outW = Math.max(cropW + padding.left + padding.right, 1);
   const outH = Math.max(cropH + padding.top + padding.bottom, 1);
@@ -536,11 +544,11 @@ export function renderLogoAnimatedToBuffer(
       cropMinX,
       cropMinY,
       cropW,
-      cropH,
+      sourceHeight,
       padding.left,
       padding.top,
       cropW,
-      cropH,
+      sourceHeight,
     );
 
     const imgData = crCtx.getImageData(0, 0, outW, outH).data;

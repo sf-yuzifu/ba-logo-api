@@ -236,6 +236,43 @@ describe('副标题横向揭示与十字同步', () => {
 
 describe('动画 Logo 生成与编码 (GIF & APNG)', () => {
   const app = createApp();
+
+  it('GIF / APNG 应仅添加与静态图相同的四边 padding，不强制总尺寸一致', () => {
+    const cases = [
+      {
+        textL: '蔚蓝',
+        textR: '档案',
+        subtitle: 'BlueArchive',
+        padding: '3 8 11 17',
+        center: true,
+      },
+      {
+        textL: 'Blue',
+        textR: 'Archive',
+        transparent: true,
+        center: false,
+        padding: '5 10 15 20',
+        scale: 2,
+      },
+    ];
+
+    for (const options of cases) {
+      const { padding } = normalizeRenderOptions(options);
+      for (const format of ['gif', 'apng'] as const) {
+        const base = renderLogoAnimatedToBuffer(
+          { ...options, padding: 0, fps: 10, duration: 0.4, holdDuration: 0.2 },
+          format,
+        );
+        const padded = renderLogoAnimatedToBuffer(
+          { ...options, fps: 10, duration: 0.4, holdDuration: 0.2 },
+          format,
+        );
+        expect(padded.width - base.width).toBe(padding.left + padding.right);
+        expect(padded.height - base.height).toBe(padding.top + padding.bottom);
+      }
+    }
+  });
+
   it('应当能成功生成合法的 GIF 动图且包含 GIF89a 标志', () => {
     const res = renderLogoAnimatedToBuffer(
       {
