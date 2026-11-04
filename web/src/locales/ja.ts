@@ -52,6 +52,8 @@ export default {
   'format-svg': 'SVG (ベクター)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
+  'format-gif': 'GIF (アニメ)',
+  'format-apng': 'APNG (高画質アニメ)',
 
   // トグル
   'toggle-tp': '背景透過',

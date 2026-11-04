@@ -53,4 +53,6 @@ export const FORMAT_OPTIONS: { format: OutputFormat; i18nKey: string }[] = [
   { format: 'svg', i18nKey: 'format-svg' },
   { format: 'jpeg', i18nKey: 'format-jpeg' },
   { format: 'base64', i18nKey: 'format-base64' },
+  { format: 'gif', i18nKey: 'format-gif' },
+  { format: 'apng', i18nKey: 'format-apng' },
 ];

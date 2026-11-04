@@ -235,7 +235,7 @@ describe('HTTP Route & Compatibility Tests', () => {
     expect(res1.status).toBe(422);
 
     // 非法 format 格式
-    const res2 = await app.handle(new Request('http://localhost/api/logo?format=gif'));
+    const res2 = await app.handle(new Request('http://localhost/api/logo?format=invalid_format'));
     expect(res2.status).toBe(422);
   });
 

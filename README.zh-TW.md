@@ -32,16 +32,19 @@
 | ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="透明背景鏤空裁切" src="samples/05-transparent-2x.png"></picture> |
 | **標準中文 (1x，關閉置中對齊)** | **4K 印刷級超高解析度 (4x)** |
 | ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
+| **入場動效 (GIF 動圖, 24fps)** | **官方英日副標題動效 (APNG 高畫質)** |
+| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
 
 ---
 
 ## ✨ 核心特性
 
 - ⚡ **極致效能躍升**：底層由 C++/Rust 編譯的 Google Skia 原生 2D 圖形內核驅動，單圖生成延遲低至 **8~15ms**，相較傳統無頭瀏覽器方案提速逾 **150 倍**。
+- 🎬 **入場動畫生成 (GIF & APNG)**：左右文字水平靠攏，左側由上往下著色、右側由下往上著色；十字從中心向外延伸，光環與副標題由左往右展開，支援 GIF 與無損 APNG 匯出。
 - 🪶 **極低記憶體佔用**：常駐記憶體僅約 **30~50 MB RSS**，JS 堆疊記憶體維持在 **20 MB** 以內，無沙箱包袱，1C1G 入門型伺服器亦能流暢運行。
 - 🎨 **像素級向量精度**：光環（Halo）與十字架（Cross）採用高精度 SVG `Path2D` 向量鏤空演算法，支援 `scale=0.1~8x` 任意縮放，4K 印刷級圖檔依然細膩清晰。
 - 🌐 **全量 CJK 字形庫**：內建高品質整合字庫（逾 **30,000 個字形**），完整支援拉丁字母、日文假名、繁體中文、簡體中文與韓文諺文。
-- 📦 **多種格式輸出**：原生支援 `png`、`webp`、`jpeg`，以及免字型依賴的純向量輪廓 `svg`（可直接匯入 Figma / Illustrator）與 JSON `base64`。
+- 📦 **多種格式輸出**：原生支援 `png`、`webp`、`jpeg`，免字型依賴的純向量輪廓 `svg`（可直接匯入 Figma / Illustrator），JSON `base64`，以及 `gif`、`apng` 動圖。
 - 🎛️ **Kivotos HUD 主控台**：專為同人創作打造的戰術儀表板前端，具備即時防手震預覽、響應式雙欄/行動裝置置頂吸頂佈局與一鍵分享功能。
 - 🔄 **平滑向下相容**：支援標準 RESTful 規範，原有 `/balogo` 端點自動進行 HTTP 308 永久重新導向並完整透傳參數。
 

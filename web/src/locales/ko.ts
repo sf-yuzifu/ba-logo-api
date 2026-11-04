@@ -52,6 +52,8 @@ export default {
   'format-svg': 'SVG (순수 벡터)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
+  'format-gif': 'GIF (애니)',
+  'format-apng': 'APNG (고화질 애니)',
 
   // 토글 스위치
   'toggle-tp': '투명 배경',

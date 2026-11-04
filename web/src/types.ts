@@ -1,4 +1,4 @@
-export type OutputFormat = 'png' | 'webp' | 'svg' | 'jpeg' | 'base64';
+export type OutputFormat = 'png' | 'webp' | 'svg' | 'jpeg' | 'base64' | 'gif' | 'apng';
 
 export type SupportedLang = 'zh' | 'zh-tw' | 'en' | 'ja' | 'ko';
 

@@ -203,7 +203,8 @@ export function useLogoPreview(state: LogoFormState) {
     const link = document.createElement('a');
     link.href = preview.blobUrl;
     const title = (preview.snapshot.left || 'Blue') + (preview.snapshot.right || 'Archive');
-    link.download = `${title}_logo.${preview.snapshot.format}`;
+    const ext = preview.snapshot.format === 'apng' ? 'png' : preview.snapshot.format;
+    link.download = `${title}_logo.${ext}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

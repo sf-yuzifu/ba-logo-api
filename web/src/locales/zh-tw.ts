@@ -52,6 +52,8 @@ export default {
   'format-svg': 'SVG (純向量)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
+  'format-gif': 'GIF (動圖)',
+  'format-apng': 'APNG (高畫質動圖)',
 
   // 開關
   'toggle-tp': '透明背景',

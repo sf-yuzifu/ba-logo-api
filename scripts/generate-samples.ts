@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { renderLogoToBuffer } from '../src/renderer.ts';
+import { type RenderOptions, renderLogoToBuffer } from '../src/renderer.ts';
 
 const outDir = path.resolve(import.meta.dir, '../samples');
 fs.mkdirSync(outDir, { recursive: true });
 
 console.log('🚀 开始生成离线样例图...\n');
 
-const samples = [
+const samples: { filename: string; options: RenderOptions; desc: string }[] = [
   {
     filename: '01-default-1x.png',
     options: { textL: '蔚蓝', textR: '档案', scale: 1, center: false },
@@ -78,6 +78,32 @@ const samples = [
       center: false,
     },
     desc: '4x 超高分辨率印刷级大图',
+  },
+  {
+    filename: '07-animated-entrance.gif',
+    options: {
+      textL: '蔚蓝',
+      textR: '档案',
+      subtitle: 'BlueArchive',
+      format: 'gif',
+      scale: 1,
+      fps: 24,
+      duration: 1.1,
+    },
+    desc: '入场动效 GIF 动图 (24fps)',
+  },
+  {
+    filename: '08-animated-entrance.png',
+    options: {
+      textL: 'Blue',
+      textR: 'Archive',
+      subtitle: 'ブルーアーカイブ',
+      format: 'apng',
+      scale: 1,
+      fps: 24,
+      duration: 1.1,
+    },
+    desc: '官方英日副标题 APNG 高清动图 (24fps 全彩)',
   },
 ];
 

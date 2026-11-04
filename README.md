@@ -32,16 +32,19 @@ A high-performance, pixel-perfect Blue Archive style logo generation service pow
 | ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="Transparent Cutout" src="samples/05-transparent-2x.png"></picture> |
 | **Standard Chinese (1x, Balanced Margins)** | **Ultra HD Print-Ready (4x)** |
 | ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
+| **Animated Entrance (GIF, 24fps)** | **Official Anime Entrance (APNG HD)** |
+| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
 
 ---
 
 ## ✨ Features
 
 - ⚡ **Blazing Fast**: Native C++/Rust Google Skia graphics engine. Sub-15ms cold/warm generation latency — over **150x faster** than legacy headless browser rendering.
+- 🎬 **Animated GIF & APNG Generation**: Text slides inward horizontally, with color filling top-to-bottom on the left and bottom-to-top on the right. The cross extends from its center; the halo and subtitle reveal from left to right. Export as GIF or lossless APNG.
 - 🪶 **Ultra Lightweight**: Resident memory stays around **30–50 MB RSS** with JS heap under **20 MB**. Runs smoothly on entry-level 1-vCPU/1-GB servers without sandbox overhead.
 - 🎨 **Pixel-Perfect Vector Graphics**: Mathematical SVG `Path2D` vector outlines for the iconic Halo and Cross. Supports dynamic scaling (`scale=0.1~8x`) up to 4K+ print resolution without pixelation.
 - 🌐 **Comprehensive CJK Typography**: Merged high-quality TrueType font asset containing **30,000+ glyphs**, supporting Latin, Japanese Kana, Simplified Chinese, Traditional Chinese, and Korean Hangul.
-- 📦 **Multi-Format Exports**: Native raster exports for `png`, `webp`, and `jpeg`, plus pure vector `svg` (fully outlined paths for direct import into Figma / Illustrator) and JSON `base64`.
+- 📦 **Multi-Format Exports**: Native raster exports for `png`, `webp`, and `jpeg`, plus pure vector `svg` (fully outlined paths for direct import into Figma / Illustrator), JSON `base64`, `gif`, and `apng`.
 - 🎛️ **Kivotos HUD WebUI**: Built-in responsive frontend inspired by Blue Archive's tactical HUD, featuring real-time preview, debounced rendering, sticky mobile layout, and one-click URL sharing.
 - 🔄 **Drop-in Compatibility**: Full backward compatibility with legacy `/balogo` endpoints via automatic HTTP 308 permanent redirect.
 

@@ -52,6 +52,8 @@ export default {
   'format-svg': 'SVG (Vector)',
   'format-jpeg': 'JPEG',
   'format-base64': 'Base64',
+  'format-gif': 'GIF (Animated)',
+  'format-apng': 'APNG (HD Animated)',
 
   // Toggles
   'toggle-tp': 'Transparent BG',

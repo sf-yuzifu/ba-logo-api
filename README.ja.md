@@ -32,16 +32,19 @@
 | ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="透過背景くり抜き" src="samples/05-transparent-2x.png"></picture> |
 | **標準中国語 (1x、余白最適化)** | **4K 印刷級超高解像度 (4x)** |
 | ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
+| **入場アニメーション (GIF, 24fps)** | **公式英日サブタイトルアニメ (APNG 高画質)** |
+| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
 
 ---
 
 ## ✨ 主な特徴
 
 - ⚡ **圧倒的な高速描画**：C++/Rust でビルドされた Google Skia 2D ネイティブグラフィックエンジンを搭載。1 画像の生成時間はわずか **8〜15ms**。従来のヘッドレスブラウザ方式と比べ **150倍以上** 高速化。
+- 🎬 **ロゴアニメーション (GIF & APNG)**：左右の文字が水平方向に近づき、左側は上から下へ、右側は下から上へ色が入ります。十字は中心から外側へ伸び、ヘイローとサブタイトルは左から右へ現れます。GIF とロスレス APNG で出力できます。
 - 🪶 **超低メモリ消費**：常駐 RSS は約 **30〜50 MB**、JS ヒープは **20 MB** 以下。サンドボックスオーバーヘッドがなく、最小構成（1コア/1GB）の VPS でも安定して動作可能。
 - 🎨 **ピクセル精度のベクター切り抜き**：ヘイロー（Halo）と十字架（Cross）に高精度な SVG `Path2D` ベクター計算を採用。`scale=0.1〜8x` の任意の解像度変更に対応し、4K 出力でもぼやけません。
 - 🌐 **包括的な CJK フォント対応**：欧文英数字、ひらがな・カタカナ、簡体字・繁体字中国語、韓国語ハングルを網羅した統合フォント（**30,000字以上**）を内蔵。
-- 📦 **多彩な出力フォーマット**：`png`、`webp`、`jpeg` のほか、フォント不要で Illustrator や Figma に直接配置可能なアウトライン化ベクター `svg`、および JSON `base64` に対応。
+- 📦 **多彩な出力フォーマット**：`png`、`webp`、`jpeg`、フォント不要の純ベクター輪郭 `svg`（Illustrator / Figma 直配対応）、JSON `base64`、ならびに `gif`・`apng` 動画像。
 - 🎛️ **Kivotos HUD コンソール**：ブルーアーカイブのゲーム画面をリスペクトしたリアルタイムプレビュー搭載の WebUI。レスポンシブな吸着配置やワンクリック共有に対応。
 - 🔄 **高い後方互換性**：標準の RESTful 形式に加え、旧仕様の `/balogo` エンドポイントからのアクセスも HTTP 308 で自動転送されます。
 

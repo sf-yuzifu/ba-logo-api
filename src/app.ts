@@ -62,6 +62,8 @@ export function parseLogoQuery(query: LogoQuery): RenderOptions {
   const swapColors = parseOptionalBoolean(value('swapColors'));
   const motifsBehindText = parseOptionalBoolean(value('motifsBehindText'));
   const center = parseOptionalBoolean(value('center'));
+  const fps = parseOptionalNumber(value('fps'));
+  const duration = parseOptionalNumber(value('duration'));
 
   const accentColor = value('accentColor') as string | undefined;
   const textColor = value('textColor') as string | undefined;
@@ -102,6 +104,8 @@ export function parseLogoQuery(query: LogoQuery): RenderOptions {
     paddingLeft,
     center,
     format,
+    fps,
+    duration,
   };
 }
 

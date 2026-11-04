@@ -17,6 +17,7 @@ import {
   TEXT_BASELINE,
 } from './constants.ts';
 import { FONT_FAMILY, loadFonts } from './font.ts';
+import { renderLogoAnimatedToBuffer } from './render/animated.ts';
 import { findAlphaBounds, trimCanvas as trimCanvasShared } from './render/bounds.ts';
 import { computeLogoLayout, type LogoLayout } from './render/layout.ts';
 import {
@@ -25,7 +26,7 @@ import {
   parsePadding as parsePaddingShared,
 } from './render/options.ts';
 
-export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64' | 'svg';
+export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'jpg' | 'base64' | 'svg' | 'gif' | 'apng';
 
 export type PaddingValue = number | string | (number | string)[];
 
@@ -68,7 +69,10 @@ export interface RenderOptions {
   darkMode?: boolean; // 是否开启暗黑模式（默认 false）
   swapColors?: boolean; // 是否对调左右文字颜色（默认 false）
   scale?: number; // 分辨率缩放倍率（默认 1，支持 2x, 3x, 4x 等高清水印与海报分辨率）
-  format?: OutputFormat; // 输出格式（'png' | 'webp' | 'jpeg' | 'jpg' | 'base64'，默认 'png'）
+  format?: OutputFormat; // 输出格式（'png' | 'webp' | 'jpeg' | 'jpg' | 'base64' | 'svg' | 'gif' | 'apng'，默认 'png'）
+  fps?: number; // 动图帧率（针对 gif/apng，默认 24，范围 10~30）
+  duration?: number; // 动图入场时长（针对 gif/apng，秒，默认 1.1，范围 0.4~3.0）
+  holdDuration?: number; // 动图定格时长（针对 gif/apng，秒，默认 1.2，范围 0.2~3.0）
 }
 
 export interface RenderResult {
@@ -144,7 +148,7 @@ function trimCanvas(
 /**
  * 渲染 Blue Archive 基础 Logo
  */
-function drawLogoCanvas(normalized: NormalizedRenderOptions, layout: LogoLayout): Canvas {
+export function drawLogoCanvas(normalized: NormalizedRenderOptions, layout: LogoLayout): Canvas {
   const { textL, textR, primaryColor, secondaryColor } = normalized;
   const haloColor = normalized.haloColor;
   const crossColor = normalized.crossColor;
@@ -504,6 +508,31 @@ export function renderLogoToBuffer(options: RenderOptions = {}): RenderResult {
       get dataUrl() {
         if (cachedDataUrl === undefined) {
           cachedDataUrl = `data:${mimeType};base64,${this.base64}`;
+        }
+        return cachedDataUrl;
+      },
+    };
+  }
+
+  if (format === 'gif' || format === 'apng') {
+    const animRes = renderLogoAnimatedToBuffer(options, format);
+    let cachedBase64: string | undefined;
+    let cachedDataUrl: string | undefined;
+
+    return {
+      buffer: animRes.buffer,
+      mimeType: animRes.mimeType,
+      width: animRes.width,
+      height: animRes.height,
+      get base64() {
+        if (cachedBase64 === undefined) {
+          cachedBase64 = animRes.buffer.toString('base64');
+        }
+        return cachedBase64;
+      },
+      get dataUrl() {
+        if (cachedDataUrl === undefined) {
+          cachedDataUrl = `data:${animRes.mimeType};base64,${this.base64}`;
         }
         return cachedDataUrl;
       },

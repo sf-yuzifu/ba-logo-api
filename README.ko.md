@@ -32,16 +32,19 @@
 | ![Custom Swap](samples/04-custom-color-swap-2x.png) | <picture><source media="(prefers-color-scheme: dark)" srcset="samples/05-transparent-dark-2x.png#gh-dark-mode-only"><source media="(prefers-color-scheme: light)" srcset="samples/05-transparent-2x.png#gh-light-mode-only"><img alt="투명 배경 컷아웃" src="samples/05-transparent-2x.png"></picture> |
 | **표준 한자 (1x, 여백 최적화)** | **4K 인쇄급 초고해상도 (4x)** |
 | ![Standard Chinese](samples/01-default-1x.png) | ![Ultra HD](samples/06-hires-4x.png) |
+| **등장 애니메이션 (GIF, 24fps)** | **공식 영문+일문 부제 애니메이션 (APNG 고화질)** |
+| ![Animated GIF](samples/07-animated-entrance.gif) | ![Animated APNG](samples/08-animated-entrance.png) |
 
 ---
 
 ## ✨ 주요 기능
 
 - ⚡ **압도적인 렌더링 성능**：C++/Rust로 사전 컴파일된 Google Skia 2D 네이티브 엔진을 적용하여, 이미지 1장당 생성 시간이 **8~15ms** 수준에 불과합니다. 기존 헤드리스 브라우저 대비 **150배 이상** 빠릅니다.
+- 🎬 **로고 애니메이션 (GIF & APNG)**: 양쪽 글자가 수평으로 가까워지며 왼쪽은 위에서 아래로, 오른쪽은 아래에서 위로 색이 채워집니다. 십자가는 중심에서 바깥으로 뻗어나가고, 헤일로와 부제목은 왼쪽에서 오른쪽으로 나타납니다. GIF와 무손실 APNG로 내보낼 수 있습니다.
 - 🪶 **초경량 메모리 사용량**：상주 RSS는 약 **30~50 MB**, JS 힙 메모리는 **20 MB** 이하를 유지합니다. 샌드박스 오버헤드가 없어 1코어 1GB 저사양 인스턴스에서도 원활하게 구동됩니다.
 - 🎨 **픽셀 완벽 벡터 그래픽**：헤일로(Halo) 및 십자가(Cross)에 수학적 정밀도를 가진 SVG `Path2D` 벡터 경로를 사용하여, `scale=0.1~8x` 확대 시에도 4K 해상도까지 선명합니다.
 - 🌐 **완벽한 CJK 다국어 폰트**：라틴 문자, 일본어 가나, 한국어 한글, 중국어 간체/번체를 아우르는 통합 글꼴 에셋(**30,000자 이상**)이 내장되어 있습니다.
-- 📦 **다양한 출력 포맷**：`png`, `webp`, `jpeg` 래스터 포맷뿐만 아니라, 외부 글꼴 없이 Figma나 Illustrator에서 바로 편집 가능한 아웃라인 벡터 `svg` 및 JSON `base64`를 직접 제공합니다.
+- 📦 **다양한 출력 포맷**：`png`, `webp`, `jpeg`, 외장 폰트 불필요 아웃라인 벡터 `svg` (Figma / Illustrator 바로 호환), JSON `base64`, 그리고 `gif` / `apng` 움직이는 이미지 지원.
 - 🎛️ **Kivotos HUD 웹 콘솔**：블루 아카이브의 전술 인터페이스 감성을 살린 웹 UI를 내장하여, 실시간 미리보기, 반응형 스티키 뷰포트, 원클릭 공유 기능을 지원합니다.
 - 🔄 **하위 호환성 유지**：표준 RESTful 엔드포인트를 제공하며, 기존 `/balogo` 요청도 HTTP 308 영구 리다이렉션을 통해 자연스럽게 호환됩니다.
 
