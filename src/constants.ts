@@ -7,7 +7,7 @@
 export const BASE_CANVAS_HEIGHT = 250;
 export const BASE_CANVAS_WIDTH = 900;
 export const BASE_FONT_SIZE = 84;
-export const BASE_SUBTITLE_FONT_SIZE = 30;
+export const BASE_SUBTITLE_FONT_SIZE = 24;
 export const TEXT_BASELINE = 0.68;
 export const HORIZONTAL_TILT = -0.4; // 倾斜率（约 -20度倾角）
 export const PADDING_X = 10;

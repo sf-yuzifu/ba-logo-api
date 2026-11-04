@@ -25,6 +25,7 @@ describe('WebUI Frontend Architecture & Logic Tests', () => {
     expect(DEFAULT_STATE.accent).toBe('#128AFA');
     expect(DEFAULT_STATE.textColor).toBe('#2B2B2B');
     expect(DEFAULT_STATE.scale).toBe(2);
+    expect(DEFAULT_STATE.subtitleFontSize).toBe(24);
     expect(DEFAULT_STATE.padding).toBe('2');
     expect(DEFAULT_STATE.format).toBe('png');
     expect(DEFAULT_STATE.transparent).toBe(false);

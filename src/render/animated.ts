@@ -93,13 +93,16 @@ function drawTextSmoothScan(
     ctx.restore();
   }
 
-  // 3. 扫描能量光带（中心亮线）
+  // 3. 扫描能量光带只绘制在文字字形内，避免在文字外留下全宽白线
   if (scanY > topY && scanY < bottomY) {
     ctx.save();
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = '#FFFFFF';
     const bandH = 2 * scale;
-    ctx.fillRect(0, scanY - bandH / 2, 9999, bandH);
+    ctx.beginPath();
+    ctx.rect(0, scanY - bandH / 2, 9999, bandH);
+    ctx.clip();
+    fillTransformedText();
     ctx.restore();
   }
 
@@ -213,11 +216,12 @@ export function drawAnimatedLogoCanvas(
   const textMoveEase = easeOutCubic(textMoveP);
   const textMoveRemain = 1 - textMoveEase;
 
-  const leftDx = -70 * textMoveRemain * scale;
-  const rightDx = 70 * textMoveRemain * scale;
+  // 初始总间距为一个基础字宽，左右文字各向外偏移半个字宽
+  const leftDx = -(BASE_FONT_SIZE / 2) * textMoveRemain * scale;
+  const rightDx = (BASE_FONT_SIZE / 2) * textMoveRemain * scale;
 
-  // 文字 alpha：原视频文字直接以纯白实色出现，无需淡入
-  const textIntroAlpha = 1;
+  // 未着色区域保持 10% 不透明度，完成后恢复实色
+  const textIntroAlpha = scanProgress < 1 ? 0.1 : 1;
 
   // === Phase 3: 十字架延伸，完整展开耗时 0.5 秒 ===
   const crossDuration = Math.min(0.5, Math.max(0.1, actionDuration - 0.55));

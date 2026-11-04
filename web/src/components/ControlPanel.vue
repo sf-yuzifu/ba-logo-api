@@ -263,7 +263,7 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
             @click="resetField('subtitleFontSize')"
             :title="t('label-sub-size')"
           >
-            30 ↺
+            24 ↺
           </button>
         </label>
         <input
@@ -274,7 +274,7 @@ const handleColorPicker = (key: 'crossColor' | 'haloColor', e: Event) => {
           min="12"
           max="96"
           step="1"
-          placeholder="30"
+          placeholder="24"
           @input="handleInput"
         >
       </div>

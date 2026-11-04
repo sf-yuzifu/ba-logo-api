@@ -52,7 +52,7 @@ export function buildLogoUrl(state: Readonly<LogoFormState>, origin = ''): strin
     if (state.subtitleColor) set('subtitleColor', cleanHex(state.subtitleColor));
     if (state.subX !== 0) set('subX', state.subX);
     if (state.subY !== 0) set('subY', state.subY);
-    if (state.subtitleFontSize !== 30) set('subtitleFontSize', state.subtitleFontSize);
+    if (state.subtitleFontSize !== 24) set('subtitleFontSize', state.subtitleFontSize);
   }
 
   const defaultTextColor = state.dark ? '#ffffff' : '#2b2b2b';

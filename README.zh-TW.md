@@ -109,7 +109,7 @@ docker run -d -p 3000:3000 ba-logo-api
 | `left` | `l` | string | `"蔚藍"` | 左側文字（主強調色） |
 | `right` | `r` | string | `"檔案"` | 右側文字（次要顏色） |
 | `subtitle` | `sub` | string | `""` | 可選副標題（右下方斜體對齊） |
-| `subtitleFontSize` | `subSize` | number | `30` | 副標題基礎字級（範圍 `12`–`96`，隨 `scale` 縮放） |
+| `subtitleFontSize` | `subSize` | number | `24` | 副標題基礎字級（範圍 `12`–`96`，隨 `scale` 縮放） |
 | `accentColor` | `accent` | string | `"#128AFA"` | 主強調色（Hex） |
 | `textColor` | `color`, `tc` | string | `"#2B2B2B"` | 主文字顏色（暗黑模式預設為白） |
 | `darkMode` | `dark` | boolean | `false` | 是否開啟暗黑模式 |

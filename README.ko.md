@@ -109,7 +109,7 @@ RESTful 엔드포인트: `GET /api/logo` *(이전 `GET /balogo` 요청도 HTTP 3
 | `left` | `l` | string | `"蔚蓝"` | 좌측 텍스트 (메인 포인트 컬러) |
 | `right` | `r` | string | `"档案"` | 우측 텍스트 (보조 글자 색상) |
 | `subtitle` | `sub` | string | `""` | 우측 하단 기울임 정렬 부제목 |
-| `subtitleFontSize` | `subSize` | number | `30` | 부제목 기본 글자 크기 (`12`–`96`, `scale`에 비례) |
+| `subtitleFontSize` | `subSize` | number | `24` | 부제목 기본 글자 크기 (`12`–`96`, `scale`에 비례) |
 | `accentColor` | `accent` | string | `"#128AFA"` | 메인 포인트 색상 (Hex 코드) |
 | `textColor` | `color`, `tc` | string | `"#2B2B2B"` | 기본 글자 색상 (다크 모드 시 흰색) |
 | `darkMode` | `dark` | boolean | `false` | 다크 모드 활성화 |

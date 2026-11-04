@@ -109,7 +109,7 @@ RESTful エンドポイント：`GET /api/logo` *(旧 `GET /balogo` からも自
 | `left` | `l` | string | `"蔚蓝"` | 左側のテキスト（メインアクセント色） |
 | `right` | `r` | string | `"档案"` | 右側のテキスト（サブ文字色） |
 | `subtitle` | `sub` | string | `""` | 任意のサブタイトル（右下に斜体で整列配置） |
-| `subtitleFontSize` | `subSize` | number | `30` | サブタイトルの基本フォントサイズ（`12`–`96`、`scale` に追従） |
+| `subtitleFontSize` | `subSize` | number | `24` | サブタイトルの基本フォントサイズ（`12`–`96`、`scale` に追従） |
 | `accentColor` | `accent` | string | `"#128AFA"` | メインアクセントカラー（16進数 Hex） |
 | `textColor` | `color`, `tc` | string | `"#2B2B2B"` | 文字色（ダークモード時は白） |
 | `darkMode` | `dark` | boolean | `false` | ダークモードの有効化 |

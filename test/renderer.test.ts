@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { loadImage } from '@napi-rs/canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { computeLogoLayout } from '../src/render/layout.ts';
+import { normalizeRenderOptions } from '../src/render/options.ts';
 import { renderLogo, renderLogoToBuffer } from '../src/renderer.ts';
 
 describe('Renderer Core Unit Tests', () => {
@@ -144,10 +146,74 @@ describe('Renderer Core Unit Tests', () => {
     expect(Math.abs(logo3x.height - logo1x.height * 3)).toBeLessThan(15);
   });
 
+  it('副标题应与右侧主标题的基线右缘对齐，并保留 subX 偏移', () => {
+    const getRightEdges = (canvas: ReturnType<typeof renderLogo>) => {
+      const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+      let title = -1;
+      let subtitle = -1;
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const index = (y * canvas.width + x) * 4;
+          if (pixels[index + 3] < 128) continue;
+          if (pixels[index] === 0 && pixels[index + 1] === 0 && pixels[index + 2] === 0) {
+            title = Math.max(title, x);
+          }
+          if (pixels[index] === 255 && pixels[index + 1] === 255 && pixels[index + 2] === 255) {
+            subtitle = Math.max(subtitle, x);
+          }
+        }
+      }
+      return { title, subtitle };
+    };
+
+    const cases = [
+      { textR: '档案', subtitle: 'ブルーアーカイブ', scale: 1, subtitleOffsetX: 0 },
+      { textR: 'Archive', subtitle: 'BlueArchive', scale: 2, subtitleOffsetX: 0 },
+      { textR: '档案', subtitle: 'BlueArchive', scale: 1, subtitleOffsetX: 0 },
+      { textR: 'Archive', subtitle: 'ブルーアーカイブ', scale: 1, subtitleOffsetX: 0 },
+      { textR: '档案', subtitle: 'ブルーアーカイブ', scale: 1, subtitleOffsetX: 12 },
+    ];
+    const measureContext = createCanvas(1, 1).getContext('2d');
+    for (const options of cases) {
+      const layout = computeLogoLayout(normalizeRenderOptions({ ...options, textL: '' }));
+      measureContext.font = layout.font;
+      const expectedSubtitleRight =
+        layout.textTransformXRight +
+        measureContext.measureText(options.textR).width +
+        (options.subtitleOffsetX - 8) * options.scale;
+      expect(Math.abs(layout.subtitleTransformX - expectedSubtitleRight)).toBeLessThanOrEqual(
+        0.001,
+      );
+
+      const canvas = renderLogo({
+        ...options,
+        textL: '',
+        textColor: '#000000',
+        subtitleColor: '#FFFFFF',
+        haloColor: '#00000000',
+        crossColor: '#00000000',
+        transparent: true,
+        center: false,
+        padding: 0,
+      });
+      const edges = getRightEdges(canvas);
+      expect(edges.title).toBeGreaterThan(0);
+      expect(edges.subtitle).toBeGreaterThan(0);
+      if (options.subtitleOffsetX === 0) {
+        expect(edges.subtitle).toBeLessThanOrEqual(edges.title + 1);
+      }
+    }
+  });
+
   it('副标题字号参数应同时影响位图与 SVG，并保持导出尺寸一致', async () => {
-    const small = renderLogo({ subtitle: 'BlueArchive', subtitleFontSize: 24 });
+    const smallLayout = computeLogoLayout(
+      normalizeRenderOptions({ subtitle: 'BlueArchive', subtitleFontSize: 24 }),
+    );
+    const largeLayout = computeLogoLayout(
+      normalizeRenderOptions({ subtitle: 'BlueArchive', subtitleFontSize: 48 }),
+    );
+    expect(largeLayout.subtitleFontSize).toBeGreaterThan(smallLayout.subtitleFontSize);
     const large = renderLogo({ subtitle: 'BlueArchive', subtitleFontSize: 48 });
-    expect(large.width).toBeGreaterThan(small.width);
 
     const svg = renderLogoToBuffer({
       subtitle: 'BlueArchive',
@@ -216,7 +282,7 @@ describe('Renderer Core Unit Tests', () => {
       subtitleFontSize: 36,
       scale: 2,
     });
-    expect(longSub.width).toBeGreaterThan(1200);
+    expect(longSub.width).toBeGreaterThan(1100);
 
     // 支持副标题独立位置微调 (subX, subY)
     const baseSub = renderLogo({

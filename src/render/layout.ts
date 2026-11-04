@@ -82,6 +82,7 @@ export function computeLogoLayout(options: NormalizedRenderOptions): LogoLayout 
     canvasHeight * TEXT_BASELINE + subtitleFontSize + 5 * scale + options.subtitleOffsetY * scale;
   let subtitleAscent = 26 * scale;
   let subtitleDescent = 6 * scale;
+  let subtitleXRelative = 0;
   let minSubtitleXRelative = 0;
   let maxSubtitleXRelative = 0;
   if (subtitle) {
@@ -91,7 +92,12 @@ export function computeLogoLayout(options: NormalizedRenderOptions): LogoLayout 
       metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent ?? subtitleAscent;
     subtitleDescent =
       metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent ?? subtitleDescent;
-    const subtitleXRelative = textWidthR + subtitleFontSize + options.subtitleOffsetX * scale;
+
+    // 对齐右侧基线 advance 锚点，补偿斜体基线差，并默认向左 8px 做光学微调。
+    subtitleXRelative =
+      rightMetrics.width +
+      HORIZONTAL_TILT * (canvasHeight * TEXT_BASELINE - subY) +
+      (options.subtitleOffsetX - 8) * scale;
     minSubtitleXRelative =
       subtitleXRelative - metrics.width + HORIZONTAL_TILT * (subY + subtitleDescent);
     maxSubtitleXRelative = subtitleXRelative + HORIZONTAL_TILT * (subY - subtitleAscent);
@@ -121,7 +127,7 @@ export function computeLogoLayout(options: NormalizedRenderOptions): LogoLayout 
   const rightTextX = canvasWidthL + halfGap;
   const graphX = rightTextX - canvasHeight / 2 + options.offsetX * scale;
   const graphY = options.offsetY * scale;
-  const subtitleX = rightTextX + textWidthR + subtitleFontSize + options.subtitleOffsetX * scale;
+  const subtitleX = rightTextX + subtitleXRelative;
   const totalCanvasHeight = Math.max(
     canvasHeight,
     subtitle ? Math.ceil(subY + subtitleDescent + margin) : 0,

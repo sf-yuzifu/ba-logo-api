@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import type { Canvas } from '@napi-rs/canvas';
 import { createApp } from '../src/app.ts';
+import { BASE_FONT_SIZE } from '../src/constants.ts';
 import { loadFonts } from '../src/font.ts';
 import { drawAnimatedLogoCanvas, renderLogoAnimatedToBuffer } from '../src/render/animated.ts';
 import { computeLogoLayout } from '../src/render/layout.ts';
 import { normalizeRenderOptions } from '../src/render/options.ts';
 
-function pixelBounds(canvas: Canvas, color?: readonly number[]) {
+function pixelBounds(canvas: Canvas, color?: readonly number[], alphaThreshold = 64) {
   const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
   let minX = canvas.width;
   let maxX = -1;
@@ -16,7 +17,7 @@ function pixelBounds(canvas: Canvas, color?: readonly number[]) {
   for (let y = 0; y < canvas.height; y++) {
     for (let x = 0; x < canvas.width; x++) {
       const index = (y * canvas.width + x) * 4;
-      if (pixels[index + 3] < 64) continue;
+      if (pixels[index + 3] < alphaThreshold) continue;
       if (color?.some((channel, offset) => Math.abs(pixels[index + offset] - channel) > 2)) {
         continue;
       }
@@ -102,13 +103,95 @@ describe('文字水平入场与反向着色', () => {
   }
 });
 
+describe('标题初始间距', () => {
+  it('左右文字应各向外偏移半个基础字宽，总间距为一个字宽', () => {
+    loadFonts();
+    for (const side of ['left', 'right'] as const) {
+      const options = normalizeRenderOptions({
+        textL: side === 'left' ? '蔚' : '',
+        textR: side === 'right' ? '档' : '',
+        haloColor: '#00000000',
+        crossColor: '#00000000',
+        transparent: true,
+      });
+      const layout = computeLogoLayout(options);
+      const initial = pixelBounds(drawAnimatedLogoCanvas(options, layout, 0), undefined, 1);
+      const settled = pixelBounds(drawAnimatedLogoCanvas(options, layout, 0.5), undefined, 1);
+      const displacement =
+        side === 'left' ? settled.maxX - initial.maxX : initial.minX - settled.minX;
+      expect(Math.abs(displacement - BASE_FONT_SIZE / 2)).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+describe('浅色文字着色可见性', () => {
+  it('右侧白色文字应通过不透明度变化呈现自下而上的着色效果', () => {
+    loadFonts();
+    const options = normalizeRenderOptions({
+      textL: '',
+      textR: '档案',
+      textColor: '#FFFFFF',
+      darkMode: true,
+      transparent: true,
+    });
+    const layout = computeLogoLayout(options);
+    const opacityCounts = (canvas: Canvas) => {
+      const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+      let faint = 0;
+      let solid = 0;
+      for (let i = 0; i < pixels.length; i += 4) {
+        const alpha = pixels[i + 3];
+        if (alpha >= 16 && alpha <= 64) faint++;
+        if (alpha >= 250) solid++;
+      }
+      return { faint, solid };
+    };
+
+    const middle = opacityCounts(drawAnimatedLogoCanvas(options, layout, 0.15));
+    const late = opacityCounts(drawAnimatedLogoCanvas(options, layout, 0.22));
+    expect(middle.faint).toBeGreaterThan(500);
+    expect(middle.solid).toBeGreaterThan(100);
+    expect(late.solid).toBeGreaterThan(middle.solid);
+  });
+});
+
+describe('文字扫描高光边界', () => {
+  for (const text of ['蔚蓝', 'HHH']) {
+    it(`${text} 着色时不应在文字外的透明画布边缘留下白线`, () => {
+      loadFonts();
+      const options = normalizeRenderOptions({
+        textL: text,
+        textR: '',
+        accentColor: '#FFC300',
+        textColor: '#FFFFFF',
+        darkMode: true,
+        transparent: true,
+      });
+      const layout = computeLogoLayout(options);
+      const canvas = drawAnimatedLogoCanvas(options, layout, 0.15);
+      const { width, height } = canvas;
+      const pixels = canvas.getContext('2d').getImageData(0, 0, width, height).data;
+      let edgePixelCount = 0;
+
+      // 任意背景下，文字外的左右边缘都必须保持完全透明。
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < 4; x++) {
+          if (pixels[(y * width + x) * 4 + 3] !== 0) edgePixelCount++;
+          if (pixels[(y * width + width - 1 - x) * 4 + 3] !== 0) edgePixelCount++;
+        }
+      }
+      expect(edgePixelCount).toBe(0);
+    });
+  }
+});
+
 describe('副标题横向揭示与十字同步', () => {
   it('应仅以最终颜色从左向右揭示，并与十字在同一帧完成', () => {
     loadFonts();
     const options = normalizeRenderOptions({
       textL: '',
       textR: '',
-      subtitle: 'HHHH',
+      subtitle: 'HHHHHHHH',
       subtitleColor: '#2B2B2B',
       haloColor: '#00000000',
       crossColor: '#00000000',

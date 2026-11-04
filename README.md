@@ -109,7 +109,7 @@ Modern RESTful endpoint: `GET /api/logo` *(Legacy `GET /balogo` automatically re
 | `left` | `l` | string | `"蔚蓝"` | Left text (primary accent color) |
 | `right` | `r` | string | `"档案"` | Right text (secondary text color) |
 | `subtitle` | `sub` | string | `""` | Optional italicized subtitle aligned at the bottom right |
-| `subtitleFontSize` | `subSize` | number | `30` | Base subtitle font size (`12`–`96`, scales with `scale`) |
+| `subtitleFontSize` | `subSize` | number | `24` | Base subtitle font size (`12`–`96`, scales with `scale`) |
 | `accentColor` | `accent` | string | `"#128AFA"` | Primary brand accent color (Hex) |
 | `textColor` | `color`, `tc` | string | `"#2B2B2B"` | Main text color (white in dark mode) |
 | `darkMode` | `dark` | boolean | `false` | Enable dark theme with inverted colors |

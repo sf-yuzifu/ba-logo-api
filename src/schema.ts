@@ -77,10 +77,10 @@ export const LogoQuerySchema = t.Object({
 
   subtitleFontSize: t.Optional(
     t.Numeric({
-      description: '副标题基础字号（默认 30，范围 12~96，随 scale 缩放）',
+      description: '副标题基础字号（默认 24，范围 12~96，随 scale 缩放）',
       minimum: 12,
       maximum: 96,
-      examples: [30, 36, 48],
+      examples: [24, 30, 48],
     }),
   ),
   subSize: alias(
